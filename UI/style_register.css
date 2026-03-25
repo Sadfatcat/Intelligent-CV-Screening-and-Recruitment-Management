@@ -75,11 +75,11 @@ body {
 }
 #registerform input:focus {
     outline:none;
-    border-color: #2b90ca;
+    border-color: #00AE72;
     box-shadow: 0 0 0 4px rgba(43,144,202,0.2);
 }
 #registerform input:hover {
-    border-color: #FF4500;
+    border-color: #00AE72;
 }
 #registerform button {
     padding : 2px;
@@ -91,5 +91,14 @@ body {
     color: #fff;
     font-size: 15px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.5s ease, scale 0.5s ease;
+    scale :1.02;
+}
+#registerform button:hover {
+    background-color: #4B3B7A;
+}
+#registerform h1 {
+    font-size: 50px;
+    color: #333;
+    margin-bottom: 15px;
 }
