@@ -23,4 +23,5 @@ form.addEventListener('submit', function(e) {
         return;
     }
     alert ('Login successful!');
-}
+    }
+)
