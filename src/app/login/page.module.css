@@ -1,0 +1,89 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(150deg, #fffafa 15%, #79378b 100%);
+  font-family: "Poppins", sans-serif;
+}
+
+.login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.loginForm h1 {
+  font-size: 50px;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.loginForm input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 18px;
+  font-size: 15px;
+}
+
+.loginForm input::placeholder {
+  color: #000000;
+  opacity: 0.6;
+}
+
+.loginForm input:focus {
+  outline: none;
+  border-color: #00ae72;
+  box-shadow: 0 0 0 4px rgba(43, 144, 202, 0.2);
+}
+
+.loginForm button {
+  padding: 10px;
+  width: 100%;
+  border: none;
+  border-radius: 40px;
+  background-color: #00ae72;
+  color: #fff;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.5s ease, transform 0.5s ease;
+}
+
+.loginForm button:hover {
+  background-color: #01724a;
+  transform: scale(1.02);
+}
+
+.error {
+  color: red;
+  font-size: 12px;
+  min-height: 16px;
+}
+
+.success {
+  color: green;
+  font-size: 12px;
+  min-height: 16px;
+}
+
+.linkText {
+  font-size: 14px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.linkText a {
+  color: #00ae72;
+  font-weight: 600;
+}
