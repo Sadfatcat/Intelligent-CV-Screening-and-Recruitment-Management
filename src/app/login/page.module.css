@@ -3,17 +3,33 @@
 .container {
   min-height: 100vh;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(150deg, #fffafa 15%, #79378b 100%);
+  flex-direction: row;
+  gap: 20px;
+  padding: 20px;
+  background: linear-gradient(150deg, #fffafa 0%, #009298 100%);
   font-family: "Poppins", sans-serif;
 }
 
-.login {
+.board {
+  flex: 6;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
+  /* background-color: rgba(255, 255, 255, 0.8); */
+  border-radius: 20px;
+  padding: 40px;
+  min-height: 400px;
+}
+
+.login {
+  flex: 4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* background-color: rgba(255, 255, 255, 0.8); */
+  border-radius: 20px;
+  padding: 40px;
+  min-height: 400px;
 }
 
 .loginForm {
@@ -86,4 +102,7 @@
 .linkText a {
   color: #00ae72;
   font-weight: 600;
+}
+
+.content {
 }

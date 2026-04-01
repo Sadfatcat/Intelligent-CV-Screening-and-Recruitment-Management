@@ -5,7 +5,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(150deg, #fffafa 15%, #79378b 100%);
+  background: linear-gradient(150deg, #fffafa 0%, #79378b 100%);
   font-family: "Poppins", sans-serif;
 }
 
@@ -35,10 +35,12 @@
   border: 1px solid #ccc;
   border-radius: 18px;
   font-size: 15px;
+  background-color: white , opacity: 0.8;;
+  gap : 15px;
 }
 
 .registerForm input::placeholder {
-  color: #000000;
+  color: #797777;
   opacity: 0.6;
 }
 
