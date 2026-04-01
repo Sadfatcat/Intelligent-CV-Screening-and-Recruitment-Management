@@ -3,12 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
+import { registerHandler }  from "@/utils/registerHandler";
 
 export default function RegisterRecruiterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [companyName, setCompanyName] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [resultMessage, setResultMessage] = useState("");
@@ -18,7 +18,7 @@ export default function RegisterRecruiterPage() {
     e.preventDefault();
 
     // Basic validation
-    if (!email || !password || !confirmPassword || !companyName) {
+    if (!email || !password || !confirmPassword ) {
       setResultMessage("All fields are required");
       setResultType("error");
       return;
@@ -37,21 +37,20 @@ export default function RegisterRecruiterPage() {
     setEmail("");
     setPassword("");
     setConfirmPassword("");
-    setCompanyName("");
+    // setCompanyName("");
   }
-
   return (
     <div className={styles.container}>
       <div className={styles.register}>
         <form className={styles.registerForm} onSubmit={handleSubmit}>
           <h1>Register as Recruiter</h1>
 
-          <input
+          {/* <input
             type="text"
             placeholder="Company Name"
             value={companyName}
             onChange={(e) => setCompanyName(e.target.value)}
-          />
+          /> */}
 
           <input
             type="email"
@@ -59,7 +58,6 @@ export default function RegisterRecruiterPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          <div className={styles.error}>{emailError}</div>
 
           <input
             type="password"
@@ -74,6 +72,7 @@ export default function RegisterRecruiterPage() {
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
+          <div className={styles.error}>{emailError}</div>
           <div className={styles.error}>{passwordError}</div>
 
           <div

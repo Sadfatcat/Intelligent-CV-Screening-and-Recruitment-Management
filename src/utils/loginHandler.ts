@@ -27,6 +27,8 @@ export function validateEmail(email: string): string | null {
   }
   return null;
 }
+//Kiểm tra password: ít nhất 6 ký tự, bao gồm cả chữ và số
+const Password_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
 
 export function validatePassword(password: string): string | null {
   if (password.trim() === "") {
@@ -37,6 +39,10 @@ export function validatePassword(password: string): string | null {
   if (password.length < 6) {
     return "Please enter a password with at least 6 characters.";
   }
+  if (!Password_REGEX.test(password)) {
+    return "Password must contain at least one letter and one number.";
+  }
+  return null;
 }
 
 export function handleLoginSubmit(
