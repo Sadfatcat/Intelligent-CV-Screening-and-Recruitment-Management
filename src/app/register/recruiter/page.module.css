@@ -35,7 +35,8 @@
   border: 1px solid #ccc;
   border-radius: 18px;
   font-size: 15px;
-  background-color: white , opacity: 0.8;;
+  background-color: white;
+  opacity: 0.8;
   gap : 15px;
 }
 
@@ -86,6 +87,6 @@
 }
 
 .linkText a {
-  color: #00ae72;
+  color: #1B4F93;
   font-weight: 600;
 }

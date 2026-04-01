@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
 import { handleLoginSubmit } from "@/utils/loginHandler";
+import Image from "next/image";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -29,7 +30,9 @@ export default function LoginPage() {
   return (
     <div className={styles.container}>
       <div className={styles.board}>
-        <p className={styles.content}>Welcome Back!</p>
+        <div className={styles.content}>
+          <Image src = "/fintlogo.png" width={400} height={400} />
+        </div>
       </div>
       <div className={styles.login}>
         <form className={styles.loginForm} onSubmit={handleSubmit}>

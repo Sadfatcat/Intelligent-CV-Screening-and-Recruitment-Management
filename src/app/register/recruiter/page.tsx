@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import styles from "./page.module.css";
-import { registerHandler }  from "@/utils/registerHandler";
+// import { registerHandler }  from "@/utils/registerHandler";
 
 export default function RegisterRecruiterPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -38,6 +40,11 @@ export default function RegisterRecruiterPage() {
     setPassword("");
     setConfirmPassword("");
     // setCompanyName("");
+
+    // Redirect to login page after 2 seconds
+    setTimeout(() => {
+      router.push("/login");
+    }, 1500);
   }
   return (
     <div className={styles.container}>
