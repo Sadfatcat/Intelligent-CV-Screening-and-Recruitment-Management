@@ -27,4 +27,82 @@ export function validateEmail(email: string) : string | null {
     if (!EMAIL_REGEX.test(email)) {
         return ("Please enter a valid email address.");
     }
+    return null;
+}
+
+const Password_Regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+
+export function validatePassword(password: string): string | null {
+    if (password.trim() === "") {
+        return "Please enter your password";
+    }
+    if (!Password_Regex.test(password)) {
+        return "Password must have at least 6 characters, 1 uppercase character and 1 number";
+    }
+    return null;
+}
+
+export function validateConfirmPassword(password: string, confirmPassword: string): string | null {
+    if (confirmPassword.trim() === "") {
+        return "Please confirm your password";
+    }
+    if (password !== confirmPassword) {
+        return "Passwords do not match";
+    }
+    return null;
+}
+
+export function handleRegisterSubmit(
+    e: React.FormEvent<HTMLFormElement>,
+    formData: RegisterStage,
+    setters: SetterType,
+    onSuccess?: () => void
+): boolean {
+    e.preventDefault();
+
+    // Clear previous errors
+    setters.setEmailError("");
+    setters.setPasswordError("");
+    setters.setResultMessage("");
+    setters.setResultType("");
+
+    // Validate email
+    const emailError = validateEmail(formData.email);
+    if (emailError) {
+        setters.setEmailError(emailError);
+        setters.setResultMessage(emailError);
+        setters.setResultType("error");
+        return false;
+    }
+
+    // Validate password
+    const passwordError = validatePassword(formData.password);
+    if (passwordError) {
+        setters.setPasswordError(passwordError);
+        setters.setResultMessage(passwordError);
+        setters.setResultType("error");
+        return false;
+    }
+
+    // Validate confirm password
+    const confirmError = validateConfirmPassword(formData.password, formData.confirmPassword);
+    if (confirmError) {
+        setters.setPasswordError(confirmError);
+        setters.setResultMessage(confirmError);
+        setters.setResultType("error");
+        return false;
+    }
+
+    // All validations passed
+    setters.setResultMessage("Registration successful!");
+    setters.setResultType("success");
+    setters.setEmail("");
+    setters.setPassword("");
+    setters.setConfirmPassword("");
+
+    if (onSuccess) {
+        onSuccess();
+    }
+
+    return true;
 }

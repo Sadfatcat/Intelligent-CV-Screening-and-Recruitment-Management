@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import styles from "./page.module.css";
-// import { registerHandler }  from "@/utils/registerHandler";
+import { handleRegisterSubmit } from "@/utils/registerHandler";
 
 export default function RegisterRecruiterPage() {
   const router = useRouter();
@@ -17,47 +17,31 @@ export default function RegisterRecruiterPage() {
   const [resultType, setResultType] = useState<"success" | "error" | "">("");
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-
-    // Basic validation
-    if (!email || !password || !confirmPassword ) {
-      setResultMessage("All fields are required");
-      setResultType("error");
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setPasswordError("Passwords do not match");
-      setResultMessage("Please check your password");
-      setResultType("error");
-      return;
-    }
-
-    // Success message for now (until backend is ready)
-    setResultMessage("Registration successful!");
-    setResultType("success");
-    setEmail("");
-    setPassword("");
-    setConfirmPassword("");
-    // setCompanyName("");
-
-    // Redirect to login page after 2 seconds
-    setTimeout(() => {
-      router.push("/login");
-    }, 1500);
+    const success = handleRegisterSubmit(
+      e,
+      { email, password, confirmPassword, emailError, passwordError, resultMessage, resultType },
+      {
+        setEmail,
+        setPassword,
+        setConfirmPassword,
+        setEmailError,
+        setPasswordError,
+        setResultMessage,
+        setResultType,
+      },
+      () => {
+        // Redirect to login page after 2 seconds
+        setTimeout(() => {
+          router.push("/login");
+        }, 1500);
+      }
+    );
   }
   return (
     <div className={styles.container}>
       <div className={styles.register}>
         <form className={styles.registerForm} onSubmit={handleSubmit}>
           <h1>Register as Recruiter</h1>
-
-          {/* <input
-            type="text"
-            placeholder="Company Name"
-            value={companyName}
-            onChange={(e) => setCompanyName(e.target.value)}
-          /> */}
 
           <input
             type="email"

@@ -31,7 +31,7 @@ export default function LoginPage() {
     <div className={styles.container}>
       <div className={styles.board}>
         <div className={styles.content}>
-          <Image src = "/fintlogo.png" width={400} height={400} />
+          <Image src = "/fintlogo.png" width={600} height={600}  />
         </div>
       </div>
       <div className={styles.login}>

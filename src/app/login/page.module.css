@@ -6,7 +6,7 @@
   flex-direction: row;
   gap: 20px;
   padding: 20px;
-  background: linear-gradient(150deg, #fffafa 0%, #009298 100%);
+  background: linear-gradient(200deg, #fffafa 0%, #009298 100%);
   font-family: "Poppins", sans-serif;
 }
 
@@ -106,4 +106,8 @@
 }
 
 .content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 50px;
 }
