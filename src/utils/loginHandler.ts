@@ -35,7 +35,7 @@ export function validatePassword(password: string): string | null {
     return "Please enter your password.";
   }
   return null;
-  
+
   if (password.length < 6) {
     return "Please enter a password with at least 6 characters.";
   }
@@ -73,7 +73,7 @@ export function handleLoginSubmit(
   }
 
   // Kiểm tra localStorage
-  const savedRecruiter = localStorage.getItem("recruiter");
+  const savedRecruiter = localStorage.getItem("savedRecruiter");
 
   if (!savedRecruiter) {
     setters.setResultMessage(

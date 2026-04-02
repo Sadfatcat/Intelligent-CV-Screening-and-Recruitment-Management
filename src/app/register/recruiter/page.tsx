@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import styles from "./page.module.css";
 import { handleRegisterSubmit } from "@/utils/registerHandler";
+import Navbar from "@/components/navbar/Navbar";
+import ImageSlider from "@/components/ImageSlider";
 
 export default function RegisterRecruiterPage() {
   const router = useRouter();
@@ -38,49 +40,55 @@ export default function RegisterRecruiterPage() {
     );
   }
   return (
-    <div className={styles.container}>
-      <div className={styles.register}>
-        <form className={styles.registerForm} onSubmit={handleSubmit}>
-          <h1>Register as Recruiter</h1>
+    <>
+      <Navbar />
+      <div className={styles.container}>
+        <div className={styles.register}>
+          <form className={styles.registerForm} onSubmit={handleSubmit}>
+            <h1>Register</h1>
 
-          <input
-            type="email"
-            placeholder="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+            <input
+              type="email"
+              placeholder="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
 
-          <input
-            type="password"
-            placeholder="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+            <input
+              type="password"
+              placeholder="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
 
-          <input
-            type="password"
-            placeholder="confirm password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-          />
-          <div className={styles.error}>{emailError}</div>
-          <div className={styles.error}>{passwordError}</div>
+            <input
+              type="password"
+              placeholder="confirm password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+            <div className={styles.error}>{emailError}</div>
+            <div className={styles.error}>{passwordError}</div>
 
-          <div
-            className={
-              resultType === "success" ? styles.success : styles.error
-            }
-          >
-            {resultMessage}
-          </div>
+            <div
+              className={
+                resultType === "success" ? styles.success : styles.error
+              }
+            >
+              {resultMessage}
+            </div>
 
-          <button type="submit">register</button>
+            <button type="submit">register</button>
 
-          <p className={styles.linkText}>
-            Already have an account? <Link href="/login">Login here</Link>
-          </p>
-        </form>
+            <p className={styles.linkText}>
+              Already have an account? <Link href="/login">Login here</Link>
+            </p>
+          </form>
+        </div>
+        <div className={styles.rightside}>
+          <ImageSlider />
+        </div>
       </div>
-    </div>
+    </>
   );
 }

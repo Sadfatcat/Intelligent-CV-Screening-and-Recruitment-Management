@@ -10,6 +10,7 @@
 }
 
 .register {
+  flex: 4;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -37,7 +38,7 @@
   font-size: 15px;
   background-color: white;
   opacity: 0.8;
-  gap : 15px;
+  gap: 15px;
 }
 
 .registerForm input::placeholder {
@@ -89,4 +90,12 @@
 .linkText a {
   color: #1B4F93;
   font-weight: 600;
+}
+
+.container.rightside {
+  flex: 6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 40px 40px 60px;
 }
