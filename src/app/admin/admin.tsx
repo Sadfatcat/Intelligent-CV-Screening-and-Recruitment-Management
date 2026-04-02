@@ -15,8 +15,8 @@ export default function AdminPage() {
 
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-    
-        handleAdminLogin (username, password, {
+
+        handleAdminLogin(username, password, {
             setUsername,
             setPassword,
             setUsernameError,
@@ -32,13 +32,13 @@ export default function AdminPage() {
                 <form className={styles.adminForm} onSubmit={handleSubmit}>
                     <h1>Admin Login</h1>
                     <input
-                        type = "text"
-                        placeholder = "username"
-                        value = {username}
-                        onChange= {(e) => setUsername(e.target.value)}
+                        type="text"
+                        placeholder="username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                     />
                     <input
-                        type = "password"
-                        placeholder = "password"
-                        value = {password}
-                        onChange = {(e)} => setPassword(e)
+                        type="password"
+                        placeholder="password"
+                        value={password}
+                        onChange={(e)} => setPassword(e.target.value)}
