@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect }  from "react";
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 import { handleLoginSubmit } from "@/utils/loginHandler";
 import Navbar from "@/components/navbar/Navbar";
-import ImageSlider from "@/components/ImageSlider";
-import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -16,21 +16,25 @@ export default function LoginPage() {
   const [passwordError, setPasswordError] = useState("");
   const [resultMessage, setResultMessage] = useState("");
   const [resultType, setResultType] = useState<"success" | "error" | "">("");
+  const [countdown, setCountdown] = useState<number | null>(null);
 
   useEffect(() => {
-    const savedEmail = localStorage.getItem("registeredEmail");
-    const savedPassword = localStorage.getItem("registeredPassword");
-    if (savedEmail) setEmail(savedEmail);
-    if (savedPassword) setPassword(savedPassword);
-  }, []);
+    if (countdown === null) return;
 
-  setTimeout(() => {
-    router.push("/recruiter_UI");
-  }, 2000);
+    if (countdown > 0) {
+      const timer = setTimeout(() => {
+        setCountdown(countdown - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else {
+      router.push("/recruiter_UI");
+    }
+  }, [countdown, router]);
+
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    handleLoginSubmit(email, password, {
+    const isSuccess = handleLoginSubmit(email, password, {
       setEmail,
       setPassword,
       setEmailError,
@@ -38,54 +42,65 @@ export default function LoginPage() {
       setResultMessage,
       setResultType,
     });
+
+    if (isSuccess) {
+      setCountdown(3);
+    }
   }
 
   return (
-    <>
-      <Navbar />
-      <div className={styles.container}>
-        <div className={styles.board}>
-          <div className={styles.content}>
-            <ImageSlider />
-          </div>
+    <div className={styles.container}>
+      <div className={styles.navbar}>
+          <Navbar />
         </div>
-        <div className={styles.login}>
-          <form className={styles.loginForm} onSubmit={handleSubmit}>
-            <h1>Login</h1>
-
-            <input
-              type="email"
-              placeholder="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <div className={styles.error}>{emailError}</div>
-
-            <input
-              type="password"
-              placeholder="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <div className={styles.error}>{passwordError}</div>
-
-            <div
-              className={
-                resultType === "success" ? styles.success : styles.error
-              }
-            >
-              {resultMessage}
-            </div>
-
-            <button type="submit">login</button>
-
-            <p className={styles.linkText}>
-              Don&apos;t have an account?{" "}
-              <Link href="/register/recruiter">Register here</Link>
-            </p>
-          </form>
+      <div className={styles.board}>
+        <div className={styles.content}>
+          <img src = "/fintlogo.png" width={600} height={600}  />
         </div>
       </div>
-    </>
+      <div className={styles.login}>
+        <form className={styles.loginForm} onSubmit={handleSubmit}>
+          <h1>Login</h1>
+
+          <input
+            type="email"
+            placeholder="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <div className={styles.error}>{emailError}</div>
+
+          <input
+            type="password"
+            placeholder="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <div className={styles.error}>{passwordError}</div>
+
+          <div
+            className={
+              resultType === "success" ? styles.success : styles.error
+            }
+          >
+            {resultMessage}
+            {countdown !== null && resultType === "success" && (
+              <span style={{ display: "block", marginTop: "8px", fontWeight: "bold" }}>
+                Page switch after {countdown}...
+              </span>
+            )}
+          </div>
+
+          <button type="submit" disabled={countdown !== null}>
+            {countdown !== null ? "Loading..." : "login"}
+          </button>
+
+          <p className={styles.linkText}>
+            Don&apos;t have an account?{" "}
+            <Link href="/register/recruiter">Register here</Link>
+          </p>
+        </form>
+      </div>
+    </div>
   );
 }

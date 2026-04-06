@@ -5,9 +5,9 @@ import { useEffect } from "react";
 import Image from "next/image";
 
 const images = [
-    "/test1.png",
-    "/test2.png",
-    // "/fintlogo.png",
+    "/nghich1.png",
+    "/usth1.png",
+    "/usthquote.png",
 ];
 
 export default function ImageSlider() {
@@ -18,7 +18,7 @@ export default function ImageSlider() {
             setCurrentIndex((prev) =>
                 prev === images.length - 1 ? 0 : prev + 1
             );
-        }, 10000);
+        }, 5000);
 
         return () => clearInterval(interval);
     }, []);
@@ -42,18 +42,28 @@ export default function ImageSlider() {
     return (
         <div style={styles.wrapper}>
             <div style={styles.slider}>
-                <img
-                    src={images[currentIndex]}
-                    alt={`Slide ${currentIndex + 1}`}
-                    style={styles.image}
-                />
+                <div
+                    style={{
+                        ...styles.imageTrack,
+                        transform: `translateX(-${currentIndex * 100}%)`,
+                    }}
+                >
+                    {images.map((src, index) => (
+                        <img
+                            key={index}
+                            src={src}
+                            alt={`Slide ${index + 1}`}
+                            style={styles.image}
+                        />
+                    ))}
+                </div>
 
                 <button onClick={handlePrev} style={styles.prevButton}>
-
+                    &#10094;
                 </button>
 
                 <button onClick={handleNext} style={styles.nextButton}>
-
+                    &#10095;
                 </button>
             </div>
 
@@ -76,66 +86,46 @@ export default function ImageSlider() {
 const styles: Record<string, React.CSSProperties> = {
     wrapper: {
         width: "100%",
-        maxWidth: "700px",
-        margin: "40px auto",
-        padding: "0 24px",
-        boxSizing: "border-box",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: "16px",
+        position: "relative",
+        padding: "20px",
+        boxSizing: "border-box",
     },
     slider: {
         position: "relative",
         width: "100%",
-        height: "420px",
         overflow: "hidden",
-        borderRadius: "16px",
+        borderLeft: "2px solid rgba(255, 255, 255, 0.3)", // Thêm border cho đẹp
+        boxShadow: "-4px 0 15px rgba(0,0,0,0.1)", // Hiệu ứng nổi nhẹ
+    },
+    imageTrack: {
+        display: "flex",
+        width: "100%",
+        transition: "transform 0.8s ease-in-out", // Hiệu ứng trượt ngang mượt mà
     },
     image: {
+        flex: "0 0 100%", // Mỗi ảnh chỉ rộng đúng 100% không gian
         width: "100%",
-        height: "100%",
-        objectFit: "contain",
-        display: "block",
-        borderRadius: "16px",
+        aspectRatio: "9/16", // Hoặc một tỷ lệ thích hợp cho thiết kế (ví dụ "4/3")
+        objectFit: "cover", // Lấp đầy khung hình mà không để lại khoảng trắng
     },
     prevButton: {
-        position: "absolute",
-        top: "50%",
-        left: "10px",
-        transform: "translateY(-50%)",
-        backgroundColor: "rgba(0,0,0,0.5)",
-        color: "#fff",
-        border: "none",
-        padding: "10px 12px",
-        borderRadius: "50%",
-        cursor: "pointer",
-        fontSize: "30px",
-        opacity: 0.2,
+        display: "none",
     },
     nextButton: {
-        position: "absolute",
-        top: "50%",
-        right: "10px",
-        transform: "translateY(-50%)",
-        backgroundColor: "rgba(0,0,0,0.5)",
-        color: "#fff",
-        border: "none",
-        padding: "10px 14px",
-        borderRadius: "50%",
-        cursor: "pointer",
-        fontSize: "18px",
-        opacity: 0.2,
+        display: "none",
     },
     dotsContainer: {
-        display: "flex",
-        gap: "10px",
+        display: "none",
     },
     dot: {
-        width: "6px",
-        height: "6px",
+        width: "12px",
+        height: "12px",
         borderRadius: "50%",
         border: "none",
         cursor: "pointer",
+        transition: "background-color 0.3s ease",
     },
 };

@@ -32,8 +32,17 @@
 
 .text {
     margin: 0 0 6px 0;
+    color: #444;
 }
 
 .description {
     margin: 0;
+    color: #555;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.label {
+    font-weight: 600;
+    color: #00888e;
 }

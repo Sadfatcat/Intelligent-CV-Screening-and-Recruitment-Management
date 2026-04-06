@@ -6,9 +6,8 @@ import { usePathname } from "next/navigation";
 
 const navItems = [
     { label: "About Us", href: "https://fint.vn/vi/ve-chung-toi" },
-    //   { label: "Home", href: "/login" },
-    //   { label: "Register", href: "/register/recruiter" },
-    // { label: "Admin", href: "/admin" },
+    { label: "Jobs", href:"/recruiter_UI" },
+    { label: "Contact", href: "https://fint.vn/vi/lien-he" },
 ];
 
 export default function Navbar() {
@@ -17,9 +16,9 @@ export default function Navbar() {
     return (
         <nav style={styles.navbar}>
             <div style={styles.container}>
-                <Link href="https://fint.vn/vi" style={styles.logo}>
-                    FINT VietNam
-                </Link>
+                <a style={styles.logo}>
+                    CV Screening
+                </a>
 
                 <div style={styles.links}>
                     {navItems.map((item) => {
@@ -50,7 +49,6 @@ const styles: Record<string, React.CSSProperties> = {
         height: "70px",
         position: "fixed",
         top: 0,
-        left: 0,
         zIndex: 1000,
         backgroundColor: "rgba(255, 255, 255, 0.2)",
         backdropFilter: "blur(10px)",
@@ -90,7 +88,7 @@ const styles: Record<string, React.CSSProperties> = {
         transition: "0.2s ease",
     },
     activeLink: {
-        backgroundColor: "#2563eb",
+        backgroundColor: "#C82E31",
         color: "#ffffff",
     },
 };

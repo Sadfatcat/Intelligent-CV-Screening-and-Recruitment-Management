@@ -17,9 +17,9 @@ export default function Navbar() {
   return (
     <nav style={styles.navbar}>
       <div style={styles.container}>
-        <Link href="https://fint.vn/vi" style={styles.logo}>
-          FINT VietNam
-        </Link>
+        <a style={styles.logo}>
+          CV Screening
+        </a>
 
         <div style={styles.links}>
           {navItems.map((item) => {
@@ -47,7 +47,8 @@ export default function Navbar() {
 const styles: Record<string, React.CSSProperties> = {
   navbar: {
     width: "100%",
-    position: "absolute",
+    height: "70px",
+    position: "fixed",
     top: 0,
     zIndex: 1000,
     backgroundColor: "rgba(255, 255, 255, 0.2)",
@@ -88,7 +89,7 @@ const styles: Record<string, React.CSSProperties> = {
     transition: "0.2s ease",
   },
   activeLink: {
-    backgroundColor: "#2563eb",
+    backgroundColor: "#C82E31",
     color: "#ffffff",
   },
 };
