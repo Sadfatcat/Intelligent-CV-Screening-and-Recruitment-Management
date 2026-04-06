@@ -39,14 +39,20 @@ export default function JobCard({
             <h3 className={styles.title}>{job.title}</h3>
 
             <p className={styles.text}>
-                {job.level} - {job.location}
+                <span className={styles.label}>Level:</span> {job.level} - <span className={styles.label}>Location:</span> {job.location}
             </p>
 
-            <p className={styles.text}>Deadline: {job.deadline}</p>
+            <p className={styles.text}>
+                <span className={styles.label}>Deadline:</span> {job.deadline}
+            </p>
 
-            <p className={styles.text}>Quantity: {job.quantity}</p>
+            <p className={styles.text}>
+                <span className={styles.label}>Quantity:</span> {job.quantity}
+            </p>
 
-            <p className={styles.description}>Description: {job.description}</p>
+            <p className={styles.description}>
+                <span className={styles.label}>Description:</span> {job.description}
+            </p>
         </div>
     );
 }

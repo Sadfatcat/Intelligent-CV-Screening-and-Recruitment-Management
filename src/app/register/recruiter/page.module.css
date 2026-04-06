@@ -1,20 +1,22 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 
 .container {
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   display: flex;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(200deg, #fffafa 0%, #79378b 100%);
+  background: linear-gradient(200deg, #9b999942 0%, #009298 100%);
   font-family: "Poppins", sans-serif;
 }
 
 .register {
   flex: 4;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
   backdrop-filter: blur(16px);
 }
 
@@ -97,10 +99,12 @@
   font-weight: 600;
 }
 
-.container.rightside {
+.rightside {
   flex: 6;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 40px 40px 40px 60px;
+  min-width: 0; /* Ngăn container flex phình to theo content ảnh */
+  overflow: hidden;
 }
