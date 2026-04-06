@@ -47,8 +47,10 @@ export default function Navbar() {
 const styles: Record<string, React.CSSProperties> = {
     navbar: {
         width: "100%",
-        position: "absolute",
+        height: "70px",
+        position: "fixed",
         top: 0,
+        left: 0,
         zIndex: 1000,
         backgroundColor: "rgba(255, 255, 255, 0.2)",
         backdropFilter: "blur(10px)",

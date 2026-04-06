@@ -1,12 +1,176 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 
 .container {
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
     display: flex;
     flex-direction: row;
-    gap: 20px;
+    gap: 10px;
     padding: 20px;
-    background: linear-gradient(200deg, #fffafa 0%, #009298 100%);
+    background: linear-gradient(360deg, #9b999942 0%, #009298 100%);
+    background-attachment: fixed;
     font-family: "Poppins", sans-serif;
+    padding-top: 90px;
+    align-items: flex-start;
+}
+
+.container .left,
+.container .middle,
+.container .right {
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(14px);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    display: flex;
+    flex-direction: column;
+}
+
+.container .left {
+    flex: 1.5;
+    justify-content: flex-start;
+    gap: 0;
+    overflow-y: auto;
+    position: sticky;
+    top: 90px;
+    height: calc(100vh - 110px);
+}
+
+.container .middle {
+    flex: 7;
+    padding: 24px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-content: flex-start;
+}
+
+.container .middle .jobList {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-content: flex-start;
+}
+
+.container .right {
+    flex: 2;
+    padding: 24px;
+    position: sticky;
+    top: 90px;
+    height: calc(100vh - 110px);
+}
+
+.container .left .leftTop {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    font-weight: 600;
+    color: #00888e;
+}
+
+.container .left .leftMiddle {
+    flex: 6;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    width: 100%;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    padding: 20px;
+    gap: 16px;
+}
+
+.container .left .leftBottom {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    font-weight: 500;
+    gap: 12px;
+    color: #555;
+}
+
+.Linktext {
+    color: #184785;
+}
+
+/* Job Details Panel */
+.jobDetails {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+}
+
+.detailsImage {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.detailsTitle {
+    color: #00888e;
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.detailsMeta {
+    color: #555;
+    font-weight: 600;
+    margin: 0;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    padding-bottom: 12px;
+}
+
+.detailsSection h4 {
+    margin: 0 0 6px 0;
+    color: #333;
+}
+
+.detailsSection p {
+    margin: 0;
+    color: #555;
+    line-height: 1.5;
+}
+
+.applyButton {
+    margin-top: auto; /* Đẩy nút xuống dưới cùng nếu còn khoảng trống */
+    background-color: #2563eb;
+    color: white;
+    text-decoration: none;
+    padding: 14px 20px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 16px;
+    transition: 0.2s ease;
+    display: block;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+}
+
+.applyButton:hover {
+    background-color: #1d4ed8;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.3);
+}
+
+.emptyState {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #888;
+    text-align: center;
+    font-weight: 500;
+    font-size: 15px;
+    padding: 20px;
 }

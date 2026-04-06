@@ -15,6 +15,7 @@
   justify-content: center;
   align-items: center;
   width: 100%;
+  backdrop-filter: blur(16px);
 }
 
 .registerForm {
@@ -23,6 +24,10 @@
   gap: 10px;
   width: 100%;
   max-width: 320px;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(232, 229, 229, 0.4);
+  border-radius: 20px;
+  padding: 20px;
 }
 
 .registerForm h1 {

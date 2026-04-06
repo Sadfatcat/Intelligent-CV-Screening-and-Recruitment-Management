@@ -26,7 +26,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  /* background-color: rgba(255, 255, 255, 0.8); */
   border-radius: 20px;
   padding: 40px;
   min-height: 400px;
@@ -38,6 +37,10 @@
   gap: 10px;
   width: 100%;
   max-width: 320px;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(232, 229, 229, 0.4);
+  border-radius: 20px;
+  padding: 20px;
 }
 
 .loginForm h1 {

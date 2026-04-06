@@ -65,17 +65,9 @@ export function handleLoginSubmit(
   }
 
   // Kiểm tra password
-  const passwordErrorMsg = validatePassword(password);
-  if (passwordErrorMsg) {
-    setters.setPasswordError(passwordErrorMsg);
-    setters.setResultType("error");
-    return false;
-  }
+  const recruiters = JSON.parse(localStorage.getItem("recruiters") || "[]");
 
-  // Kiểm tra localStorage
-  const savedRecruiter = localStorage.getItem("savedRecruiter");
-
-  if (!savedRecruiter) {
+  if (recruiters.length === 0) {
     setters.setResultMessage(
       "No recruiter account found. Please register first."
     );
@@ -83,15 +75,13 @@ export function handleLoginSubmit(
     return false;
   }
 
-  try {
-    const recruiter = JSON.parse(savedRecruiter);
-    if (recruiter.email !== email || recruiter.password !== password) {
-      setters.setResultMessage("Wrong email or password.");
-      setters.setResultType("error");
-      return false;
-    }
-  } catch (error) {
-    setters.setResultMessage("Invalid recruiter data.");
+  const matchedRecruiter = recruiters.find(
+    (item: { email: string; password: string }) =>
+      item.email === email && item.password === password
+  );
+
+  if (!matchedRecruiter) {
+    setters.setResultMessage("Wrong email or password.");
     setters.setResultType("error");
     return false;
   }
