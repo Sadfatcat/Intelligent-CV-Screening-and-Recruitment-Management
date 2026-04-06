@@ -6,9 +6,10 @@ import styles from "./page.module.css";
 import { handleLoginSubmit } from "@/utils/loginHandler";
 import Navbar from "@/components/navbar/Navbar";
 import ImageSlider from "@/components/ImageSlider";
-
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
@@ -23,6 +24,9 @@ export default function LoginPage() {
     if (savedPassword) setPassword(savedPassword);
   }, []);
 
+  setTimeout(() => {
+    router.push("/recruiter_UI");
+  }, 2000);
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 

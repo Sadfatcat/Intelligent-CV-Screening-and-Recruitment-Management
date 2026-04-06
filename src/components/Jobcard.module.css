@@ -1,0 +1,39 @@
+.jobCard {
+    border-radius: 16px;
+    padding: 16px;
+    background-color: #fff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    width: 280px;
+    border: 1px solid #ddd;
+    transition: all 0.3s ease;
+}
+
+.jobCard.active {
+    border: 2px solid #2563eb;
+}
+
+.jobCard:hover {
+    transform: translateX(-7px);
+    transform: translateY(7px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+.image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+
+.title {
+    margin: 0 0 8px 0;
+}
+
+.text {
+    margin: 0 0 6px 0;
+}
+
+.description {
+    margin: 0;
+}

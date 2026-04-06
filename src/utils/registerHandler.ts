@@ -100,12 +100,29 @@ export function handleRegisterSubmit(
     setters.setPassword("");
     setters.setConfirmPassword("");
 
-    const recruiterData = {
+    const existingRecruiters = JSON.parse(
+        localStorage.getItem("recruiters") || "[]"
+    );
+
+    const isEmailExist = existingRecruiters.some(
+        (item: { email: string }) => item.email === formData.email
+    );
+
+    if (isEmailExist) {
+        setters.setResultMessage("This email is already registered.");
+        setters.setResultType("error");
+        return false;
+    }
+
+    const newRecruiter = {
         email: formData.email,
         password: formData.password,
     };
 
-    localStorage.setItem("savedRecruiter", JSON.stringify(recruiterData));
+    const updatedRecruiters = [...existingRecruiters, newRecruiter];
+
+    localStorage.setItem("recruiters", JSON.stringify(updatedRecruiters));
+    localStorage.setItem("savedRecruiter", JSON.stringify(newRecruiter));
 
     if (onSuccess) {
         onSuccess();
