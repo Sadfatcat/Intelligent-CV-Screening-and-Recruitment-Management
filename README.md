@@ -27,9 +27,31 @@ To learn more about Next.js, take a look at the following resources:
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Intelligent CV Screening and Recruitment Management
 
-## Deploy on Vercel
+A personal graduation project for building a recruitment platform with job posting, CV submission, and future intelligent CV screening.
+
+## Tech Stack
+
+- Frontend: Next.js + React + TypeScript
+- Backend: FastAPI + Python
+- Database: PostgreSQL
+- Container: Docker
+
+## Project Structure
+
+```bash
+.
+├── public/                 # Static assets
+├── src/                    # Next.js frontend source code
+│   ├── app/
+│   ├── components/
+│   └── utils/
+├── backend/                # FastAPI backend
+│   ├── app/
+│   ├── .env
+│   └── requirements.txt
+└── README.md
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
