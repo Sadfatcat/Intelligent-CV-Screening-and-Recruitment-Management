@@ -5,9 +5,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navItems = [
-    { label: "About Us", href: "https://fint.vn/vi/ve-chung-toi" },
+    { label: "About Us", href: "https://usth.edu.vn/gioi-thieu/gioi-thieu-chung-ve-usth/" },
     { label: "Jobs", href:"/recruiter_UI" },
-    { label: "Contact", href: "https://fint.vn/vi/lien-he" },
+    { label: "Contact", href: "https://usth.edu.vn/" },
 ];
 
 export default function Navbar() {
