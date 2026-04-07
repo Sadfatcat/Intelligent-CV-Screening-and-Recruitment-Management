@@ -13,7 +13,7 @@
 **Tắt hết**
     
     docker compose stop
-    //dừng nhưng ko xóa container
+    //dừng nhưng ko tắt docker
 
     docker compose start
     //bật lại docker, ko build lại, ko tạo container mới
