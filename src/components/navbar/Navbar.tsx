@@ -18,6 +18,7 @@ export default function Navbar() {
     <nav style={styles.navbar}>
       <div style={styles.container}>
         <a style={styles.logo}>
+          <img src="/usthvector.webp" alt="USTH Logo" style={{ height: "30px", width: "auto", objectFit: "contain" }} />
           CV Screening
         </a>
 
@@ -72,6 +73,9 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 700,
     textDecoration: "none",
     whiteSpace: "nowrap",
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
   },
   links: {
     display: "flex",

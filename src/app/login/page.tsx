@@ -54,9 +54,7 @@ export default function LoginPage() {
           <Navbar />
         </div>
       <div className={styles.board}>
-        <div className={styles.content}>
-          <img src = "/fintlogo.png" width={600} height={600}  />
-        </div>
+        <img src="/usthabove.jpeg" alt="Image" className={styles.image} />
       </div>
       <div className={styles.login}>
         <form className={styles.loginForm} onSubmit={handleSubmit}>

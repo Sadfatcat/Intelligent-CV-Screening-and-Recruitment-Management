@@ -6,7 +6,7 @@ import Link from "next/link";
 import styles from "./page.module.css";
 import { handleRegisterSubmit } from "@/utils/registerHandler";
 import Navbar from "@/components/navbar/Navbar";
-import ImageSlider from "@/components/ImageSlider";
+// import ImageSlider from "@/components/ImageSlider";
 
 export default function RegisterRecruiterPage() {
   const router = useRouter();
@@ -86,7 +86,7 @@ export default function RegisterRecruiterPage() {
           </form>
         </div>
         <div className={styles.rightside}>
-          <ImageSlider />
+          <img src = "/nghich1.png" alt="Image" className={styles.image} />
         </div>
       </div>
     </>

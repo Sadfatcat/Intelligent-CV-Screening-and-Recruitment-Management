@@ -8,6 +8,7 @@ const images = [
     "/nghich1.png",
     "/usth1.png",
     "/usthquote.png",
+    "/doannhatquang.jpeg",
 ];
 
 export default function ImageSlider() {
