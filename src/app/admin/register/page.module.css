@@ -1,0 +1,103 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(360deg, #9b999942 0%, #79378B 100%);
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+.formContainer {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+    flex-wrap: wrap; /* Giúp response tốt hơn trên mobile */
+}
+
+.glassPanel {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    background: rgba(255, 255, 255, 0.4);
+    border: 1px solid rgba(232, 229, 229, 0.4);
+    border-radius: 20px;
+    padding: 30px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    backdrop-filter: blur(10px);
+}
+
+.glassPanel h2 {
+    font-size: 24px;
+    text-align: center;
+    color: #111111;
+    font-weight: 900;
+    margin: 0 0 10px 0;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+}
+
+.glassPanel input {
+    padding: 12px 15px;
+    font-size: 15px;
+    border: 1px solid #cccccc;
+    border-radius: 20px;
+    outline: none;
+    transition: border-color 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.glassPanel input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.submitBtn {
+    padding: 12px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.submitBtn:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.submitBtn:active {
+    background-color: #004494;
+    transform: translateY(0);
+}
+
+.loginLink {
+    text-align: center;
+    display: inline-block;
+    color: #0056b3;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.loginLink:hover {
+    text-decoration: underline;
+}

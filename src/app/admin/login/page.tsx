@@ -67,6 +67,10 @@ export default function AdminPage() {
                             {resultMessage}
                         </p>
                     )}
+
+                    <a href="/admin/register" style={{ marginTop: "1rem", display: "inline-block", color: "#0070f3", textDecoration: "none", fontSize: "0.9rem" }}>
+                        Don't have a business account? Register now
+                    </a>
                 </form>
             </div>
         </div>
