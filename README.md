@@ -53,6 +53,13 @@
         
         cd ~/intelligent-cv-screening
     # đi về thư mục gốc project    
+
+**Sau khi bật máy**
+        sudo docker compose up -d
+
+**sau khi sửa code**
+        cd ~/intelligent-cv-screening/backend
+        sudo docker compose up --build -d
         
         npm run dev
 # chạy frontend Next.js
