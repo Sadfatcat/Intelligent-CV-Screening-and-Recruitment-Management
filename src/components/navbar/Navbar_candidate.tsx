@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 
 const navItems = [
     { label: "About Us", href: "https://usth.edu.vn/gioi-thieu/gioi-thieu-chung-ve-usth/" },
-    { label: "Jobs", href:"/recruiter_UI" },
+    { label: "Jobs", href:"/candidate_UI" },
     { label: "Contact", href: "https://usth.edu.vn/" },
 ];
 
