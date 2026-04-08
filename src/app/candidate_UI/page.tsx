@@ -6,10 +6,10 @@ import Link from "next/link";
 import styles from "./page.module.css";
 // import { handleLoginSubmit } from "@/utils/loginHandler";
 // import Image from "next/image";
-import Navbar from "@/components/navbar/Navbar_recruiter";
+import Navbar from "@/components/navbar/Navbar_candidate";
 import Jobcard from "@/components/Jobcard";
 
-export default function RecruiterPage() {
+export default function CandidatePage() {
     const [selectedJob, setSelectedJob] = useState<any>(null); // Trạng thái lưu trữ công việc đang được chọn
     const [selectedCategory, setSelectedCategory] = useState<string>("All"); // Trạng thái filter
     const [isModalOpen, setIsModalOpen] = useState(false); // Trạng thái mở/đóng modal

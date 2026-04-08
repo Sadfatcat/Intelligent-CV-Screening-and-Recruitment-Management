@@ -100,11 +100,11 @@ export function handleRegisterSubmit(
     setters.setPassword("");
     setters.setConfirmPassword("");
 
-    const existingRecruiters = JSON.parse(
-        localStorage.getItem("recruiters") || "[]"
+    const existingCandidates = JSON.parse(
+        localStorage.getItem("candidates") || "[]"
     );
 
-    const isEmailExist = existingRecruiters.some(
+    const isEmailExist = existingCandidates.some(
         (item: { email: string }) => item.email === formData.email
     );
 
@@ -114,15 +114,15 @@ export function handleRegisterSubmit(
         return false;
     }
 
-    const newRecruiter = {
+    const newCandidate = {
         email: formData.email,
         password: formData.password,
     };
 
-    const updatedRecruiters = [...existingRecruiters, newRecruiter];
+    const updatedCandidates = [...existingCandidates, newCandidate];
 
-    localStorage.setItem("recruiters", JSON.stringify(updatedRecruiters));
-    localStorage.setItem("savedRecruiter", JSON.stringify(newRecruiter));
+    localStorage.setItem("candidates", JSON.stringify(updatedCandidates));
+    localStorage.setItem("savedCandidate", JSON.stringify(newCandidate));
 
     if (onSuccess) {
         onSuccess();

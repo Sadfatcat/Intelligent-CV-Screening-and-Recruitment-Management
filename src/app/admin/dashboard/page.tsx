@@ -60,7 +60,7 @@ export default function AdminDashboard() {
 
                 <main className={styles.contentArea}>
                     <div className={styles.card}>
-                        <h3>No.Recruiters</h3>
+                        <h3>No.Candidates</h3>
                         <p>150 New CVs</p>
                     </div>
                     <div className={styles.card}>

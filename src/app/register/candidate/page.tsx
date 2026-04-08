@@ -8,7 +8,7 @@ import { handleRegisterSubmit } from "@/utils/registerHandler";
 import Navbar from "@/components/navbar/Navbar";
 // import ImageSlider from "@/components/ImageSlider";
 
-export default function RegisterRecruiterPage() {
+export default function RegisterCandidatePage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

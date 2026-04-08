@@ -27,7 +27,7 @@ export default function LoginPage() {
       }, 1000);
       return () => clearTimeout(timer);
     } else {
-      router.push("/recruiter_UI");
+      router.push("/candidate_UI");
     }
   }, [countdown, router]);
 
@@ -95,7 +95,7 @@ export default function LoginPage() {
 
           <p className={styles.linkText}>
             Don&apos;t have an account?{" "}
-            <Link href="/register/recruiter">Register here</Link>
+            <Link href="/register/candidate">Register here</Link>
           </p>
         </form>
       </div>

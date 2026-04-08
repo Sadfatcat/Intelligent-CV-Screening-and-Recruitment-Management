@@ -65,22 +65,22 @@ export function handleLoginSubmit(
   }
 
   // Kiểm tra password
-  const recruiters = JSON.parse(localStorage.getItem("recruiters") || "[]");
+  const candidates = JSON.parse(localStorage.getItem("candidates") || "[]");
 
-  if (recruiters.length === 0) {
+  if (candidates.length === 0) {
     setters.setResultMessage(
-      "No recruiter account found. Please register first."
+      "No candidate account found. Please register first."
     );
     setters.setResultType("error");
     return false;
   }
 
-  const matchedRecruiter = recruiters.find(
+  const matchedCandidate = candidates.find(
     (item: { email: string; password: string }) =>
       item.email === email && item.password === password
   );
 
-  if (!matchedRecruiter) {
+  if (!matchedCandidate) {
     setters.setResultMessage("Wrong email or password.");
     setters.setResultType("error");
     return false;
