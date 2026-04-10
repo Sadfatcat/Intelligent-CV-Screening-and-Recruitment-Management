@@ -31,10 +31,10 @@ export default function LoginPage() {
     }
   }, [countdown, router]);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    const isSuccess = handleLoginSubmit(email, password, {
+    const isSuccess = await handleLoginSubmit(email, password, {
       setEmail,
       setPassword,
       setEmailError,

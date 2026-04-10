@@ -3,7 +3,7 @@ import { useState } from "react";
 
 // Component này sẽ nhận vào tham số url { params } từ Next.js
 export default function ApplyCVPage({ params }: { params: { id: string } }) {
-    // Rút xuất id từ url (ví dụ: url là /job/1 => id sẽ bằng "1")
+    // Extract id from the URL (for example, /job/1 gives id = "1")
     const jobId = params.id; 
 
     const [file, setFile] = useState<File | null>(null);
@@ -16,14 +16,14 @@ export default function ApplyCVPage({ params }: { params: { id: string } }) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        alert(`Bạn đang nộp file ${file?.name} cho Job có ID là: ${jobId}`);
+        alert(`You are submitting file ${file?.name} for Job ID: ${jobId}`);
     };
 
     return (
         <div style={{ padding: "40px", maxWidth: "600px", margin: "auto" }}>
-            <h1>Nộp CV ứng tuyển</h1>
+            <h1>Submit CV for Application</h1>
             {/* IN RA MÀN HÌNH ĐỂ BẠN KIỂM TRA XEM NÓ CÓ BẮT ĐÚNG ID KHÔNG */}
-            <p>Bạn đang nộp hồ sơ cho công việc ID: <strong>{jobId}</strong></p>
+            <p>You are applying for job ID: <strong>{jobId}</strong></p>
 
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
                 <label>

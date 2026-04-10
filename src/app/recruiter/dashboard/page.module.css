@@ -1,0 +1,124 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+.container {
+  min-height: 100vh;
+  display: flex;
+  background: linear-gradient(190deg, #fff8f9 0%, #fde5eb 50%, #f9d0db 100%);
+  font-family: "Poppins", sans-serif;
+}
+
+.sidebar {
+  width: 240px;
+  padding: 24px;
+  color: #fff;
+  background: linear-gradient(180deg, #7a0f2b 0%, #dc143c 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sidebar h2 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.logoutButton {
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  border-radius: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.main {
+  flex: 1;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.header {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 18px;
+}
+
+.header h1 {
+  margin: 0;
+}
+
+.section {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 18px;
+}
+
+.section h3 {
+  margin: 0 0 12px;
+}
+
+.jobGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.jobCard {
+  text-align: left;
+  border: 1px solid #ead2d8;
+  background: #fff;
+  border-radius: 14px;
+  padding: 14px;
+  cursor: pointer;
+}
+
+.jobCard h4,
+.jobCard p {
+  margin: 0 0 6px;
+}
+
+.jobCardActive {
+  border-color: #dc143c;
+  box-shadow: 0 0 0 3px rgba(220, 20, 60, 0.18);
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+}
+
+.table th,
+.table td {
+  border-bottom: 1px solid #edd8dd;
+  padding: 10px;
+  text-align: left;
+}
+
+.table th {
+  background: #fff1f4;
+}
+
+.table select {
+  padding: 6px;
+  border-radius: 8px;
+  border: 1px solid #d8c3c9;
+}
+
+.success {
+  color: #166534;
+  margin-top: 8px;
+}
+
+.error {
+  color: #b0002d;
+  margin-top: 8px;
+}

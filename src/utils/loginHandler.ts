@@ -45,11 +45,11 @@ export function validatePassword(password: string): string | null {
   return null;
 }
 
-export function handleLoginSubmit(
+export async function handleLoginSubmit(
   email: string,
   password: string,
   setters: SettersType
-): boolean {
+): Promise<boolean> {
   // Reset lỗi cũ
   setters.setEmailError("");
   setters.setPasswordError("");
@@ -64,29 +64,37 @@ export function handleLoginSubmit(
     return false;
   }
 
-  // Kiểm tra password
-  const candidates = JSON.parse(localStorage.getItem("candidates") || "[]");
+  // --- PHẦN LIÊN KẾT FRONTEND & BACKEND API LOGIN ---
+  try {
+    setters.setResultMessage("Logging in...");
+    
+    const response = await fetch("http://localhost:8000/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
 
-  if (candidates.length === 0) {
-    setters.setResultMessage(
-      "No candidate account found. Please register first."
-    );
+    const data = await response.json();
+
+    if (!response.ok) {
+      setters.setResultMessage(data.detail || "Login failed!");
+      setters.setResultType("error");
+      return false;
+    }
+
+    // Backend báo OK 200, thành công!
+    setters.setResultMessage("Login successful!");
+    setters.setResultType("success");
+    // Tuỳ vào logic ứng dụng (ví dụ lưu user_id/role vào Redux hoặc Context)
+    // Ở bản demo này, ta lưu response JSON vào localStorage để phiên làm việc nhớ
+    localStorage.setItem("currentUser", JSON.stringify(data));
+
+    return true;
+  } catch (error) {
+    setters.setResultMessage("Error: Cannot connect to Backend.");
     setters.setResultType("error");
     return false;
   }
-
-  const matchedCandidate = candidates.find(
-    (item: { email: string; password: string }) =>
-      item.email === email && item.password === password
-  );
-
-  if (!matchedCandidate) {
-    setters.setResultMessage("Wrong email or password.");
-    setters.setResultType("error");
-    return false;
-  }
-
-  setters.setResultMessage("Login successful!");
-  setters.setResultType("success");
-  return true;
 }
