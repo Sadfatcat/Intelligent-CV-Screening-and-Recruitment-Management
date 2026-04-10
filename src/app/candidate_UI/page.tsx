@@ -1,7 +1,6 @@
 "use client"
 
-import { useState } from "react";
-// import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import styles from "./page.module.css";
 // import { handleLoginSubmit } from "@/utils/loginHandler";
@@ -12,8 +11,10 @@ import Jobcard from "@/components/Jobcard";
 export default function CandidatePage() {
     const [selectedJob, setSelectedJob] = useState<any>(null); // Trạng thái lưu trữ công việc đang được chọn
     const [selectedCategory, setSelectedCategory] = useState<string>("All"); // Trạng thái filter
+    const [searchQuery, setSearchQuery] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false); // Trạng thái mở/đóng modal
     const [file, setFile] = useState<File | null>(null); // Lưu trữ file CV được chọn
+    const [displayName, setDisplayName] = useState("Candidate");
 
     const job1 = {
         id: 1,
@@ -58,7 +59,31 @@ export default function CandidatePage() {
     };
 
     const allJobs = [job1, job2, job3, job4];
-    const filteredJobs = selectedCategory === "All" ? allJobs : allJobs.filter(job => job.title.includes(selectedCategory));
+    const filteredJobs = useMemo(() => {
+        const byCategory = selectedCategory === "All"
+            ? allJobs
+            : allJobs.filter(job => job.title.includes(selectedCategory));
+
+        const q = searchQuery.trim().toLowerCase();
+        if (!q) return byCategory;
+
+        return byCategory.filter(job => job.title.toLowerCase().includes(q));
+    }, [selectedCategory, searchQuery]);
+
+    useEffect(() => {
+        const currentUserRaw = localStorage.getItem("currentUser");
+        if (!currentUserRaw) return;
+
+        try {
+            const currentUser = JSON.parse(currentUserRaw);
+            const email = currentUser?.email || currentUser?.user?.email;
+            if (typeof email === "string" && email.includes("@")) {
+                setDisplayName(email.split("@")[0]);
+            }
+        } catch {
+            setDisplayName("Candidate");
+        }
+    }, []);
 
     // onClick cho job cards
     const handleClickjob = (jobData: any) => {
@@ -90,6 +115,16 @@ export default function CandidatePage() {
                             </div>
                         </div>
                     <div className={styles.leftMiddleBox}>
+                        <div className={styles.searchRowLeft}>
+                            <input
+                                className={styles.searchInput}
+                                type="text"
+                                placeholder="Search job by title..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                            <span className={styles.searchHint}>{filteredJobs.length} jobs found</span>
+                        </div>
                         <div className={styles.leftMiddle}>
                             <p className={styles.Linktext} onClick={() => setSelectedCategory("All")} style={{cursor: "pointer", fontWeight: selectedCategory === "All" ? "bold" : "normal"}}>All Jobs</p>
                             <p className={styles.Linktext} onClick={() => setSelectedCategory("FrontEnd")} style={{cursor: "pointer", fontWeight: selectedCategory === "FrontEnd" ? "bold" : "normal"}}>FrontEnd</p>
@@ -99,9 +134,14 @@ export default function CandidatePage() {
                         </div>
                     </div>
                     <div className={styles.leftBottomBox}>
-                        <div className={styles.leftBottom}>
-                            <p className={styles.Linktext}>Settings</p>
-                            <Link className={styles.Linktext} href="/login">Logout</Link>
+                        <div className={styles.leftBottomUser}>
+                            <div className={styles.avatarCircle} title={displayName}>
+                                {displayName.charAt(0).toUpperCase()}
+                            </div>
+                            <div className={styles.userMeta}>
+                                <p className={styles.userName}>{displayName}</p>
+                                <Link className={styles.logoutLink} href="/login">Logout</Link>
+                            </div>
                         </div>
                     </div>
                 </div>

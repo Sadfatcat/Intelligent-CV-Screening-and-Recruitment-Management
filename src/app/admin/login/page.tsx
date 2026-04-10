@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
-import { handleAdminLogin } from "@/utils/adminLoginHandler";
 
 export default function AdminPage() {
     const router = useRouter(); // Khởi tạo router chuyển trang
@@ -14,7 +13,7 @@ export default function AdminPage() {
     const [resultMessage, setResultMessage] = useState("");
     const [resultType, setResultType] = useState<"success" | "error" | "">("");
 
-    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
 
         // 1. Reset all error states before checking
@@ -23,19 +22,42 @@ export default function AdminPage() {
         setResultMessage("");
         setResultType("");
 
-        // 2. Only send inputs to handler and get the returned result
-        const result = handleAdminLogin(username, password);
+        if (!username.trim()) {
+            setUsernameError("Email cannot be empty");
+            return;
+        }
+        if (!password) {
+            setPasswordError("Password cannot be empty");
+            return;
+        }
 
-        // 3. UI logic handles success or errors based on the returned result
-        if (result.success) {
-            setResultMessage(result.message!);
+        try {
+            const response = await fetch("http://localhost:8000/api/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: username, password }),
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                setResultType("error");
+                setResultMessage(data.detail || "Login failed");
+                return;
+            }
+
+            if (data.role !== "admin") {
+                setResultType("error");
+                setResultMessage("This account does not have admin access");
+                return;
+            }
+
+            localStorage.setItem("adminUser", JSON.stringify(data));
+            setResultMessage("Admin login successful! Redirecting...");
             setResultType("success");
-            router.push("/admin/dashboard"); // Redirect only on valid login
-        } else {
+            router.push("/admin/dashboard");
+        } catch {
             setResultType("error");
-            if (result.errorType === "username") setUsernameError(result.message!);
-            if (result.errorType === "password") setPasswordError(result.message!);
-            if (result.errorType === "system") setResultMessage(result.message!);
+            setResultMessage("Cannot connect to backend");
         }
     }
 
@@ -68,9 +90,9 @@ export default function AdminPage() {
                         </p>
                     )}
 
-                    <a href="/admin/register" style={{ marginTop: "1rem", display: "inline-block", color: "#0070f3", textDecoration: "none", fontSize: "0.9rem" }}>
-                        Don't have a business account? Register now
-                    </a>
+                    <p style={{ marginTop: "1rem", fontSize: "0.9rem" }}>
+                        Recruiter accounts are created by admin inside dashboard.
+                    </p>
                 </form>
             </div>
         </div>

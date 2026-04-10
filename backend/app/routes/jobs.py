@@ -4,9 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 from sqlmodel import Session, select
 
 from app.database import get_session
-from app.models import Job
-from app.services.extractor import extract_text
-from app.services.vectorizer import text_to_vector_json
+from app.models import ActivityLog, Job, User
 
 # prefix /api/jobs, tất cả route trong file này đều bắt đầu bằng /api/jobs/...
 router = APIRouter(prefix="/api/jobs", tags=["jobs"])
@@ -28,6 +26,10 @@ async def upload_jd(
     jd_file: UploadFile = File(...),
     session: Session = Depends(get_session),
 ):
+    recruiter = session.get(User, recruiter_id)
+    if not recruiter or recruiter.role != "recruiter":
+        raise HTTPException(status_code=403, detail="Chỉ recruiter được phép đăng JD")
+
     if not jd_file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="JD chỉ nhận file PDF")
 
@@ -39,14 +41,16 @@ async def upload_jd(
     with open(file_path, "wb") as f:
         f.write(file_bytes)
 
-    # đọc text từ PDF
+    # đọc text từ PDF (lazy import để không làm sập cả app nếu thiếu thư viện OCR/parser)
     try:
+        from app.services.extractor import extract_text
         parsed_text = extract_text(file_bytes, jd_file.filename)
     except Exception as e:
         raise HTTPException(status_code=422, detail=f"Không đọc được file JD: {str(e)}")
 
     # lưu vector JD, nếu lỗi thì để None, không ảnh hưởng phần còn lại
     try:
+        from app.services.vectorizer import text_to_vector_json
         jd_vector_json = text_to_vector_json(parsed_text) if parsed_text else None
     except Exception:
         jd_vector_json = None
@@ -66,6 +70,18 @@ async def upload_jd(
     session.add(new_job)
     session.commit()
     session.refresh(new_job)
+
+    session.add(
+        ActivityLog(
+            actor_user_id=recruiter_id,
+            actor_role="recruiter",
+            action="recruiter.job.upload",
+            target_type="job",
+            target_id=new_job.id,
+            detail=f"Uploaded JD: {title}",
+        )
+    )
+    session.commit()
 
     return {
         "message": "Đăng JD thành công",

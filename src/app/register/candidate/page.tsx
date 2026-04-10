@@ -18,8 +18,8 @@ export default function RegisterCandidatePage() {
   const [resultMessage, setResultMessage] = useState("");
   const [resultType, setResultType] = useState<"success" | "error" | "">("");
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    const success = handleRegisterSubmit(
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    await handleRegisterSubmit(
       e,
       { email, password, confirmPassword, emailError, passwordError, resultMessage, resultType },
       {

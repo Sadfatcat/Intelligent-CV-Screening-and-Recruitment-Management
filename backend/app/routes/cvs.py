@@ -5,9 +5,7 @@ from sqlmodel import Session, select
 from typing import Optional
 
 from app.database import get_session
-from app.models import CV, Job, JobApplication
-from app.services.extractor import extract_text
-from app.services.vectorizer import text_to_vector_json
+from app.models import ActivityLog, CV, Job, JobApplication
 
 # prefix /api/cvs, tất cả route trong file này đều bắt đầu bằng /api/cvs/...
 router = APIRouter(prefix="/api/cvs", tags=["cvs"])
@@ -48,14 +46,16 @@ async def upload_cv(
     with open(file_path, "wb") as f:
         f.write(file_bytes)
 
-    # đọc text từ cv (pdf/docx/ảnh)
+    # đọc text từ cv (pdf/docx/ảnh) - lazy import để tránh sập app do thiếu dependency
     try:
+        from app.services.extractor import extract_text
         parsed_text = extract_text(file_bytes, cv_file.filename)
     except Exception as e:
         raise HTTPException(status_code=422, detail=f"Không đọc được CV: {str(e)}")
 
     # lưu vector cv, nếu lỗi thì để None, không ảnh hưởng phần còn lại
     try:
+        from app.services.vectorizer import text_to_vector_json
         cv_vector_json = text_to_vector_json(parsed_text) if parsed_text else None
     except Exception:
         cv_vector_json = None
@@ -78,6 +78,18 @@ async def upload_cv(
     session.add(application)
     session.commit()
     session.refresh(application)
+
+    session.add(
+        ActivityLog(
+            actor_user_id=candidate_id,
+            actor_role="candidate" if candidate_id else "guest",
+            action="candidate.cv.submit",
+            target_type="application",
+            target_id=application.id,
+            detail=f"Submitted CV to job id={job_id}",
+        )
+    )
+    session.commit()
 
     return {
         "message": "Nộp hồ sơ thành công",

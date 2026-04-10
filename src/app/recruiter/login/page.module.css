@@ -1,0 +1,124 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+
+.container {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  background: linear-gradient(205deg, #ffffff 0%, #dc143c 100%);
+  font-family: "Poppins", sans-serif;
+}
+
+.board {
+  flex: 6;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.image {
+  width: 90%;
+  aspect-ratio: 16 / 9;
+  max-height: 90%;
+  object-fit: cover;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 26px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.login {
+  flex: 4;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+}
+
+.loginForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 340px;
+  background: rgba(255, 255, 255, 0.44);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 20px;
+  padding: 22px;
+}
+
+.loginForm h1 {
+  font-size: 42px;
+  color: #5f0f23;
+  margin-bottom: 12px;
+}
+
+.loginForm input {
+  padding: 11px;
+  border: 1px solid #d6c8cd;
+  border-radius: 18px;
+  font-size: 15px;
+}
+
+.loginForm input:focus {
+  outline: none;
+  border-color: #dc143c;
+  box-shadow: 0 0 0 4px rgba(220, 20, 60, 0.18);
+}
+
+.loginForm button {
+  padding: 11px;
+  width: 100%;
+  border: none;
+  border-radius: 40px;
+  background-color: #dc143c;
+  color: #fff;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.25s ease;
+}
+
+.loginForm button:hover {
+  background-color: #b10f31;
+  transform: scale(1.02);
+}
+
+.loginForm button:disabled {
+  opacity: 0.75;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #b0002d;
+  font-size: 12px;
+  min-height: 16px;
+}
+
+.success {
+  color: #0f5132;
+  font-size: 12px;
+  min-height: 16px;
+}
+
+.countdown {
+  display: block;
+  margin-top: 8px;
+  font-weight: 700;
+}
+
+.linkText {
+  font-size: 14px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.linkText a {
+  color: #7a0f2b;
+  font-weight: 600;
+}

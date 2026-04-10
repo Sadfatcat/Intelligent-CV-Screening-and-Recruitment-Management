@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
 
@@ -7,6 +8,11 @@ class User(SQLModel, table=True):
     email: str = Field(index=True, unique=True)
     password_hash: str
     role: str = "candidate"  # candidate | recruiter | admin
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    company_name: Optional[str] = None
+    is_active: bool = Field(default=True)
 
     jobs: List["Job"] = Relationship(back_populates="recruiter")
     cvs: List["CV"] = Relationship(back_populates="candidate")
@@ -60,3 +66,14 @@ class JobApplication(SQLModel, table=True):
 
     job: Optional[Job] = Relationship(back_populates="applications")
     cv: Optional[CV] = Relationship(back_populates="applications")
+
+
+class ActivityLog(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    actor_user_id: Optional[int] = Field(default=None, foreign_key="user.id")
+    actor_role: str
+    action: str
+    target_type: str
+    target_id: Optional[int] = None
+    detail: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)

@@ -52,12 +52,12 @@ export function validateConfirmPassword(password: string, confirmPassword: strin
     return null;
 }
 
-export function handleRegisterSubmit(
+export async function handleRegisterSubmit(
     e: React.FormEvent<HTMLFormElement>,
     formData: RegisterStage,
     setters: SetterType,
     onSuccess?: () => void
-): boolean {
+): Promise<boolean> {
     e.preventDefault();
 
     // Clear previous errors
@@ -93,40 +93,47 @@ export function handleRegisterSubmit(
         return false;
     }
 
-    // All validations passed
-    setters.setResultMessage("Registration successful!");
-    setters.setResultType("success");
-    setters.setEmail("");
-    setters.setPassword("");
-    setters.setConfirmPassword("");
+    // --- PHẦN LIÊN KẾT FRONTEND & BACKEND API CỐT LÕI ---
+    try {
+        setters.setResultMessage("Connecting to server...");
+        
+        // Nhấc máy gọi điện lên cổng 8000 của Backend
+        const response = await fetch("http://localhost:8000/api/auth/register", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                email: formData.email,
+                password: formData.password,
+                role: "candidate" // Ép người dùng này thành Candidate
+            }),
+        });
 
-    const existingCandidates = JSON.parse(
-        localStorage.getItem("candidates") || "[]"
-    );
+        const data = await response.json();
 
-    const isEmailExist = existingCandidates.some(
-        (item: { email: string }) => item.email === formData.email
-    );
+        // Kiểm tra xem Backend có chửi mình không (như trùng email)
+        if (!response.ok) {
+            setters.setResultMessage(data.detail || "Registration failed!");
+            setters.setResultType("error");
+            return false;
+        }
 
-    if (isEmailExist) {
-        setters.setResultMessage("This email is already registered.");
+        // Backend báo OK 200, thành công!
+        setters.setResultMessage("Registration successful!");
+        setters.setResultType("success");
+        setters.setEmail("");
+        setters.setPassword("");
+        setters.setConfirmPassword("");
+
+        if (onSuccess) {
+            onSuccess();
+        }
+
+        return true;
+    } catch (error) {
+        setters.setResultMessage("Error: Cannot connect to Backend.");
         setters.setResultType("error");
         return false;
     }
-
-    const newCandidate = {
-        email: formData.email,
-        password: formData.password,
-    };
-
-    const updatedCandidates = [...existingCandidates, newCandidate];
-
-    localStorage.setItem("candidates", JSON.stringify(updatedCandidates));
-    localStorage.setItem("savedCandidate", JSON.stringify(newCandidate));
-
-    if (onSuccess) {
-        onSuccess();
-    }
-
-    return true;
 }
