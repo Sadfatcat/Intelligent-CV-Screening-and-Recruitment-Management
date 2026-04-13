@@ -251,6 +251,12 @@
     gap: 10px;
 }
 
+.jobItemWrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .jobBtn {
     border: 1px solid var(--line);
     background: rgba(255, 255, 255, 0.86);
@@ -269,6 +275,38 @@
     color: #fff;
     border-color: transparent;
     background: linear-gradient(135deg, #1d4ed8, #0ea5e9);
+}
+
+.jobDeleteXBtn {
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(220, 38, 38, 0.9);
+    background: #dc2626;
+    color: #fff;
+    border-radius: 10px;
+    padding: 0;
+    cursor: pointer;
+    font-weight: 800;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.jobDeleteXBtn:hover {
+    background: #b91c1c;
+    border-color: #b91c1c;
+}
+
+.themeDark .jobDeleteXBtn {
+    background: #ef4444;
+    border-color: #ef4444;
+    color: #fff;
+}
+
+.themeDark .jobDeleteXBtn:hover {
+    background: #dc2626;
+    border-color: #dc2626;
 }
 
 .tableWrap {

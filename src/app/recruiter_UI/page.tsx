@@ -19,6 +19,7 @@ type RecruiterJob = {
     deadline: string;
     quantity?: number | null;
     direct_contact?: string | null;
+    image_url?: string | null;
 };
 
 type JobApplicationsResponse = {
@@ -59,6 +60,7 @@ export default function RecruiterUIPage() {
     const [directContact, setDirectContact] = useState("");
     const [description, setDescription] = useState("");
     const [jdFile, setJdFile] = useState<File | null>(null);
+    const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
 
     const [jobs, setJobs] = useState<RecruiterJob[]>([]);
     const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
@@ -240,6 +242,9 @@ export default function RecruiterUIPage() {
             formData.append("direct_contact", directContact);
             formData.append("description", description);
             formData.append("jd_file", jdFile);
+            if (coverImageFile) {
+                formData.append("cover_image", coverImageFile);
+            }
 
             const res = await fetch("http://localhost:8000/api/jobs/upload-jd", {
                 method: "POST",
@@ -253,7 +258,7 @@ export default function RecruiterUIPage() {
             setMessage("JD uploaded successfully");
             setMessageType("success");
             setTitle("");
-            setCompanyName("");
+            setCompanyName(session.company_name || "");
             setLocation("");
             setLevel("Junior");
             setDeadline("");
@@ -261,6 +266,7 @@ export default function RecruiterUIPage() {
             setDirectContact("");
             setDescription("");
             setJdFile(null);
+            setCoverImageFile(null);
             setIsUploadPopupOpen(false);
 
             await loadRecruiterJobs(session.user_id);
@@ -271,6 +277,39 @@ export default function RecruiterUIPage() {
             }
         } catch (err) {
             setMessage(err instanceof Error ? err.message : "Upload JD failed");
+            setMessageType("error");
+        }
+    }
+
+    async function handleDeleteJob(jobId: number) {
+        if (!session) return;
+        if (!window.confirm(`Delete JD #${jobId}?`)) return;
+
+        try {
+            const res = await fetch(`http://localhost:8000/api/recruiter/${session.user_id}/jobs/${jobId}`, {
+                method: "DELETE",
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.detail || "Delete JD failed");
+            }
+
+            setMessage("JD deleted successfully");
+            setMessageType("success");
+
+            if (selectedJobId === jobId) {
+                setSelectedJobId(null);
+            }
+
+            await loadRecruiterJobs(session.user_id);
+
+            const logsRes = await fetch(`http://localhost:8000/api/recruiter/${session.user_id}/cv-logs`);
+            const logsData = await logsRes.json();
+            if (logsRes.ok) {
+                setCvLogs(Array.isArray(logsData) ? logsData : []);
+            }
+        } catch (err) {
+            setMessage(err instanceof Error ? err.message : "Delete JD failed");
             setMessageType("error");
         }
     }
@@ -412,13 +451,22 @@ export default function RecruiterUIPage() {
                         <p className={styles.subtleText}>Select a job to filter logs and application status.</p>
                         <div className={styles.jobs}>
                             {jobs.map((job) => (
-                                <button
-                                    key={job.id}
-                                    className={`${styles.jobBtn} ${selectedJobId === job.id ? styles.jobBtnActive : ""}`}
-                                    onClick={() => setSelectedJobId(job.id)}
-                                >
-                                    #{job.id} {job.title} ({job.quantity ?? "-"})
-                                </button>
+                                <div key={job.id} className={styles.jobItemWrap}>
+                                    <button
+                                        className={`${styles.jobBtn} ${selectedJobId === job.id ? styles.jobBtnActive : ""}`}
+                                        onClick={() => setSelectedJobId(job.id)}
+                                    >
+                                        #{job.id} {job.title} ({job.quantity ?? "-"})
+                                    </button>
+                                    <button
+                                        className={styles.jobDeleteXBtn}
+                                        onClick={() => handleDeleteJob(job.id)}
+                                        title="Delete this job"
+                                        aria-label={`Delete job ${job.title}`}
+                                    >
+                                        X
+                                    </button>
+                                </div>
                             ))}
                             {jobs.length === 0 && <p>No JD uploaded yet.</p>}
                         </div>
@@ -552,6 +600,24 @@ export default function RecruiterUIPage() {
                                         <>
                                             <p className={styles.uploadText}><span>Upload</span> JD PDF here</p>
                                             <p className={styles.uploadSubText}>Only PDF files are accepted</p>
+                                        </>
+                                    )}
+                                </div>
+
+                                <div className={styles.modalUploadCol}>
+                                    <input
+                                        className={styles.fileInput}
+                                        type="file"
+                                        accept=".jpg,.jpeg,.png,.webp"
+                                        onChange={(e) => setCoverImageFile(e.target.files?.[0] || null)}
+                                    />
+                                    <div className={styles.uploadIcon}>🖼️</div>
+                                    {coverImageFile ? (
+                                        <p className={styles.uploadText}>Cover: {coverImageFile.name}</p>
+                                    ) : (
+                                        <>
+                                            <p className={styles.uploadText}><span>Upload</span> Cover Image</p>
+                                            <p className={styles.uploadSubText}>Optional: jpg, jpeg, png, webp</p>
                                         </>
                                     )}
                                 </div>

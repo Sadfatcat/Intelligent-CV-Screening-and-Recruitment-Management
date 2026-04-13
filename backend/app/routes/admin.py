@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -5,7 +6,7 @@ from pydantic import BaseModel
 from sqlmodel import Session, select
 
 from app.database import get_session
-from app.models import ActivityLog, Job, JobApplication, User
+from app.models import ActivityLog, CV, Job, JobApplication, User
 from app.security import get_password_hash
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
@@ -26,6 +27,57 @@ def require_admin(admin_id: int, session: Session) -> User:
     if not admin or admin.role != "admin":
         raise HTTPException(status_code=403, detail="Chỉ admin được phép thực hiện")
     return admin
+
+
+def _delete_file_if_exists(path: str | None):
+    if path and os.path.exists(path):
+        try:
+            os.remove(path)
+        except OSError:
+            pass
+
+
+def _resolve_cover_path_from_url(image_url: str | None) -> str | None:
+    if not image_url:
+        return None
+
+    uploads_marker = "/uploads/"
+    marker_index = image_url.find(uploads_marker)
+    if marker_index == -1:
+        return None
+    return f"/app{image_url[marker_index:]}"
+
+
+def _purge_activity_logs_for_target(session: Session, target_type: str, target_id: int):
+    logs = session.exec(
+        select(ActivityLog).where(
+            ActivityLog.target_type == target_type,
+            ActivityLog.target_id == target_id,
+        )
+    ).all()
+    for log in logs:
+        session.delete(log)
+
+
+def _delete_job_and_dependencies(session: Session, job: Job) -> dict:
+    applications = session.exec(select(JobApplication).where(JobApplication.job_id == job.id)).all()
+    deleted_application_ids = []
+    for app in applications:
+        deleted_application_ids.append(app.id)
+        session.delete(app)
+
+    _delete_file_if_exists(job.jd_file_path)
+    _delete_file_if_exists(_resolve_cover_path_from_url(job.image_url))
+
+    _purge_activity_logs_for_target(session, "job", job.id)
+    for app_id in deleted_application_ids:
+        _purge_activity_logs_for_target(session, "application", app_id)
+
+    session.delete(job)
+    return {
+        "deleted_applications": len(deleted_application_ids),
+        "deleted_application_ids": deleted_application_ids,
+    }
 
 
 @router.post("/recruiters")
@@ -124,11 +176,7 @@ def admin_delete_job(job_id: int, admin_id: int = Query(...), session: Session =
     if not job:
         raise HTTPException(status_code=404, detail="Không tìm thấy job")
 
-    applications = session.exec(select(JobApplication).where(JobApplication.job_id == job_id)).all()
-    for app in applications:
-        session.delete(app)
-
-    session.delete(job)
+    cleanup = _delete_job_and_dependencies(session, job)
     session.commit()
 
     session.add(
@@ -143,7 +191,123 @@ def admin_delete_job(job_id: int, admin_id: int = Query(...), session: Session =
     )
     session.commit()
 
-    return {"message": "Đã xoá job", "job_id": job_id}
+    return {
+        "message": "Đã xoá job",
+        "job_id": job_id,
+        "deleted_applications": cleanup["deleted_applications"],
+    }
+
+
+@router.delete("/candidates/{candidate_id}")
+def admin_delete_candidate(
+    candidate_id: int,
+    admin_id: int = Query(...),
+    session: Session = Depends(get_session),
+):
+    admin = require_admin(admin_id, session)
+
+    candidate = session.get(User, candidate_id)
+    if not candidate:
+        raise HTTPException(status_code=404, detail="Không tìm thấy candidate")
+    if candidate.role != "candidate":
+        raise HTTPException(status_code=400, detail="User này không phải candidate")
+
+    cvs = session.exec(select(CV).where(CV.candidate_id == candidate_id)).all()
+    deleted_cv_ids = []
+    deleted_application_ids = []
+
+    for cv in cvs:
+        applications = session.exec(select(JobApplication).where(JobApplication.cv_id == cv.id)).all()
+        for app in applications:
+            deleted_application_ids.append(app.id)
+            session.delete(app)
+
+        _delete_file_if_exists(cv.file_path)
+        deleted_cv_ids.append(cv.id)
+        session.delete(cv)
+
+    for cv_id in deleted_cv_ids:
+        _purge_activity_logs_for_target(session, "cv", cv_id)
+    for app_id in deleted_application_ids:
+        _purge_activity_logs_for_target(session, "application", app_id)
+
+    user_logs = session.exec(select(ActivityLog).where(ActivityLog.actor_user_id == candidate_id)).all()
+    for log in user_logs:
+        session.delete(log)
+    _purge_activity_logs_for_target(session, "user", candidate_id)
+
+    session.delete(candidate)
+    session.commit()
+
+    session.add(
+        ActivityLog(
+            actor_user_id=admin.id,
+            actor_role="admin",
+            action="admin.delete.candidate",
+            target_type="user",
+            target_id=candidate_id,
+            detail=f"Deleted candidate id={candidate_id}",
+        )
+    )
+    session.commit()
+
+    return {
+        "message": "Đã xoá candidate",
+        "candidate_id": candidate_id,
+        "deleted_cvs": len(deleted_cv_ids),
+        "deleted_applications": len(deleted_application_ids),
+    }
+
+
+@router.delete("/recruiters/{recruiter_id}")
+def admin_delete_recruiter(
+    recruiter_id: int,
+    admin_id: int = Query(...),
+    session: Session = Depends(get_session),
+):
+    admin = require_admin(admin_id, session)
+
+    recruiter = session.get(User, recruiter_id)
+    if not recruiter:
+        raise HTTPException(status_code=404, detail="Không tìm thấy recruiter")
+    if recruiter.role != "recruiter":
+        raise HTTPException(status_code=400, detail="User này không phải recruiter")
+
+    jobs = session.exec(select(Job).where(Job.recruiter_id == recruiter_id)).all()
+    deleted_job_ids = []
+    deleted_applications = 0
+
+    for job in jobs:
+        cleanup = _delete_job_and_dependencies(session, job)
+        deleted_job_ids.append(job.id)
+        deleted_applications += cleanup["deleted_applications"]
+
+    user_logs = session.exec(select(ActivityLog).where(ActivityLog.actor_user_id == recruiter_id)).all()
+    for log in user_logs:
+        session.delete(log)
+    _purge_activity_logs_for_target(session, "user", recruiter_id)
+
+    session.delete(recruiter)
+    session.commit()
+
+    session.add(
+        ActivityLog(
+            actor_user_id=admin.id,
+            actor_role="admin",
+            action="admin.delete.recruiter",
+            target_type="user",
+            target_id=recruiter_id,
+            detail=f"Deleted recruiter id={recruiter_id}",
+        )
+    )
+    session.commit()
+
+    return {
+        "message": "Đã xoá recruiter/company",
+        "recruiter_id": recruiter_id,
+        "deleted_jobs": len(deleted_job_ids),
+        "deleted_applications": deleted_applications,
+    }
 
 
 @router.get("/activities")

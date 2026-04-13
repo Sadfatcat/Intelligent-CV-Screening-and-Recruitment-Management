@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+import os
 from pydantic import BaseModel
 from sqlmodel import Session, select
 
@@ -17,6 +18,17 @@ def require_recruiter(recruiter_id: int, session: Session) -> User:
     if not recruiter or recruiter.role != "recruiter":
         raise HTTPException(status_code=403, detail="Chỉ recruiter được phép thực hiện")
     return recruiter
+
+
+def _purge_activity_logs_for_target(session: Session, target_type: str, target_id: int):
+    logs = session.exec(
+        select(ActivityLog).where(
+            ActivityLog.target_type == target_type,
+            ActivityLog.target_id == target_id,
+        )
+    ).all()
+    for log in logs:
+        session.delete(log)
 
 
 @router.get("/{recruiter_id}/profile")
@@ -45,9 +57,73 @@ def list_recruiter_jobs(recruiter_id: int, session: Session = Depends(get_sessio
             "deadline": j.deadline,
             "quantity": j.quantity,
             "direct_contact": j.direct_contact,
+            "image_url": j.image_url,
         }
         for j in jobs
     ]
+
+
+@router.delete("/{recruiter_id}/jobs/{job_id}")
+def delete_recruiter_job(
+    recruiter_id: int,
+    job_id: int,
+    session: Session = Depends(get_session),
+):
+    recruiter = require_recruiter(recruiter_id, session)
+
+    job = session.get(Job, job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Không tìm thấy job")
+    if job.recruiter_id != recruiter_id:
+        raise HTTPException(status_code=403, detail="Bạn không có quyền xoá JD này")
+
+    if job.jd_file_path and os.path.exists(job.jd_file_path):
+        try:
+            os.remove(job.jd_file_path)
+        except OSError:
+            pass
+
+    if job.image_url:
+        uploads_marker = "/uploads/"
+        marker_index = job.image_url.find(uploads_marker)
+        if marker_index != -1:
+            cover_path = f"/app{job.image_url[marker_index:]}"
+            if os.path.exists(cover_path):
+                try:
+                    os.remove(cover_path)
+                except OSError:
+                    pass
+
+    applications = session.exec(select(JobApplication).where(JobApplication.job_id == job_id)).all()
+    deleted_application_ids = []
+    for app in applications:
+        deleted_application_ids.append(app.id)
+        session.delete(app)
+
+    _purge_activity_logs_for_target(session, "job", job_id)
+    for app_id in deleted_application_ids:
+        _purge_activity_logs_for_target(session, "application", app_id)
+
+    session.delete(job)
+    session.commit()
+
+    session.add(
+        ActivityLog(
+            actor_user_id=recruiter.id,
+            actor_role="recruiter",
+            action="recruiter.job.delete",
+            target_type="job",
+            target_id=job_id,
+            detail=f"Deleted JD id={job_id}",
+        )
+    )
+    session.commit()
+
+    return {
+        "message": "Xoá JD thành công",
+        "job_id": job_id,
+        "deleted_applications": len(deleted_application_ids),
+    }
 
 
 @router.get("/{recruiter_id}/jobs/{job_id}/applications")

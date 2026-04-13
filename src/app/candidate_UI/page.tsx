@@ -22,11 +22,12 @@ type JobItem = {
     image_url?: string | null;
     description: string;
     requirements?: string;
+    jd_file_path?: string | null;
 };
 
 export default function CandidatePage() {
     const [selectedJob, setSelectedJob] = useState<JobItem | null>(null);
-    const [selectedCategory, setSelectedCategory] = useState<string>("All"); // Trạng thái filter
+    const [selectedCategory, setSelectedCategory] = useState<string>("All Jobs"); // Trạng thái filter
     const [searchQuery, setSearchQuery] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false); // Trạng thái mở/đóng modal
     const [file, setFile] = useState<File | null>(null); // Lưu trữ file CV được chọn
@@ -38,12 +39,37 @@ export default function CandidatePage() {
     const [candidatePhone, setCandidatePhone] = useState("");
     const [additionalInfo, setAdditionalInfo] = useState("");
     const [theme, setTheme] = useState<"bright" | "dark">("dark");
+    const [showAllCategories, setShowAllCategories] = useState(false);
     const searchParams = useSearchParams();
 
     const styles = theme === "dark" ? darkStyles : brightStyles;
 
+    const allCategories = [
+        "All Jobs",
+        "FrontEnd",
+        "BackEnd",
+        "Full Stack",
+        "Mobile Developer",
+        "DevOps/Cloud",
+        "QA/Testing",
+        "AI/ML",
+        "Data Scientist",
+        "Data Analyst",
+        "Big Data Engineer",
+        "Database Admin",
+        "System Admin",
+        "Cybersecurity",
+        "UI/UX Designer",
+        "Software Architect",
+        "Engineering Manager",
+        "Business Analyst",
+        "Technical Writer",
+    ];
+
+    const visibleCategories = showAllCategories ? allCategories : allCategories.slice(0, 6);
+
     const filteredJobs = useMemo(() => {
-        const byCategory = selectedCategory === "All"
+        const byCategory = selectedCategory === "All Jobs" || selectedCategory === "All"
             ? jobs
             : jobs.filter(job => job.title.includes(selectedCategory));
 
@@ -170,11 +196,31 @@ export default function CandidatePage() {
                             <span className={styles.searchHint}>{filteredJobs.length} jobs found</span>
                         </div>
                         <div className={styles.leftMiddle}>
-                            <p className={styles.Linktext} onClick={() => setSelectedCategory("All")} style={{cursor: "pointer", fontWeight: selectedCategory === "All" ? "bold" : "normal"}}>All Jobs</p>
-                            <p className={styles.Linktext} onClick={() => setSelectedCategory("FrontEnd")} style={{cursor: "pointer", fontWeight: selectedCategory === "FrontEnd" ? "bold" : "normal"}}>FrontEnd</p>
-                            <p className={styles.Linktext} onClick={() => setSelectedCategory("BackEnd")} style={{cursor: "pointer", fontWeight: selectedCategory === "BackEnd" ? "bold" : "normal"}}>BackEnd</p>
-                            <p className={styles.Linktext} onClick={() => setSelectedCategory("AI/ML")} style={{cursor: "pointer", fontWeight: selectedCategory === "AI/ML" ? "bold" : "normal"}}>AI/ML</p>
-                            <p className={styles.Linktext} onClick={() => setSelectedCategory("Data Analyst")} style={{cursor: "pointer", fontWeight: selectedCategory === "Data Analyst" ? "bold" : "normal"}}>Data Analyst</p>
+                            {visibleCategories.map((category) => (
+                                <p 
+                                    key={category}
+                                    className={styles.Linktext} 
+                                    onClick={() => setSelectedCategory(category)} 
+                                    style={{cursor: "pointer", fontWeight: selectedCategory === category ? "bold" : "normal"}}
+                                >
+                                    {category}
+                                </p>
+                            ))}
+                            <button
+                                onClick={() => setShowAllCategories(!showAllCategories)}
+                                style={{
+                                    background: "none",
+                                    border: "none",
+                                    color: "#0ea5e9",
+                                    cursor: "pointer",
+                                    fontSize: "14px",
+                                    fontWeight: "600",
+                                    marginTop: "8px",
+                                    padding: "0",
+                                }}
+                            >
+                                {showAllCategories ? "▼" : "▶"}
+                            </button>
                         </div>
                     </div>
                     <div className={styles.leftBottomBox}>
@@ -227,6 +273,33 @@ export default function CandidatePage() {
                                 <h4>Requirements / Deadline:</h4>
                                 <p>Deadline: <strong>{selectedJob.deadline}</strong></p>
                                 <p>Direct contact: <strong>{selectedJob.direct_contact || "N/A"}</strong></p>
+                            </div>
+
+                            <div className={styles.detailsSection}>
+                                <h4>Job Description File:</h4>
+                                <div style={{ display: "flex", gap: "10px" }}>
+                                    {selectedJob.jd_file_path && (
+                                        <>
+                                            <a 
+                                                href={`http://localhost:8000/api/jobs/${selectedJob.id}/jd-file`} 
+                                                download
+                                                className={styles.applyButton}
+                                                style={{ textDecoration: "none" }}
+                                            >
+                                                📥 Download JD
+                                            </a>
+                                            <a 
+                                                href={`http://localhost:8000/api/jobs/${selectedJob.id}/jd-file?inline=true`} 
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className={styles.applyButton}
+                                                style={{ textDecoration: "none" }}
+                                            >
+                                                👁️ View JD
+                                            </a>
+                                        </>
+                                    )}
+                                </div>
                             </div>
 
                             {/* Đổi thẻ Link thành button mở Modal */}

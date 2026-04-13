@@ -1,6 +1,7 @@
 import os
 import uuid
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Query
+from fastapi.responses import FileResponse
 from sqlmodel import Session, select
 
 from app.database import get_session
@@ -8,10 +9,30 @@ from app.models import ActivityLog, Job, User
 
 # prefix /api/jobs, tất cả route trong file này đều bắt đầu bằng /api/jobs/...
 router = APIRouter(prefix="/api/jobs", tags=["jobs"])
+PUBLIC_UPLOAD_BASE_URL = "http://localhost:8000"
 
 # thư mục lưu file JD trên server
 UPLOAD_DIR = "/app/uploads/jd"
+JOB_COVER_UPLOAD_DIR = "/app/uploads/job_cover"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+os.makedirs(JOB_COVER_UPLOAD_DIR, exist_ok=True)
+
+
+def save_cover_image(cover_image: UploadFile | None) -> str | None:
+    if not cover_image or not cover_image.filename:
+        return None
+
+    filename = cover_image.filename.lower()
+    if not filename.endswith((".jpg", ".jpeg", ".png", ".webp")):
+        raise HTTPException(status_code=400, detail="Ảnh bìa chỉ nhận jpg, jpeg, png hoặc webp")
+
+    safe_name = f"{uuid.uuid4()}_{cover_image.filename}"
+    file_path = os.path.join(JOB_COVER_UPLOAD_DIR, safe_name)
+    file_bytes = cover_image.file.read()
+    with open(file_path, "wb") as f:
+        f.write(file_bytes)
+
+    return f"{PUBLIC_UPLOAD_BASE_URL}/uploads/job_cover/{safe_name}"
 
 
 @router.post("/upload-jd")
@@ -26,6 +47,7 @@ async def upload_jd(
     direct_contact: str = Form(...),
     description: str = Form(...),
     jd_file: UploadFile = File(...),
+    cover_image: UploadFile | None = File(default=None),
     session: Session = Depends(get_session),
 ):
     recruiter = session.get(User, recruiter_id)
@@ -50,6 +72,8 @@ async def upload_jd(
     with open(file_path, "wb") as f:
         f.write(file_bytes)
 
+    image_url = save_cover_image(cover_image)
+
     # đọc text từ PDF (lazy import để không làm sập cả app nếu thiếu thư viện OCR/parser)
     try:
         from app.services.extractor import extract_text
@@ -73,6 +97,7 @@ async def upload_jd(
         deadline=deadline,
         quantity=quantity,
         direct_contact=direct_contact,
+        image_url=image_url,
         description=description,
         jd_file_path=file_path,
         jd_parsed_text=parsed_text,
@@ -116,6 +141,7 @@ def list_jobs(session: Session = Depends(get_session)):
             "direct_contact": j.direct_contact,
             "description": j.description,
             "image_url": j.image_url,
+            "jd_file_path": j.jd_file_path,
         }
         for j in jobs
     ]
@@ -140,4 +166,31 @@ def get_job(job_id: int, session: Session = Depends(get_session)):
         "image_url": job.image_url,
         "jd_parsed_text": job.jd_parsed_text,
         "vector_saved": job.jd_vector is not None,
+        "jd_file_path": job.jd_file_path,
     }
+
+
+@router.get("/{job_id}/jd-file")
+def download_job_jd_file(job_id: int, inline: bool = Query(False), session: Session = Depends(get_session)):
+    job = session.get(Job, job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Không tìm thấy job")
+    
+    if not job.jd_file_path or not os.path.exists(job.jd_file_path):
+        raise HTTPException(status_code=404, detail="JD file không tồn tại")
+    
+    filename = f"JD_{job.id}_{job.title}.pdf".replace(" ", "_")
+    
+    if inline:
+        # Mở trong browser
+        return FileResponse(
+            path=job.jd_file_path,
+            media_type="application/pdf"
+        )
+    else:
+        # Tải file
+        return FileResponse(
+            path=job.jd_file_path,
+            filename=filename,
+            media_type="application/pdf"
+        )

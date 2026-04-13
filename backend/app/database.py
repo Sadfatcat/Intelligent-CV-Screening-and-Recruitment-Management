@@ -27,6 +27,7 @@ def run_startup_migrations():
         "ALTER TABLE job ADD COLUMN IF NOT EXISTS jd_vector TEXT",
         "ALTER TABLE job ADD COLUMN IF NOT EXISTS quantity INTEGER",
         "ALTER TABLE job ADD COLUMN IF NOT EXISTS direct_contact VARCHAR",
+        "ALTER TABLE job ADD COLUMN IF NOT EXISTS image_url VARCHAR",
     ]
 
     with engine.begin() as conn:

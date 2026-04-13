@@ -35,9 +35,10 @@ uvicorn[standard]
 sqlmodel
 psycopg2-binary
 bcrypt
-pdfplumber
 python-docx
 pytesseract
 Pillow
 sentence-transformers
 python-multipart
+PyMuPDF
+scikit-learn

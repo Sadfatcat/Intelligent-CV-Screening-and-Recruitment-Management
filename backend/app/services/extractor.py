@@ -1,5 +1,5 @@
 import io
-import pdfplumber
+import fitz
 import pytesseract
 from PIL import Image
 from docx import Document
@@ -7,11 +7,14 @@ from docx import Document
 
 def extract_text_from_pdf(file_bytes: bytes) -> str:
     text_parts = []
-    with pdfplumber.open(io.BytesIO(file_bytes)) as pdf:
-        for page in pdf.pages:
-            page_text = page.extract_text()
-            if page_text:
+    pdf_doc = fitz.open(stream=file_bytes, filetype="pdf")
+    try:
+        for page in pdf_doc:
+            page_text = page.get_text("text")
+            if page_text and page_text.strip():
                 text_parts.append(page_text)
+    finally:
+        pdf_doc.close()
     return "\n".join(text_parts).strip()
 
 
