@@ -91,7 +91,13 @@ def login_user(user_data: UserLoginRequest, session: Session = Depends(get_sessi
     )
     session.commit()
 
-    return {"message": "Đăng nhập thành công", "user_id": user.id, "role": user.role}
+    return {
+        "message": "Đăng nhập thành công",
+        "user_id": user.id,
+        "role": user.role,
+        "email": user.email,
+        "company_name": user.company_name,
+    }
 
 
 @router.put("/candidate/{candidate_id}/profile")

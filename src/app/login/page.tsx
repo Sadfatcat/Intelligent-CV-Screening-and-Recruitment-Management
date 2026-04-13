@@ -3,8 +3,9 @@
 import { useEffect }  from "react";
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import styles from "./page.module.css";
+import { useRouter, useSearchParams } from "next/navigation";
+import brightStyles from "./page.bright.module.css";
+import darkStyles from "./page.dark.module.css";
 import { handleLoginSubmit } from "@/utils/loginHandler";
 import Navbar from "@/components/navbar/Navbar";
 
@@ -17,6 +18,15 @@ export default function LoginPage() {
   const [resultMessage, setResultMessage] = useState("");
   const [resultType, setResultType] = useState<"success" | "error" | "">("");
   const [countdown, setCountdown] = useState<number | null>(null);
+  const [theme, setTheme] = useState<"bright" | "dark">("dark");
+  const searchParams = useSearchParams();
+
+  const styles = theme === "dark" ? darkStyles : brightStyles;
+
+  useEffect(() => {
+    const qsTheme = searchParams.get("theme");
+    setTheme(qsTheme === "bright" ? "bright" : "dark");
+  }, [searchParams]);
 
   useEffect(() => {
     if (countdown === null) return;
@@ -50,9 +60,7 @@ export default function LoginPage() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.navbar}>
-          <Navbar />
-        </div>
+      <Navbar />
       <div className={styles.board}>
         <img src="/usthabove.jpeg" alt="Image" className={styles.image} />
       </div>

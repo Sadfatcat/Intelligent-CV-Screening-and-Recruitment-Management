@@ -1,68 +1,116 @@
 .container {
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    background: linear-gradient(360deg, #9b999942 0%, #79378B 100%);
-    font-family: Arial, sans-serif;
+    padding: 24px;
+    font-family: "Space Grotesk", "Poppins", sans-serif;
+    background:
+        radial-gradient(circle at top right, rgba(20, 184, 166, 0.16), transparent 34%),
+        radial-gradient(circle at bottom left, rgba(30, 64, 175, 0.12), transparent 38%),
+        linear-gradient(180deg, #f8fafc 0%, #eef3f8 100%);
 }
 
 .admin {
-    background: #777676;
-    padding: 40px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     width: 100%;
-    max-width: 400px;
-    background: rgba(255, 255, 255, 0.4);
-    border: 1px solid rgba(232, 229, 229, 0.4);
-    border-radius: 20px;
-    padding: 20px;
+    max-width: 460px;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(203, 213, 225, 0.7);
+    border-radius: 22px;
+    padding: 26px;
+    box-shadow:
+        0 24px 56px rgba(15, 23, 42, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    position: relative;
+    overflow: hidden;
+}
+
+.admin::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 6px;
+    background: linear-gradient(90deg, #0f172a, #1e3a8a, #14b8a6);
 }
 
 .adminForm {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 14px;
 }
 
 .adminForm h1 {
-    font-size: 32px;
-    text-align: center;
-    color: #111111;
-    font-weight: 900;
+    margin: 0;
+    font-size: 2rem;
+    color: #0f172a;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.subtitle {
+    margin: 0 0 2px;
+    color: #64748b;
+    font-size: 0.95rem;
 }
 
 .adminForm input {
-    padding: 12px 15px;
-    font-size: 16px;
-    border: 1px solid #cccccc;
-    border-radius: 20px;
+    padding: 12px 14px;
+    font-size: 15px;
+    border: 1px solid #cbd5e1;
+    border-radius: 14px;
     outline: none;
-    transition: border-color 0.3s ease;
+    background: #fff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .adminForm input:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+    border-color: #0f766e;
+    box-shadow: 0 0 0 4px rgba(20, 184, 166, 0.14);
 }
 
-.adminForm button {
+.errorText {
+    color: #b91c1c;
+    font-size: 12px;
+    margin: -6px 0 0;
+}
+
+.submitBtn {
+    margin-top: 2px;
     padding: 12px;
-    font-size: 16px;
-    font-weight: bold;
+    font-size: 15px;
+    font-weight: 700;
     color: #ffffff;
-    background-color: #007bff;
+    background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #14b8a6 100%);
     border: none;
-    border-radius: 20px;
+    border-radius: 14px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 12px 24px rgba(29, 78, 216, 0.24);
 }
 
-.adminForm button:hover {
-    background-color: #0056b3;
+.submitBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 16px 28px rgba(29, 78, 216, 0.28);
 }
 
-.adminForm button:active {
-    background-color: #004494;
+.resultText {
+    font-size: 14px;
+    margin-top: 4px;
+    font-weight: 600;
+}
+
+.resultSuccess {
+    color: #065f46;
+}
+
+.resultError {
+    color: #b91c1c;
+}
+
+.note {
+    margin-top: 6px;
+    color: #64748b;
+    font-size: 0.9rem;
 }

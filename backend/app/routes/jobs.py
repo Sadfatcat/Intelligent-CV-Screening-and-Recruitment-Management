@@ -18,10 +18,12 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 async def upload_jd(
     recruiter_id: int = Form(...),
     title: str = Form(...),
-    company_name: str = Form(...),
+    company_name: str | None = Form(default=None),
     location: str = Form(...),
     level: str = Form(...),
     deadline: str = Form(...),
+    quantity: int = Form(...),
+    direct_contact: str = Form(...),
     description: str = Form(...),
     jd_file: UploadFile = File(...),
     session: Session = Depends(get_session),
@@ -29,6 +31,13 @@ async def upload_jd(
     recruiter = session.get(User, recruiter_id)
     if not recruiter or recruiter.role != "recruiter":
         raise HTTPException(status_code=403, detail="Chỉ recruiter được phép đăng JD")
+
+    resolved_company_name = (recruiter.company_name or company_name or "").strip()
+    if not resolved_company_name:
+        raise HTTPException(
+            status_code=400,
+            detail="Tài khoản recruiter chưa có company_name. Vui lòng nhờ admin cập nhật trước khi đăng JD.",
+        )
 
     if not jd_file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="JD chỉ nhận file PDF")
@@ -58,10 +67,12 @@ async def upload_jd(
     new_job = Job(
         recruiter_id=recruiter_id,
         title=title,
-        company_name=company_name,
+        company_name=resolved_company_name,
         location=location,
         level=level,
         deadline=deadline,
+        quantity=quantity,
+        direct_contact=direct_contact,
         description=description,
         jd_file_path=file_path,
         jd_parsed_text=parsed_text,
@@ -101,6 +112,8 @@ def list_jobs(session: Session = Depends(get_session)):
             "location": j.location,
             "level": j.level,
             "deadline": j.deadline,
+            "quantity": j.quantity,
+            "direct_contact": j.direct_contact,
             "description": j.description,
             "image_url": j.image_url,
         }
@@ -121,6 +134,8 @@ def get_job(job_id: int, session: Session = Depends(get_session)):
         "location": job.location,
         "level": job.level,
         "deadline": job.deadline,
+        "quantity": job.quantity,
+        "direct_contact": job.direct_contact,
         "description": job.description,
         "image_url": job.image_url,
         "jd_parsed_text": job.jd_parsed_text,
