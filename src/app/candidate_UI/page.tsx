@@ -2,73 +2,61 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import styles from "./page.module.css";
+import { useSearchParams } from "next/navigation";
+import brightStyles from "./page.bright.module.css";
+import darkStyles from "./page.dark.module.css";
 // import { handleLoginSubmit } from "@/utils/loginHandler";
 // import Image from "next/image";
 import Navbar from "@/components/navbar/Navbar_candidate";
 import Jobcard from "@/components/Jobcard";
 
+type JobItem = {
+    id: number;
+    title: string;
+    company_name: string;
+    location: string;
+    level: string;
+    deadline: string;
+    quantity?: number | null;
+    direct_contact?: string | null;
+    image_url?: string | null;
+    description: string;
+    requirements?: string;
+};
+
 export default function CandidatePage() {
-    const [selectedJob, setSelectedJob] = useState<any>(null); // Trạng thái lưu trữ công việc đang được chọn
+    const [selectedJob, setSelectedJob] = useState<JobItem | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<string>("All"); // Trạng thái filter
     const [searchQuery, setSearchQuery] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false); // Trạng thái mở/đóng modal
     const [file, setFile] = useState<File | null>(null); // Lưu trữ file CV được chọn
     const [displayName, setDisplayName] = useState("Candidate");
+    const [candidateId, setCandidateId] = useState<number | null>(null);
+    const [jobs, setJobs] = useState<JobItem[]>([]);
+    const [candidateName, setCandidateName] = useState("");
+    const [candidateEmail, setCandidateEmail] = useState("");
+    const [candidatePhone, setCandidatePhone] = useState("");
+    const [additionalInfo, setAdditionalInfo] = useState("");
+    const [theme, setTheme] = useState<"bright" | "dark">("dark");
+    const searchParams = useSearchParams();
 
-    const job1 = {
-        id: 1,
-        title: "Data Analyst",
-        level: "Mid-Level",
-        location: "Ha Noi",
-        deadline: "18/05/2026",
-        quantity: 1,
-        image: "/dataanalyse.jpeg", // Đã sửa 'src' thành 'image' để khớp với `type` của Jobcard
-        description: "Have >2 year experience in data analysis"
-    }
-    const job2 = {
-        id: 2,
-        title: "BackEnd Developer",
-        level: "Junior",
-        location: "Ha Noi",
-        deadline: "29/05/2026",
-        quantity: 3,
-        image: "/BE.webp",
-        description: "Have >1 years experience with Node.js, Java Spring, good at Database (SQL/NoSQL) and RESTful API."
-    };
-    //fake data
-    const job3 = {
-        id: 3,
-        title: "FrontEnd Developer",
-        level: "Fresher",
-        location: "Ha Noi",
-        deadline: "10/05/2026",
-        quantity: 1,
-        image: "/FE.webp",
-        description: "Know how to use NextJs, ReactJs, good at HTML, CSS, JavaScript"
-    };
-    const job4 = {
-        id: 4,
-        title: "AI/ML Engineer",
-        level: "Senior",
-        location: "Ha Noi",
-        deadline: "26/07/2026",
-        quantity: 2,
-        image: "/AI.jpeg",
-        description: "Know how to use Python, good at AI/ML concepts"
-    };
+    const styles = theme === "dark" ? darkStyles : brightStyles;
 
-    const allJobs = [job1, job2, job3, job4];
     const filteredJobs = useMemo(() => {
         const byCategory = selectedCategory === "All"
-            ? allJobs
-            : allJobs.filter(job => job.title.includes(selectedCategory));
+            ? jobs
+            : jobs.filter(job => job.title.includes(selectedCategory));
 
         const q = searchQuery.trim().toLowerCase();
         if (!q) return byCategory;
 
         return byCategory.filter(job => job.title.toLowerCase().includes(q));
-    }, [selectedCategory, searchQuery]);
+    }, [selectedCategory, searchQuery, jobs]);
+
+    useEffect(() => {
+        const qsTheme = searchParams.get("theme");
+        setTheme(qsTheme === "bright" ? "bright" : "dark");
+    }, [searchParams]);
 
     useEffect(() => {
         const currentUserRaw = localStorage.getItem("currentUser");
@@ -76,17 +64,35 @@ export default function CandidatePage() {
 
         try {
             const currentUser = JSON.parse(currentUserRaw);
+            if (typeof currentUser?.user_id === "number") {
+                setCandidateId(currentUser.user_id);
+            }
             const email = currentUser?.email || currentUser?.user?.email;
             if (typeof email === "string" && email.includes("@")) {
                 setDisplayName(email.split("@")[0]);
+                setCandidateEmail(email);
             }
         } catch {
             setDisplayName("Candidate");
         }
     }, []);
 
+    useEffect(() => {
+        fetch("http://localhost:8000/api/jobs/")
+            .then(async (res) => {
+                const data = await res.json();
+                if (!res.ok) {
+                    throw new Error(data.detail || "Failed to load jobs");
+                }
+                setJobs(Array.isArray(data) ? data : []);
+            })
+            .catch(() => {
+                setJobs([]);
+            });
+    }, []);
+
     // onClick cho job cards
-    const handleClickjob = (jobData: any) => {
+    const handleClickjob = (jobData: JobItem) => {
         setSelectedJob(jobData);
         console.log("Selected Job:", jobData.title);
     }
@@ -100,14 +106,52 @@ export default function CandidatePage() {
     const handleCloseModal = () => {
         setIsModalOpen(false);
         setFile(null); // Reset file khi đóng modal
+        setAdditionalInfo("");
     };
+
+    async function handleApply(e: React.FormEvent) {
+        e.preventDefault();
+        if (!file || !selectedJob) {
+            alert("Please attach your CV!");
+            return;
+        }
+
+        if (!candidateName || !candidateEmail || !candidatePhone) {
+            alert("Please fill all candidate fields.");
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append("job_id", String(selectedJob.id));
+            formData.append("candidate_name", candidateName);
+            formData.append("candidate_email", candidateEmail);
+            formData.append("candidate_phone", candidatePhone);
+            if (candidateId !== null) {
+                formData.append("candidate_id", String(candidateId));
+            }
+            formData.append("cv_file", file);
+
+            const response = await fetch("http://localhost:8000/api/cvs/upload-cv", {
+                method: "POST",
+                body: formData,
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.detail || "Failed to submit CV");
+            }
+
+            alert(`Application submitted successfully for ${selectedJob.title}`);
+            handleCloseModal();
+        } catch (err) {
+            alert(err instanceof Error ? err.message : "Failed to submit CV");
+        }
+    }
 
     return (
         <main>
             <div className={styles.container}>
-                <div className={styles.navbar}>
-                    <Navbar />
-                </div>
+                <Navbar />
                 <div className={styles.left}>
                         <div className={styles.leftTopBox}>
                             <div className={styles.leftTop}>
@@ -165,11 +209,13 @@ export default function CandidatePage() {
                 <div className={styles.right}>
                     {selectedJob ? (
                         <div className={styles.jobDetails}>
-                            <img src={selectedJob.image} alt={selectedJob.title} className={styles.detailsImage} />
+                            {selectedJob.image_url && (
+                                <img src={selectedJob.image_url} alt={selectedJob.title} className={styles.detailsImage} />
+                            )}
                             
                             <h2 className={styles.detailsTitle}>{selectedJob.title}</h2>
                             <p className={styles.detailsMeta}>
-                                {selectedJob.level} | {selectedJob.location} | Quantity: {selectedJob.quantity}
+                                {selectedJob.level} | {selectedJob.location} | Quantity: {selectedJob.quantity ?? "-"}
                             </p>
                             
                             <div className={styles.detailsSection}>
@@ -180,6 +226,7 @@ export default function CandidatePage() {
                             <div className={styles.detailsSection}>
                                 <h4>Requirements / Deadline:</h4>
                                 <p>Deadline: <strong>{selectedJob.deadline}</strong></p>
+                                <p>Direct contact: <strong>{selectedJob.direct_contact || "N/A"}</strong></p>
                             </div>
 
                             {/* Đổi thẻ Link thành button mở Modal */}
@@ -206,23 +253,36 @@ export default function CandidatePage() {
                             <p>If you have any questions, please contact us through the contact information, or fill in the form below.</p>
                         </div>
 
-                        <form onSubmit={(e) => {
-                            e.preventDefault();
-                            if (!file) {
-                                alert("Please attach your CV!");
-                                return;
-                            }
-                            alert(`Successfully applied for position ${selectedJob?.title} with file ${file.name}`);
-                            handleCloseModal();
-                        }}>
+                        <form onSubmit={handleApply}>
                             <div className={styles.modalBody}>
                                 {/* Cột Trái: Các Form nhập liệu */}
                                 <div className={styles.modalFormCol}>
-                                    <input className={styles.modalInput} type="text" placeholder="Full Name" required />
-                                    <input className={styles.modalInput} type="email" placeholder="Email" required />
+                                    <input
+                                        className={styles.modalInput}
+                                        type="text"
+                                        placeholder="Full Name"
+                                        value={candidateName}
+                                        onChange={(e) => setCandidateName(e.target.value)}
+                                        required
+                                    />
+                                    <input
+                                        className={styles.modalInput}
+                                        type="email"
+                                        placeholder="Email"
+                                        value={candidateEmail}
+                                        onChange={(e) => setCandidateEmail(e.target.value)}
+                                        required
+                                    />
                                     <div className={styles.phoneGroup}>
                                         <div className={styles.phonePrefix}>🇻🇳 +84</div>
-                                        <input className={styles.modalInput} type="tel" placeholder="Phone Number" required />
+                                        <input
+                                            className={styles.modalInput}
+                                            type="tel"
+                                            placeholder="Phone Number"
+                                            value={candidatePhone}
+                                            onChange={(e) => setCandidatePhone(e.target.value)}
+                                            required
+                                        />
                                     </div>
                                     <input 
                                         className={styles.modalInput} 
@@ -231,7 +291,13 @@ export default function CandidatePage() {
                                         readOnly 
                                         style={{ background: "#f9f9f9", opacity : 0.8}} 
                                     />
-                                    <textarea className={styles.modalInput} rows={4} placeholder="Additional Information"></textarea>
+                                    <textarea
+                                        className={styles.modalInput}
+                                        rows={4}
+                                        placeholder="Additional Information"
+                                        value={additionalInfo}
+                                        onChange={(e) => setAdditionalInfo(e.target.value)}
+                                    ></textarea>
                                 </div>
 
                                 {/* Cột Phải: Upload File */}

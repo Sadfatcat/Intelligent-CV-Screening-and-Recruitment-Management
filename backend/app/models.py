@@ -8,10 +8,10 @@ class User(SQLModel, table=True):
     email: str = Field(index=True, unique=True)
     password_hash: str
     role: str = "candidate"  # candidate | recruiter | admin
-    full_name: Optional[str] = None
-    phone: Optional[str] = None
-    address: Optional[str] = None
-    company_name: Optional[str] = None
+    full_name: str | None = None
+    phone: str | None = None
+    address: str | None = None
+    company_name: str | None = None
     is_active: bool = Field(default=True)
 
     jobs: List["Job"] = Relationship(back_populates="recruiter")
@@ -27,13 +27,15 @@ class Job(SQLModel, table=True):
     location: str
     level: str
     deadline: str
-    image_url: Optional[str] = None
+    quantity: int | None = None
+    direct_contact: str | None = None
+    image_url: str | None = None
     description: str
 
     # lưu JD
-    jd_file_path: Optional[str] = None
-    jd_parsed_text: Optional[str] = None
-    jd_vector: Optional[str] = None  # json string của vector 384 chiều
+    jd_file_path: str | None = None
+    jd_parsed_text: str | None = None
+    jd_vector: str | None = None  # json string của vector 384 chiều
 
     recruiter: Optional[User] = Relationship(back_populates="jobs")
     applications: List["JobApplication"] = Relationship(back_populates="job")
@@ -44,13 +46,13 @@ class CV(SQLModel, table=True):
     candidate_id: Optional[int] = Field(default=None, foreign_key="user.id")
 
     # thông tin cá nhân ứng viên tự điền
-    candidate_name: Optional[str] = None
-    candidate_email: Optional[str] = None
-    candidate_phone: Optional[str] = None
+    candidate_name: str | None = None
+    candidate_email: str | None = None
+    candidate_phone: str | None = None
 
     file_path: str  # lưu cv trong ổ cứng
-    parsed_text: Optional[str] = None
-    cv_vector: Optional[str] = None  # lưu vector cv
+    parsed_text: str | None = None
+    cv_vector: str | None = None  # lưu vector cv
 
     candidate: Optional[User] = Relationship(back_populates="cvs")
     applications: List["JobApplication"] = Relationship(back_populates="cv")
@@ -75,5 +77,5 @@ class ActivityLog(SQLModel, table=True):
     action: str
     target_type: str
     target_id: Optional[int] = None
-    detail: Optional[str] = None
+    detail: str | None = None
     created_at: datetime = Field(default_factory=datetime.utcnow)

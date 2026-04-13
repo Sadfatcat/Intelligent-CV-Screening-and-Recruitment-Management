@@ -19,6 +19,18 @@ def require_recruiter(recruiter_id: int, session: Session) -> User:
     return recruiter
 
 
+@router.get("/{recruiter_id}/profile")
+def get_recruiter_profile(recruiter_id: int, session: Session = Depends(get_session)):
+    recruiter = require_recruiter(recruiter_id, session)
+    return {
+        "id": recruiter.id,
+        "email": recruiter.email,
+        "full_name": recruiter.full_name,
+        "company_name": recruiter.company_name,
+        "phone": recruiter.phone,
+    }
+
+
 @router.get("/{recruiter_id}/jobs")
 def list_recruiter_jobs(recruiter_id: int, session: Session = Depends(get_session)):
     require_recruiter(recruiter_id, session)
@@ -31,6 +43,8 @@ def list_recruiter_jobs(recruiter_id: int, session: Session = Depends(get_sessio
             "location": j.location,
             "level": j.level,
             "deadline": j.deadline,
+            "quantity": j.quantity,
+            "direct_contact": j.direct_contact,
         }
         for j in jobs
     ]
@@ -108,3 +122,45 @@ def update_application_status(
     session.commit()
 
     return {"message": "Cập nhật trạng thái thành công", "application_id": application.id, "status": application.status}
+
+
+@router.get("/{recruiter_id}/cv-logs")
+def list_recruiter_cv_logs(recruiter_id: int, session: Session = Depends(get_session)):
+    require_recruiter(recruiter_id, session)
+
+    logs = session.exec(
+        select(ActivityLog)
+        .where(ActivityLog.action == "candidate.cv.submit")
+        .order_by(ActivityLog.created_at.desc())
+    ).all()
+
+    result = []
+    for log in logs:
+        if log.target_type != "application" or log.target_id is None:
+            continue
+
+        application = session.get(JobApplication, log.target_id)
+        if not application:
+            continue
+
+        job = session.get(Job, application.job_id) if application.job_id else None
+        if not job or job.recruiter_id != recruiter_id:
+            continue
+
+        cv = session.get(CV, application.cv_id) if application.cv_id else None
+        result.append(
+            {
+                "log_id": log.id,
+                "created_at": log.created_at,
+                "job_id": job.id,
+                "job_title": job.title,
+                "application_id": application.id,
+                "candidate_name": cv.candidate_name if cv else None,
+                "candidate_email": cv.candidate_email if cv else None,
+                "candidate_phone": cv.candidate_phone if cv else None,
+                "status": application.status,
+                "ai_matching_score": application.ai_matching_score,
+            }
+        )
+
+    return result

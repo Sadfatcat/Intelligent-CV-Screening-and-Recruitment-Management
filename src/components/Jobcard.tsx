@@ -13,9 +13,11 @@ type JobCardProps = {
         location: string;
         level: string;
         deadline: string;
+        quantity?: number | null;
+        direct_contact?: string | null;
         image_url?: string;
         description: string;
-        requirements: string; // Rất quan trọng để phục vụ AI screening
+        requirements?: string;
     };
     onClick?: () => void;
     isActive?: boolean;
@@ -53,13 +55,23 @@ export default function JobCard({
                 <span className={styles.label}>Deadline:</span> {job.deadline}
             </p>
 
+            <p className={styles.text}>
+                <span className={styles.label}>Quantity:</span> {job.quantity ?? "-"}
+            </p>
+
+            <p className={styles.text}>
+                <span className={styles.label}>Direct contact:</span> {job.direct_contact || "N/A"}
+            </p>
+
             <p className={styles.description}>
                 <span className={styles.label}>Description:</span> {job.description}
             </p>
             
-            <p className={styles.description}>
-                <span className={styles.label}>Requirements:</span> {job.requirements}
-            </p>
+            {job.requirements && (
+                <p className={styles.description}>
+                    <span className={styles.label}>Requirements:</span> {job.requirements}
+                </p>
+            )}
         </div>
     );
 }

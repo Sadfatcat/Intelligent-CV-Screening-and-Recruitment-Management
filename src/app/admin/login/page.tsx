@@ -66,13 +66,14 @@ export default function AdminPage() {
             <div className={styles.admin}>
                 <form className={styles.adminForm} onSubmit={handleSubmit}>
                     <h1>Admin Login</h1>
+                    <p className={styles.subtitle}>Secure access to dashboard management.</p>
                     <input
                         type="text"
-                        placeholder="username"
+                        placeholder="admin email"
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                     />
-                    {usernameError && <p style={{color: "red", fontSize: "12px", margin: "0"}}>{usernameError}</p>}
+                    {usernameError && <p className={styles.errorText}>{usernameError}</p>}
                     
                     <input
                         type="password"
@@ -80,17 +81,17 @@ export default function AdminPage() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
-                    {passwordError && <p style={{color: "red", fontSize: "12px", margin: "0"}}>{passwordError}</p>}
+                    {passwordError && <p className={styles.errorText}>{passwordError}</p>}
                     
-                    <button type="submit">Login</button>
+                    <button type="submit" className={styles.submitBtn}>Login</button>
                     
                     {resultMessage && (
-                        <p style={{ color: resultType === "success" ? "green" : "red", fontSize: "14px", marginTop: "10px" }}>
+                        <p className={`${styles.resultText} ${resultType === "success" ? styles.resultSuccess : styles.resultError}`}>
                             {resultMessage}
                         </p>
                     )}
 
-                    <p style={{ marginTop: "1rem", fontSize: "0.9rem" }}>
+                    <p className={styles.note}>
                         Recruiter accounts are created by admin inside dashboard.
                     </p>
                 </form>

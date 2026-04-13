@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import styles from "./page.module.css";
+import brightStyles from "./page.bright.module.css";
+import darkStyles from "./page.dark.module.css";
 import { handleRegisterSubmit } from "@/utils/registerHandler";
 import Navbar from "@/components/navbar/Navbar";
 // import ImageSlider from "@/components/ImageSlider";
@@ -17,6 +18,15 @@ export default function RegisterCandidatePage() {
   const [passwordError, setPasswordError] = useState("");
   const [resultMessage, setResultMessage] = useState("");
   const [resultType, setResultType] = useState<"success" | "error" | "">("");
+  const [theme, setTheme] = useState<"bright" | "dark">("dark");
+  const searchParams = useSearchParams();
+
+  const styles = theme === "dark" ? darkStyles : brightStyles;
+
+  useEffect(() => {
+    const qsTheme = searchParams.get("theme");
+    setTheme(qsTheme === "bright" ? "bright" : "dark");
+  }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     await handleRegisterSubmit(
