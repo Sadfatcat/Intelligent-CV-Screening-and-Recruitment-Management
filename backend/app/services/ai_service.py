@@ -1,10 +1,11 @@
 # backend/app/services/ai_service.py
 
 import fitz  # PyMuPDF
-from sentence_transformers import SentenceTransformer, util
+from sentence_transformers import util
 
-# 1. Load model (nên load một lần khi khởi động app)
-model = SentenceTransformer('all-MiniLM-L6-v2')
+from app.services.vectorizer import get_model, query_to_vector, passage_to_vector
+
+model = get_model()
 
 def extract_text_from_pdf(file_path):
     doc = fitz.open(file_path)
@@ -15,7 +16,7 @@ def extract_text_from_pdf(file_path):
 
 def calculate_match_score(cv_text, jd_text):
     # 2. Chuyển đổi sang vector
-    embeddings = model.encode([cv_text, jd_text])
+    embeddings = [query_to_vector(cv_text), passage_to_vector(jd_text)]
     
     # 3. Tính toán Cosine Similarity
     score = util.cos_sim(embeddings[0], embeddings[1])
