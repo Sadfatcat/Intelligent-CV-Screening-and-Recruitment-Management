@@ -28,6 +28,16 @@ def run_startup_migrations():
         "ALTER TABLE job ADD COLUMN IF NOT EXISTS quantity INTEGER",
         "ALTER TABLE job ADD COLUMN IF NOT EXISTS direct_contact VARCHAR",
         "ALTER TABLE job ADD COLUMN IF NOT EXISTS image_url VARCHAR",
+        "ALTER TABLE cv ADD COLUMN IF NOT EXISTS candidate_name VARCHAR",
+        "ALTER TABLE cv ADD COLUMN IF NOT EXISTS candidate_email VARCHAR",
+        "ALTER TABLE cv ADD COLUMN IF NOT EXISTS candidate_phone VARCHAR",
+        "ALTER TABLE cv ADD COLUMN IF NOT EXISTS parsed_text TEXT",
+        "ALTER TABLE cv ADD COLUMN IF NOT EXISTS cv_vector TEXT",
+        "ALTER TABLE jobapplication ADD COLUMN IF NOT EXISTS ai_matching_score DOUBLE PRECISION",
+        "ALTER TABLE activitylog ADD COLUMN IF NOT EXISTS target_type VARCHAR",
+        "ALTER TABLE activitylog ADD COLUMN IF NOT EXISTS target_id INTEGER",
+        "ALTER TABLE activitylog ADD COLUMN IF NOT EXISTS detail VARCHAR",
+        "ALTER TABLE activitylog ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITHOUT TIME ZONE",
     ]
 
     with engine.begin() as conn:

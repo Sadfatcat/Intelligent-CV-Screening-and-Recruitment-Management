@@ -25,6 +25,7 @@ type RecruiterJob = {
 type JobApplicationsResponse = {
     applications: Array<{
         application_id: number;
+        cv_id: number | null;
         candidate_name: string | null;
         candidate_email: string | null;
         candidate_phone: string | null;
@@ -39,6 +40,7 @@ type CVLogItem = {
     job_id: number;
     job_title: string;
     application_id: number;
+    cv_id: number | null;
     candidate_name: string | null;
     candidate_email: string | null;
     candidate_phone: string | null;
@@ -66,6 +68,8 @@ export default function RecruiterUIPage() {
     const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
     const [applications, setApplications] = useState<JobApplicationsResponse["applications"]>([]);
     const [cvLogs, setCvLogs] = useState<CVLogItem[]>([]);
+    const [deleteConfirmApplicationId, setDeleteConfirmApplicationId] = useState<number | null>(null);
+    const [selectedLog, setSelectedLog] = useState<CVLogItem | null>(null);
     const [isUploadPopupOpen, setIsUploadPopupOpen] = useState(false);
     const [theme, setTheme] = useState<"light" | "dark">("light");
 
@@ -96,6 +100,27 @@ export default function RecruiterUIPage() {
             throw new Error(data.detail || "Failed to load recruiter jobs");
         }
         setJobs(Array.isArray(data) ? data : []);
+    }
+
+    async function reloadRecruiterData(recruiterId: number, keepCurrentSelection = true) {
+        await loadRecruiterJobs(recruiterId);
+
+        const logsRes = await fetch(`http://localhost:8000/api/recruiter/${recruiterId}/cv-logs`);
+        const logsData = await logsRes.json();
+        if (!logsRes.ok) {
+            throw new Error(logsData.detail || "Failed to load CV logs");
+        }
+        const logs = Array.isArray(logsData) ? logsData : [];
+        setCvLogs(logs);
+
+        if (keepCurrentSelection && selectedJobId) {
+            const appsRes = await fetch(`http://localhost:8000/api/recruiter/${recruiterId}/jobs/${selectedJobId}/applications`);
+            const appsData = await appsRes.json();
+            if (!appsRes.ok) {
+                throw new Error(appsData.detail || "Failed to load applications");
+            }
+            setApplications(Array.isArray(appsData.applications) ? appsData.applications : []);
+        }
     }
 
     useEffect(() => {
@@ -314,6 +339,32 @@ export default function RecruiterUIPage() {
         }
     }
 
+    async function handleDeleteApplication(applicationId: number) {
+        if (!session) return;
+        try {
+            const res = await fetch(`http://localhost:8000/api/recruiter/${session.user_id}/applications/${applicationId}`, {
+                method: "DELETE",
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data.detail || "Delete CV failed");
+            }
+
+            setDeleteConfirmApplicationId(null);
+            setMessage("CV deleted successfully");
+            setMessageType("success");
+
+            if (selectedLog?.application_id === applicationId) {
+                setSelectedLog(null);
+            }
+
+            await reloadRecruiterData(session.user_id);
+        } catch (err) {
+            setMessage(err instanceof Error ? err.message : "Delete CV failed");
+            setMessageType("error");
+        }
+    }
+
     const selectedJob = useMemo(
         () => jobs.find((job) => job.id === selectedJobId) || null,
         [jobs, selectedJobId]
@@ -362,6 +413,11 @@ export default function RecruiterUIPage() {
             minute: "2-digit",
             second: "2-digit",
         });
+    }
+
+    function formatScore(value: number | null) {
+        if (value === null || Number.isNaN(value)) return "-";
+        return value.toFixed(3);
     }
 
     if (!session) {
@@ -489,14 +545,14 @@ export default function RecruiterUIPage() {
                                 </thead>
                                 <tbody>
                                     {filteredLogs.map((log) => (
-                                        <tr key={log.log_id}>
+                                        <tr key={log.log_id} className={styles.clickableRow} onClick={() => setSelectedLog(log)}>
                                             <td>{formatLogTime(log.created_at)}</td>
                                             <td>{log.job_title}</td>
                                             <td>{log.candidate_name || "-"}</td>
                                             <td>{log.candidate_email || "-"}</td>
                                             <td>{log.candidate_phone || "-"}</td>
                                             <td>{log.status}</td>
-                                            <td>{log.ai_matching_score ?? "-"}</td>
+                                            <td>{formatScore(log.ai_matching_score)}</td>
                                         </tr>
                                     ))}
                                     {filteredLogs.length === 0 && (
@@ -520,6 +576,7 @@ export default function RecruiterUIPage() {
                                         <th>Phone</th>
                                         <th>Status</th>
                                         <th>Score</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -529,12 +586,40 @@ export default function RecruiterUIPage() {
                                             <td>{app.candidate_email || "-"}</td>
                                             <td>{app.candidate_phone || "-"}</td>
                                             <td>{app.status}</td>
-                                            <td>{app.ai_matching_score ?? "-"}</td>
+                                            <td>{formatScore(app.ai_matching_score)}</td>
+                                            <td>
+                                                {deleteConfirmApplicationId === app.application_id ? (
+                                                    <div className={styles.actionConfirmBox}>
+                                                        <button
+                                                            className={styles.confirmDeleteBtn}
+                                                            onClick={() => handleDeleteApplication(app.application_id)}
+                                                            type="button"
+                                                        >
+                                                            Confirm
+                                                        </button>
+                                                        <button
+                                                            className={styles.cancelDeleteBtn}
+                                                            onClick={() => setDeleteConfirmApplicationId(null)}
+                                                            type="button"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <button
+                                                        className={styles.deleteCvBtn}
+                                                        onClick={() => setDeleteConfirmApplicationId(app.application_id)}
+                                                        type="button"
+                                                    >
+                                                        Delete CV
+                                                    </button>
+                                                )}
+                                            </td>
                                         </tr>
                                     ))}
                                     {applications.length === 0 && (
                                         <tr>
-                                            <td colSpan={5}>No applications for selected job yet.</td>
+                                            <td colSpan={6}>No applications for selected job yet.</td>
                                         </tr>
                                     )}
                                 </tbody>
@@ -627,6 +712,62 @@ export default function RecruiterUIPage() {
                                 <button className={styles.button} type="submit">Create Job Card & Upload JD</button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {selectedLog && session && (
+                <div className={styles.popupOverlay}>
+                    <div className={styles.popupCard}>
+                        <button className={styles.popupClose} onClick={() => setSelectedLog(null)}>×</button>
+                        <div className={styles.popupHeader}>
+                            <h3>Candidate Contact Details</h3>
+                            <p>From CV log for application #{selectedLog.application_id}</p>
+                        </div>
+
+                        <div className={styles.contactGrid}>
+                            <div className={styles.contactItem}>
+                                <p className={styles.contactLabel}>Candidate</p>
+                                <p className={styles.contactValue}>{selectedLog.candidate_name || "-"}</p>
+                            </div>
+                            <div className={styles.contactItem}>
+                                <p className={styles.contactLabel}>Email</p>
+                                <p className={styles.contactValue}>{selectedLog.candidate_email || "-"}</p>
+                            </div>
+                            <div className={styles.contactItem}>
+                                <p className={styles.contactLabel}>Phone</p>
+                                <p className={styles.contactValue}>{selectedLog.candidate_phone || "-"}</p>
+                            </div>
+                            <div className={styles.contactItem}>
+                                <p className={styles.contactLabel}>Job</p>
+                                <p className={styles.contactValue}>{selectedLog.job_title}</p>
+                            </div>
+                            <div className={styles.contactItem}>
+                                <p className={styles.contactLabel}>Status</p>
+                                <p className={styles.contactValue}>{selectedLog.status}</p>
+                            </div>
+                            <div className={styles.contactItem}>
+                                <p className={styles.contactLabel}>Score</p>
+                                <p className={styles.contactValue}>{formatScore(selectedLog.ai_matching_score)}</p>
+                            </div>
+                        </div>
+
+                        <div className={styles.modalFooter}>
+                            <a
+                                className={styles.button}
+                                href={`http://localhost:8000/api/recruiter/${session.user_id}/applications/${selectedLog.application_id}/cv-file?inline=true`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                View CV in Browser
+                            </a>
+                            <a
+                                className={styles.navButton}
+                                href={`http://localhost:8000/api/recruiter/${session.user_id}/applications/${selectedLog.application_id}/cv-file`}
+                            >
+                                Download CV
+                            </a>
+                        </div>
                     </div>
                 </div>
             )}

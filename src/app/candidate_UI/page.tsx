@@ -19,10 +19,22 @@ type JobItem = {
     deadline: string;
     quantity?: number | null;
     direct_contact?: string | null;
-    image_url?: string | null;
+    image_url?: string;
     description: string;
     requirements?: string;
     jd_file_path?: string | null;
+};
+
+type CandidateSubmissionItem = {
+    application_id: number;
+    job_id: number;
+    job_title: string;
+    company_name: string;
+    location: string;
+    level: string;
+    status: string;
+    ai_matching_score: number | null;
+    submitted_at: string | null;
 };
 
 export default function CandidatePage() {
@@ -34,13 +46,32 @@ export default function CandidatePage() {
     const [displayName, setDisplayName] = useState("Candidate");
     const [candidateId, setCandidateId] = useState<number | null>(null);
     const [jobs, setJobs] = useState<JobItem[]>([]);
+    const [submittedJobs, setSubmittedJobs] = useState<CandidateSubmissionItem[]>([]);
     const [candidateName, setCandidateName] = useState("");
     const [candidateEmail, setCandidateEmail] = useState("");
     const [candidatePhone, setCandidatePhone] = useState("");
     const [additionalInfo, setAdditionalInfo] = useState("");
+    const [applyStatus, setApplyStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [theme, setTheme] = useState<"bright" | "dark">("dark");
     const [showAllCategories, setShowAllCategories] = useState(false);
     const searchParams = useSearchParams();
+
+    async function parseApiResponse(response: Response): Promise<{ data: unknown; message: string }> {
+        const contentType = response.headers.get("content-type") || "";
+
+        if (contentType.includes("application/json")) {
+            const data = await response.json();
+            const message =
+                typeof data === "object" && data !== null && "detail" in data
+                    ? String((data as { detail?: unknown }).detail || "")
+                    : "";
+            return { data, message };
+        }
+
+        const text = await response.text();
+        return { data: null, message: text || "Unexpected server response" };
+    }
 
     const styles = theme === "dark" ? darkStyles : brightStyles;
 
@@ -79,6 +110,55 @@ export default function CandidatePage() {
         return byCategory.filter(job => job.title.toLowerCase().includes(q));
     }, [selectedCategory, searchQuery, jobs]);
 
+    const groupedJobsByCompany = useMemo(() => {
+        const grouped = filteredJobs.reduce<Record<string, JobItem[]>>((acc, job) => {
+            const company = (job.company_name || "Unknown Company").trim() || "Unknown Company";
+            if (!acc[company]) {
+                acc[company] = [];
+            }
+            acc[company].push(job);
+            return acc;
+        }, {});
+
+        return Object.entries(grouped).sort(([companyA], [companyB]) => companyA.localeCompare(companyB));
+    }, [filteredJobs]);
+
+    function formatSubmittedTime(value: string | null) {
+        if (!value) return "-";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return value;
+        return date.toLocaleString("vi-VN", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+        });
+    }
+
+    function formatScore(value: number | null) {
+        if (value === null || Number.isNaN(value)) return "-";
+        return value.toFixed(3);
+    }
+
+    async function loadSubmittedJobs(candidateIdValue: number) {
+        const response = await fetch(`/api/cvs/candidate/${candidateIdValue}/applications`);
+        const { data, message } = await parseApiResponse(response);
+        if (!response.ok) {
+            throw new Error(message || "Failed to load submitted jobs");
+        }
+
+        const applications =
+            typeof data === "object" &&
+            data !== null &&
+            "applications" in data &&
+            Array.isArray((data as { applications?: unknown }).applications)
+                ? ((data as { applications: CandidateSubmissionItem[] }).applications)
+                : [];
+
+        setSubmittedJobs(applications);
+    }
+
     useEffect(() => {
         const qsTheme = searchParams.get("theme");
         setTheme(qsTheme === "bright" ? "bright" : "dark");
@@ -104,13 +184,30 @@ export default function CandidatePage() {
     }, []);
 
     useEffect(() => {
-        fetch("http://localhost:8000/api/jobs/")
-            .then(async (res) => {
-                const data = await res.json();
-                if (!res.ok) {
-                    throw new Error(data.detail || "Failed to load jobs");
+        if (candidateId === null) {
+            setSubmittedJobs([]);
+            return;
+        }
+
+        loadSubmittedJobs(candidateId).catch(() => {
+            setSubmittedJobs([]);
+        });
+    }, [candidateId]);
+
+    useEffect(() => {
+        fetch("/api/jobs/")
+            .then(async (response) => {
+                const { data, message } = await parseApiResponse(response);
+                if (!response.ok) {
+                    throw new Error(message || "Failed to load jobs");
                 }
-                setJobs(Array.isArray(data) ? data : []);
+                const normalizedJobs: JobItem[] = Array.isArray(data)
+                    ? data.map((job: JobItem) => ({
+                        ...job,
+                        image_url: job.image_url ?? undefined,
+                    }))
+                    : [];
+                setJobs(normalizedJobs);
             })
             .catch(() => {
                 setJobs([]);
@@ -133,21 +230,25 @@ export default function CandidatePage() {
         setIsModalOpen(false);
         setFile(null); // Reset file khi đóng modal
         setAdditionalInfo("");
+        setApplyStatus(null);
     };
 
     async function handleApply(e: React.FormEvent) {
         e.preventDefault();
+        setApplyStatus(null);
+
         if (!file || !selectedJob) {
-            alert("Please attach your CV!");
+            setApplyStatus({ type: "error", message: "Please attach your CV before applying." });
             return;
         }
 
         if (!candidateName || !candidateEmail || !candidatePhone) {
-            alert("Please fill all candidate fields.");
+            setApplyStatus({ type: "error", message: "Please fill your full name, email, and phone number." });
             return;
         }
 
         try {
+            setIsSubmitting(true);
             const formData = new FormData();
             formData.append("job_id", String(selectedJob.id));
             formData.append("candidate_name", candidateName);
@@ -158,19 +259,43 @@ export default function CandidatePage() {
             }
             formData.append("cv_file", file);
 
-            const response = await fetch("http://localhost:8000/api/cvs/upload-cv", {
+            const response = await fetch("/api/cvs/upload-cv", {
                 method: "POST",
                 body: formData,
             });
-            const data = await response.json();
+            const { data, message } = await parseApiResponse(response);
             if (!response.ok) {
-                throw new Error(data.detail || "Failed to submit CV");
+                throw new Error(message || "Failed to submit CV");
             }
 
-            alert(`Application submitted successfully for ${selectedJob.title}`);
-            handleCloseModal();
+            const applicationId =
+                typeof data === "object" && data !== null && "application_id" in data
+                    ? (data as { application_id?: number }).application_id
+                    : undefined;
+
+            setApplyStatus({
+                type: "success",
+                message: `CV submitted successfully for ${selectedJob.title}.${applicationId ? ` Application ID: ${applicationId}` : ""}`,
+            });
+            setFile(null);
+            setAdditionalInfo("");
+            if (candidateId !== null) {
+                loadSubmittedJobs(candidateId).catch(() => {
+                    // keep existing list when refresh fails
+                });
+            }
         } catch (err) {
-            alert(err instanceof Error ? err.message : "Failed to submit CV");
+            setApplyStatus({
+                type: "error",
+                message:
+                    err instanceof TypeError
+                        ? "Cannot connect to backend API. Check backend server and Next.js API rewrite config."
+                        : err instanceof Error
+                            ? err.message
+                            : "Failed to submit CV",
+            });
+        } finally {
+            setIsSubmitting(false);
         }
     }
 
@@ -222,6 +347,36 @@ export default function CandidatePage() {
                                 {showAllCategories ? "▼" : "▶"}
                             </button>
                         </div>
+
+                        {candidateId !== null && (
+                            <div className={styles.submittedJobsCard}>
+                                <h4 className={styles.submittedJobsTitle}>Submitted CV Jobs</h4>
+                                {submittedJobs.length === 0 ? (
+                                    <p className={styles.submittedJobsEmpty}>You have not submitted any CV yet.</p>
+                                ) : (
+                                    <ul className={styles.submittedJobsList}>
+                                        {submittedJobs.map((item) => (
+                                            <li key={item.application_id}>
+                                                <button
+                                                    type="button"
+                                                    className={styles.submittedJobItem}
+                                                    onClick={() => {
+                                                        const matchedJob = jobs.find((job) => job.id === item.job_id) || null;
+                                                        setSelectedJob(matchedJob);
+                                                    }}
+                                                >
+                                                    <span className={styles.submittedJobTitle}>{item.job_title}</span>
+                                                    <span className={styles.submittedJobMeta}>{item.company_name} | {item.level}</span>
+                                                    <span className={styles.submittedJobMeta}>Status: {item.status}</span>
+                                                    <span className={styles.submittedJobMeta}>Score: {formatScore(item.ai_matching_score)}</span>
+                                                    <span className={styles.submittedJobMeta}>Submitted: {formatSubmittedTime(item.submitted_at)}</span>
+                                                </button>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+                        )}
                     </div>
                     <div className={styles.leftBottomBox}>
                         <div className={styles.leftBottomUser}>
@@ -236,20 +391,31 @@ export default function CandidatePage() {
                     </div>
                 </div>
                 <div className={styles.middle}>
-                    <div className={styles.jobList}>
-                        {filteredJobs.length > 0 ? (
-                            filteredJobs.map(job => (
-                                <Jobcard 
-                                    key={job.id} 
-                                    job={job} 
-                                    isActive={selectedJob?.id === job.id} 
-                                    onClick={() => handleClickjob(job)} 
-                                />
-                            ))
-                        ) : (
-                            <p style={{ textAlign: "center", marginTop: "20px" }}>No jobs found in this category.</p>
-                        )}
-                    </div>
+                    {groupedJobsByCompany.length > 0 ? (
+                        <div className={styles.companySections}>
+                            {groupedJobsByCompany.map(([companyName, companyJobs]) => (
+                                <section key={companyName} className={styles.companySection}>
+                                    <div className={styles.companyHeader}>
+                                        <h3>{companyName}</h3>
+                                        <span>{companyJobs.length} jobs</span>
+                                    </div>
+
+                                    <div className={styles.companyJobList}>
+                                        {companyJobs.map((job) => (
+                                            <Jobcard
+                                                key={job.id}
+                                                job={job}
+                                                isActive={selectedJob?.id === job.id}
+                                                onClick={() => handleClickjob(job)}
+                                            />
+                                        ))}
+                                    </div>
+                                </section>
+                            ))}
+                        </div>
+                    ) : (
+                        <p style={{ textAlign: "center", marginTop: "20px" }}>No jobs found in this category.</p>
+                    )}
                 </div>
 
                 <div className={styles.right}>
@@ -281,7 +447,7 @@ export default function CandidatePage() {
                                     {selectedJob.jd_file_path && (
                                         <>
                                             <a 
-                                                href={`http://localhost:8000/api/jobs/${selectedJob.id}/jd-file`} 
+                                                href={`/api/jobs/${selectedJob.id}/jd-file`} 
                                                 download
                                                 className={styles.applyButton}
                                                 style={{ textDecoration: "none" }}
@@ -289,7 +455,7 @@ export default function CandidatePage() {
                                                 📥 Download JD
                                             </a>
                                             <a 
-                                                href={`http://localhost:8000/api/jobs/${selectedJob.id}/jd-file?inline=true`} 
+                                                href={`/api/jobs/${selectedJob.id}/jd-file?inline=true`} 
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className={styles.applyButton}
@@ -303,8 +469,8 @@ export default function CandidatePage() {
                             </div>
 
                             {/* Đổi thẻ Link thành button mở Modal */}
-                            <button onClick={() => setIsModalOpen(true)} className={styles.applyButton}>
-                                Recruit Now!
+                            <button onClick={() => setIsModalOpen(true)} className={`${styles.applyButton} ${styles.applyPrimaryButton}`}>
+                                Apply For This Job
                             </button>
                         </div>
                     ) : (
@@ -367,7 +533,7 @@ export default function CandidatePage() {
                                     <textarea
                                         className={styles.modalInput}
                                         rows={4}
-                                        placeholder="Additional Information"
+                                        placeholder="Additional Information (optional)"
                                         value={additionalInfo}
                                         onChange={(e) => setAdditionalInfo(e.target.value)}
                                     ></textarea>
@@ -379,7 +545,7 @@ export default function CandidatePage() {
                                         type="file" 
                                         className={styles.fileInput} 
                                         onChange={handleFileChange}
-                                        accept=".pdf, .jpeg, .jpg, .png" 
+                                        accept=".pdf,.docx,.jpeg,.jpg,.png" 
                                         required 
                                     />
                                     <div className={styles.uploadIcon}>☁️</div>
@@ -401,7 +567,16 @@ export default function CandidatePage() {
                             </div>
 
                             <div className={styles.modalFooter}>
-                                <button type="submit" className={styles.submitModalBtn}>Apply Now</button>
+                                <div className={styles.submitActionBox}>
+                                    <button type="submit" className={styles.submitModalBtn} disabled={isSubmitting}>
+                                        {isSubmitting ? "Submitting..." : "Submit CV"}
+                                    </button>
+                                </div>
+                                {applyStatus && (
+                                    <p className={`${styles.submitStatus} ${applyStatus.type === "success" ? styles.submitStatusSuccess : styles.submitStatusError}`}>
+                                        {applyStatus.message}
+                                    </p>
+                                )}
                             </div>
                         </form>
                     </div>

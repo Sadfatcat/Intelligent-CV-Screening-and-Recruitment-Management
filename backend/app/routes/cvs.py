@@ -1,11 +1,12 @@
 import os
 import uuid
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select
 from typing import Optional
 
 from app.database import get_session
-from app.models import ActivityLog, CV, Job, JobApplication
+from app.models import ActivityLog, CV, Job, JobApplication, User
 
 # prefix /api/cvs, tất cả route trong file này đều bắt đầu bằng /api/cvs/...
 router = APIRouter(prefix="/api/cvs", tags=["cvs"])
@@ -28,6 +29,12 @@ async def upload_cv(
     cv_file: UploadFile = File(...),
     session: Session = Depends(get_session),
 ):
+    # localStorage có thể giữ candidate_id cũ sau khi reset DB; fallback về guest thay vì crash 500
+    if candidate_id is not None:
+        candidate = session.get(User, candidate_id)
+        if not candidate or candidate.role != "candidate":
+            candidate_id = None
+
     # kiểm tra job có tồn tại không
     job = session.get(Job, job_id)
     if not job:
@@ -60,6 +67,15 @@ async def upload_cv(
     except Exception:
         cv_vector_json = None
 
+    matching_score = None
+    if job.jd_vector and cv_vector_json:
+        try:
+            from app.services.ai_service import calculate_match_score_from_vectors
+
+            matching_score = calculate_match_score_from_vectors(cv_vector_json, job.jd_vector)
+        except Exception:
+            matching_score = None
+
     new_cv = CV(
         candidate_id=candidate_id,
         candidate_name=candidate_name,
@@ -70,13 +86,26 @@ async def upload_cv(
         cv_vector=cv_vector_json,
     )
     session.add(new_cv)
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError:
+        session.rollback()
+        raise HTTPException(status_code=400, detail="Candidate information is invalid. Please login again and retry.")
     session.refresh(new_cv)
 
     # tạo đơn ứng tuyển, liên kết cv này với job
-    application = JobApplication(job_id=job_id, cv_id=new_cv.id, status="pending")
+    application = JobApplication(
+        job_id=job_id,
+        cv_id=new_cv.id,
+        status="pending",
+        ai_matching_score=matching_score,
+    )
     session.add(application)
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError:
+        session.rollback()
+        raise HTTPException(status_code=400, detail="Cannot create application for this CV/job pair.")
     session.refresh(application)
 
     session.add(
@@ -89,7 +118,10 @@ async def upload_cv(
             detail=f"Submitted CV to job id={job_id}",
         )
     )
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError:
+        session.rollback()
 
     return {
         "message": "Nộp hồ sơ thành công",
@@ -97,6 +129,7 @@ async def upload_cv(
         "application_id": application.id,
         "job_title": job.title,
         "vector_saved": cv_vector_json is not None,
+        "matching_score": matching_score,
     }
 
 
@@ -127,3 +160,56 @@ def list_cvs_for_job(job_id: int, session: Session = Depends(get_session)):
             })
 
     return {"job_title": job.title, "total": len(result), "applications": result}
+
+
+@router.get("/candidate/{candidate_id}/applications")
+def list_candidate_applications(candidate_id: int, session: Session = Depends(get_session)):
+    candidate = session.get(User, candidate_id)
+    if not candidate or candidate.role != "candidate":
+        raise HTTPException(status_code=404, detail="Không tìm thấy candidate")
+
+    cvs = session.exec(select(CV).where(CV.candidate_id == candidate_id)).all()
+    cv_ids = [cv.id for cv in cvs if cv.id is not None]
+    if not cv_ids:
+        return {"candidate_id": candidate_id, "total": 0, "applications": []}
+
+    applications = session.exec(
+        select(JobApplication)
+        .where(JobApplication.cv_id.in_(cv_ids))
+        .order_by(JobApplication.id.desc())
+    ).all()
+
+    result = []
+    for app in applications:
+        if not app.job_id:
+            continue
+
+        job = session.get(Job, app.job_id)
+        if not job:
+            continue
+
+        submit_log = session.exec(
+            select(ActivityLog)
+            .where(
+                ActivityLog.action == "candidate.cv.submit",
+                ActivityLog.target_type == "application",
+                ActivityLog.target_id == app.id,
+            )
+            .order_by(ActivityLog.created_at.desc())
+        ).first()
+
+        result.append(
+            {
+                "application_id": app.id,
+                "job_id": job.id,
+                "job_title": job.title,
+                "company_name": job.company_name,
+                "location": job.location,
+                "level": job.level,
+                "status": app.status,
+                "ai_matching_score": app.ai_matching_score,
+                "submitted_at": submit_log.created_at if submit_log else None,
+            }
+        )
+
+    return {"candidate_id": candidate_id, "total": len(result), "applications": result}

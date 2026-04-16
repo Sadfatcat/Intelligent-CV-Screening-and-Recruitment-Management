@@ -116,6 +116,67 @@
   gap: 12px;
 }
 
+.submittedJobsCard {
+  margin-top: 4px;
+  border: 1px solid rgba(129, 164, 194, 0.24);
+  border-radius: 14px;
+  padding: 12px;
+  background: rgba(11, 23, 37, 0.72);
+}
+
+.submittedJobsTitle {
+  margin: 0 0 8px;
+  color: var(--title);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.submittedJobsEmpty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.submittedJobsList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 190px;
+  overflow-y: auto;
+}
+
+.submittedJobItem {
+  width: 100%;
+  text-align: left;
+  border: 1px solid rgba(129, 164, 194, 0.26);
+  background: rgba(16, 33, 52, 0.9);
+  border-radius: 10px;
+  padding: 9px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.submittedJobItem:hover {
+  border-color: rgba(143, 179, 210, 0.6);
+  box-shadow: 0 10px 16px rgba(2, 8, 17, 0.44);
+}
+
+.submittedJobTitle {
+  color: var(--title);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.submittedJobMeta {
+  color: var(--text);
+  font-size: 12px;
+}
+
 .leftBottomBox {
   padding: 18px;
 }
@@ -179,6 +240,71 @@
   padding: 20px;
   display: flex;
   overflow: hidden;
+}
+
+.companySections {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.companySection {
+  border: 1px solid rgba(129, 164, 194, 0.24);
+  border-radius: 16px;
+  padding: 14px;
+  background: rgba(13, 26, 42, 0.66);
+}
+
+.companyHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.companyHeader h3 {
+  margin: 0;
+  color: var(--title);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.companyHeader span {
+  color: #d6e5f2;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid rgba(129, 164, 194, 0.34);
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: rgba(47, 111, 165, 0.24);
+}
+
+.companyJobList {
+  display: flex;
+  flex-direction: row;
+  gap: 14px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 8px;
+  scroll-behavior: smooth;
+}
+
+.companyJobList::-webkit-scrollbar {
+  height: 9px;
+}
+
+.companyJobList::-webkit-scrollbar-thumb {
+  background: rgba(129, 164, 194, 0.34);
+  border-radius: 999px;
+}
+
+.companyJobList::-webkit-scrollbar-track {
+  background: rgba(16, 38, 58, 0.6);
+  border-radius: 999px;
 }
 
 .jobList {
@@ -272,6 +398,18 @@
 .applyButton:hover {
   background: var(--accent-hover);
   transform: translateY(-1px);
+}
+
+.applyPrimaryButton {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  padding: 15px 18px;
+  box-shadow: 0 14px 24px rgba(7, 18, 30, 0.55);
+}
+
+.applyPrimaryButton:hover {
+  box-shadow: 0 16px 26px rgba(7, 18, 30, 0.65);
 }
 
 .emptyState {
@@ -446,6 +584,27 @@
 .modalFooter {
   margin-top: 24px;
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.submitActionBox {
+  display: inline-flex;
+  padding: 6px;
+  border-radius: 14px;
+  border: 1px solid rgba(181, 200, 217, 0.32);
+  background: rgba(13, 31, 51, 0.5);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 14px 24px rgba(3, 9, 16, 0.5);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.submitActionBox:hover {
+  transform: translateY(-1px);
+  background: rgba(17, 40, 63, 0.62);
+  box-shadow: 0 18px 28px rgba(3, 9, 16, 0.62);
 }
 
 .submitModalBtn {
@@ -462,6 +621,26 @@
 
 .submitModalBtn:hover {
   background: var(--accent-hover);
+}
+
+.submitModalBtn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.submitStatus {
+  margin: 0 0 0 14px;
+  font-size: 14px;
+  font-weight: 700;
+  align-self: center;
+}
+
+.submitStatusSuccess {
+  color: #73d29b;
+}
+
+.submitStatusError {
+  color: #ff9292;
 }
 
 @media (max-width: 1200px) {

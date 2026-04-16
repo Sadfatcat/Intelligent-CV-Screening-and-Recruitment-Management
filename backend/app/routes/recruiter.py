@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import FileResponse
 import os
 from pydantic import BaseModel
 from sqlmodel import Session, select
@@ -200,6 +201,115 @@ def update_application_status(
     return {"message": "Cập nhật trạng thái thành công", "application_id": application.id, "status": application.status}
 
 
+@router.delete("/{recruiter_id}/applications/{application_id}")
+def delete_application_and_cv(
+    recruiter_id: int,
+    application_id: int,
+    session: Session = Depends(get_session),
+):
+    recruiter = require_recruiter(recruiter_id, session)
+
+    application = session.get(JobApplication, application_id)
+    if not application:
+        raise HTTPException(status_code=404, detail="Không tìm thấy application")
+
+    job = session.get(Job, application.job_id) if application.job_id else None
+    if not job:
+        raise HTTPException(status_code=404, detail="Không tìm thấy job")
+    if job.recruiter_id != recruiter_id:
+        raise HTTPException(status_code=403, detail="Bạn không có quyền xoá application này")
+
+    cv = session.get(CV, application.cv_id) if application.cv_id else None
+    cv_id = cv.id if cv else None
+    cv_file_path = cv.file_path if cv else None
+
+    session.delete(application)
+
+    delete_cv_record = False
+    if cv_id:
+        remaining_apps = session.exec(
+            select(JobApplication).where(
+                JobApplication.cv_id == cv_id,
+                JobApplication.id != application_id,
+            )
+        ).all()
+        delete_cv_record = len(remaining_apps) == 0
+
+    if delete_cv_record and cv:
+        if cv_file_path and os.path.exists(cv_file_path):
+            try:
+                os.remove(cv_file_path)
+            except OSError:
+                pass
+        session.delete(cv)
+
+    _purge_activity_logs_for_target(session, "application", application_id)
+    session.commit()
+
+    session.add(
+        ActivityLog(
+            actor_user_id=recruiter.id,
+            actor_role="recruiter",
+            action="recruiter.application.delete",
+            target_type="application",
+            target_id=application_id,
+            detail=f"Deleted application id={application_id}",
+        )
+    )
+    session.commit()
+
+    return {
+        "message": "Xoá CV nộp thành công",
+        "application_id": application_id,
+        "deleted_cv": delete_cv_record,
+    }
+
+
+@router.get("/{recruiter_id}/applications/{application_id}/cv-file")
+def view_application_cv_file(
+    recruiter_id: int,
+    application_id: int,
+    inline: bool = Query(False),
+    session: Session = Depends(get_session),
+):
+    require_recruiter(recruiter_id, session)
+
+    application = session.get(JobApplication, application_id)
+    if not application:
+        raise HTTPException(status_code=404, detail="Không tìm thấy application")
+
+    job = session.get(Job, application.job_id) if application.job_id else None
+    if not job:
+        raise HTTPException(status_code=404, detail="Không tìm thấy job")
+    if job.recruiter_id != recruiter_id:
+        raise HTTPException(status_code=403, detail="Bạn không có quyền xem CV này")
+
+    cv = session.get(CV, application.cv_id) if application.cv_id else None
+    if not cv or not cv.file_path:
+        raise HTTPException(status_code=404, detail="Không tìm thấy file CV")
+    if not os.path.exists(cv.file_path):
+        raise HTTPException(status_code=404, detail="File CV không tồn tại trên server")
+
+    ext = os.path.splitext(cv.file_path)[1].lower()
+    media_type_map = {
+        ".pdf": "application/pdf",
+        ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".png": "image/png",
+    }
+    media_type = media_type_map.get(ext, "application/octet-stream")
+    filename = os.path.basename(cv.file_path)
+    disposition = "inline" if inline else "attachment"
+
+    return FileResponse(
+        path=cv.file_path,
+        media_type=media_type,
+        filename=filename,
+        headers={"Content-Disposition": f'{disposition}; filename="{filename}"'},
+    )
+
+
 @router.get("/{recruiter_id}/cv-logs")
 def list_recruiter_cv_logs(recruiter_id: int, session: Session = Depends(get_session)):
     require_recruiter(recruiter_id, session)
@@ -231,6 +341,7 @@ def list_recruiter_cv_logs(recruiter_id: int, session: Session = Depends(get_ses
                 "job_id": job.id,
                 "job_title": job.title,
                 "application_id": application.id,
+                "cv_id": cv.id if cv else None,
                 "candidate_name": cv.candidate_name if cv else None,
                 "candidate_email": cv.candidate_email if cv else None,
                 "candidate_phone": cv.candidate_phone if cv else None,
