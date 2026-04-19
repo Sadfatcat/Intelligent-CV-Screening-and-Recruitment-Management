@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect }  from "react";
+import { Suspense, useEffect }  from "react";
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -9,7 +9,7 @@ import darkStyles from "./page.dark.module.css";
 import { handleLoginSubmit } from "@/utils/loginHandler";
 import Navbar from "@/components/navbar/Navbar";
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -108,5 +108,13 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div />}>
+      <LoginPageContent />
+    </Suspense>
   );
 }

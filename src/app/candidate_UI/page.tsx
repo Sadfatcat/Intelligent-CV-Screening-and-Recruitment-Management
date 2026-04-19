@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import brightStyles from "./page.bright.module.css";
@@ -37,7 +37,7 @@ type CandidateSubmissionItem = {
     submitted_at: string | null;
 };
 
-export default function CandidatePage() {
+function CandidatePageContent() {
     const [selectedJob, setSelectedJob] = useState<JobItem | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<string>("All Jobs"); // Trạng thái filter
     const [searchQuery, setSearchQuery] = useState("");
@@ -585,4 +585,12 @@ export default function CandidatePage() {
             {/* ---------- KẾT THÚC: MODAL ỨNG TUYỂN ---------- */}
         </main>
     )
+}
+
+export default function CandidatePage() {
+    return (
+        <Suspense fallback={<div />}>
+            <CandidatePageContent />
+        </Suspense>
+    );
 }

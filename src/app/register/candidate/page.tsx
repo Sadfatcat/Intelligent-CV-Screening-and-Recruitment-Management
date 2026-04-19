@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import brightStyles from "./page.bright.module.css";
@@ -9,7 +9,7 @@ import { handleRegisterSubmit } from "@/utils/registerHandler";
 import Navbar from "@/components/navbar/Navbar";
 // import ImageSlider from "@/components/ImageSlider";
 
-export default function RegisterCandidatePage() {
+function RegisterCandidatePageContent() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -100,5 +100,13 @@ export default function RegisterCandidatePage() {
         </div>
       </div>
     </>
+  );
+}
+
+export default function RegisterCandidatePage() {
+  return (
+    <Suspense fallback={<div />}>
+      <RegisterCandidatePageContent />
+    </Suspense>
   );
 }
