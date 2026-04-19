@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import styles from "./page.module.css";
+import { apiUrl } from "@/utils/api";
 
 type RecruiterSession = {
     user_id: number;
@@ -94,7 +95,7 @@ export default function RecruiterUIPage() {
     }, []);
 
     async function loadRecruiterJobs(recruiterId: number) {
-        const res = await fetch(`http://localhost:8000/api/recruiter/${recruiterId}/jobs`);
+        const res = await fetch(apiUrl(`/api/recruiter/${recruiterId}/jobs`));
         const data = await res.json();
         if (!res.ok) {
             throw new Error(data.detail || "Failed to load recruiter jobs");
@@ -105,7 +106,7 @@ export default function RecruiterUIPage() {
     async function reloadRecruiterData(recruiterId: number, keepCurrentSelection = true) {
         await loadRecruiterJobs(recruiterId);
 
-        const logsRes = await fetch(`http://localhost:8000/api/recruiter/${recruiterId}/cv-logs`);
+        const logsRes = await fetch(apiUrl(`/api/recruiter/${recruiterId}/cv-logs`));
         const logsData = await logsRes.json();
         if (!logsRes.ok) {
             throw new Error(logsData.detail || "Failed to load CV logs");
@@ -114,7 +115,7 @@ export default function RecruiterUIPage() {
         setCvLogs(logs);
 
         if (keepCurrentSelection && selectedJobId) {
-            const appsRes = await fetch(`http://localhost:8000/api/recruiter/${recruiterId}/jobs/${selectedJobId}/applications`);
+            const appsRes = await fetch(apiUrl(`/api/recruiter/${recruiterId}/jobs/${selectedJobId}/applications`));
             const appsData = await appsRes.json();
             if (!appsRes.ok) {
                 throw new Error(appsData.detail || "Failed to load applications");
@@ -126,7 +127,7 @@ export default function RecruiterUIPage() {
     useEffect(() => {
         if (!session) return;
 
-        fetch(`http://localhost:8000/api/recruiter/${session.user_id}/profile`)
+        fetch(apiUrl(`/api/recruiter/${session.user_id}/profile`))
             .then(async (res) => {
                 const data = await res.json();
                 if (!res.ok) {
@@ -159,7 +160,7 @@ export default function RecruiterUIPage() {
             setMessageType("error");
         });
 
-        fetch(`http://localhost:8000/api/recruiter/${session.user_id}/cv-logs`)
+        fetch(apiUrl(`/api/recruiter/${session.user_id}/cv-logs`))
             .then(async (res) => {
                 const data = await res.json();
                 if (!res.ok) {
@@ -179,7 +180,7 @@ export default function RecruiterUIPage() {
             return;
         }
 
-        fetch(`http://localhost:8000/api/recruiter/${session.user_id}/jobs/${selectedJobId}/applications`)
+        fetch(apiUrl(`/api/recruiter/${session.user_id}/jobs/${selectedJobId}/applications`))
             .then(async (res) => {
                 const data = await res.json();
                 if (!res.ok) {
@@ -199,7 +200,7 @@ export default function RecruiterUIPage() {
         setMessageType("");
 
         try {
-            const response = await fetch("http://localhost:8000/api/auth/login", {
+            const response = await fetch(apiUrl("/api/auth/login"), {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
@@ -271,7 +272,7 @@ export default function RecruiterUIPage() {
                 formData.append("cover_image", coverImageFile);
             }
 
-            const res = await fetch("http://localhost:8000/api/jobs/upload-jd", {
+            const res = await fetch(apiUrl("/api/jobs/upload-jd"), {
                 method: "POST",
                 body: formData,
             });
@@ -295,7 +296,7 @@ export default function RecruiterUIPage() {
             setIsUploadPopupOpen(false);
 
             await loadRecruiterJobs(session.user_id);
-            const logsRes = await fetch(`http://localhost:8000/api/recruiter/${session.user_id}/cv-logs`);
+            const logsRes = await fetch(apiUrl(`/api/recruiter/${session.user_id}/cv-logs`));
             const logsData = await logsRes.json();
             if (logsRes.ok) {
                 setCvLogs(Array.isArray(logsData) ? logsData : []);
@@ -311,7 +312,7 @@ export default function RecruiterUIPage() {
         if (!window.confirm(`Delete JD #${jobId}?`)) return;
 
         try {
-            const res = await fetch(`http://localhost:8000/api/recruiter/${session.user_id}/jobs/${jobId}`, {
+            const res = await fetch(apiUrl(`/api/recruiter/${session.user_id}/jobs/${jobId}`), {
                 method: "DELETE",
             });
             const data = await res.json();
@@ -328,7 +329,7 @@ export default function RecruiterUIPage() {
 
             await loadRecruiterJobs(session.user_id);
 
-            const logsRes = await fetch(`http://localhost:8000/api/recruiter/${session.user_id}/cv-logs`);
+            const logsRes = await fetch(apiUrl(`/api/recruiter/${session.user_id}/cv-logs`));
             const logsData = await logsRes.json();
             if (logsRes.ok) {
                 setCvLogs(Array.isArray(logsData) ? logsData : []);
@@ -342,7 +343,7 @@ export default function RecruiterUIPage() {
     async function handleDeleteApplication(applicationId: number) {
         if (!session) return;
         try {
-            const res = await fetch(`http://localhost:8000/api/recruiter/${session.user_id}/applications/${applicationId}`, {
+            const res = await fetch(apiUrl(`/api/recruiter/${session.user_id}/applications/${applicationId}`), {
                 method: "DELETE",
             });
             const data = await res.json();
@@ -755,7 +756,7 @@ export default function RecruiterUIPage() {
                         <div className={styles.modalFooter}>
                             <a
                                 className={styles.button}
-                                href={`http://localhost:8000/api/recruiter/${session.user_id}/applications/${selectedLog.application_id}/cv-file?inline=true`}
+                                href={apiUrl(`/api/recruiter/${session.user_id}/applications/${selectedLog.application_id}/cv-file?inline=true`)}
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >
@@ -763,7 +764,7 @@ export default function RecruiterUIPage() {
                             </a>
                             <a
                                 className={styles.navButton}
-                                href={`http://localhost:8000/api/recruiter/${session.user_id}/applications/${selectedLog.application_id}/cv-file`}
+                                href={apiUrl(`/api/recruiter/${session.user_id}/applications/${selectedLog.application_id}/cv-file`)}
                             >
                                 Download CV
                             </a>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
+import { apiUrl } from "@/utils/api";
 
 export default function AdminPage() {
     const router = useRouter(); // Khởi tạo router chuyển trang
@@ -32,7 +33,7 @@ export default function AdminPage() {
         }
 
         try {
-            const response = await fetch("http://localhost:8000/api/auth/login", {
+            const response = await fetch(apiUrl("/api/auth/login"), {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: username, password }),

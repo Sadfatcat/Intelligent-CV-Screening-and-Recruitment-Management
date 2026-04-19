@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./dashboard.module.css";
+import { apiUrl } from "@/utils/api";
 
 const VISIBLE_ACTIVITY_ACTIONS = new Set([
     "candidate.register",
@@ -52,11 +53,11 @@ export default function AdminDashboard() {
             setLoading(true);
             try {
                 const [overviewRes, jobsRes, activitiesRes] = await Promise.all([
-                    fetch(`http://localhost:8000/api/admin/overview?admin_id=${adminId}`),
-                    fetch(`http://localhost:8000/api/admin/jobs?admin_id=${adminId}`),
-                    fetch(`http://localhost:8000/api/admin/activities?admin_id=${adminId}&limit=20`),
+                    fetch(apiUrl(`/api/admin/overview?admin_id=${adminId}`)),
+                    fetch(apiUrl(`/api/admin/jobs?admin_id=${adminId}`)),
+                    fetch(apiUrl(`/api/admin/activities?admin_id=${adminId}&limit=20`)),
                 ]);
-                const recruitersRes = await fetch(`http://localhost:8000/api/admin/recruiters?admin_id=${adminId}`);
+                const recruitersRes = await fetch(apiUrl(`/api/admin/recruiters?admin_id=${adminId}`));
 
                 const overviewData = await overviewRes.json();
                 const jobsData = await jobsRes.json();
@@ -95,7 +96,7 @@ export default function AdminDashboard() {
         setMessageType("");
 
         try {
-            const response = await fetch("http://localhost:8000/api/admin/recruiters", {
+            const response = await fetch(apiUrl("/api/admin/recruiters"), {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -121,12 +122,12 @@ export default function AdminDashboard() {
             setPhone("");
 
             const [overviewRes, activitiesRes] = await Promise.all([
-                fetch(`http://localhost:8000/api/admin/overview?admin_id=${adminId}`),
-                fetch(`http://localhost:8000/api/admin/activities?admin_id=${adminId}&limit=20`),
+                fetch(apiUrl(`/api/admin/overview?admin_id=${adminId}`)),
+                fetch(apiUrl(`/api/admin/activities?admin_id=${adminId}&limit=20`)),
             ]);
             setOverview(await overviewRes.json());
             setActivities(await activitiesRes.json());
-            const recruitersRes = await fetch(`http://localhost:8000/api/admin/recruiters?admin_id=${adminId}`);
+            const recruitersRes = await fetch(apiUrl(`/api/admin/recruiters?admin_id=${adminId}`));
             setRecruiters(await recruitersRes.json());
         } catch (err) {
             setMessage(err instanceof Error ? err.message : "Failed to create recruiter");
@@ -139,7 +140,7 @@ export default function AdminDashboard() {
         if (!confirm(`Confirm delete JD #${jobId}?`)) return;
 
         try {
-            const response = await fetch(`http://localhost:8000/api/admin/jobs/${jobId}?admin_id=${adminId}`, {
+            const response = await fetch(apiUrl(`/api/admin/jobs/${jobId}?admin_id=${adminId}`), {
                 method: "DELETE",
             });
             const data = await response.json();

@@ -16,6 +16,8 @@ export interface SettersType {
   setResultType: (value: "success" | "error" | "") => void;
 }
 
+import { apiUrl } from "./api";
+
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function validateEmail(email: string): string | null {
@@ -68,7 +70,7 @@ export async function handleLoginSubmit(
   try {
     setters.setResultMessage("Logging in...");
     
-    const response = await fetch("http://localhost:8000/api/auth/login", {
+    const response = await fetch(apiUrl("/api/auth/login"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

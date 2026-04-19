@@ -18,6 +18,8 @@ export interface SetterType {
     setResultType: (value: "success" | "error" | "") => void;
 }
 
+import { apiUrl } from "./api";
+
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function validateEmail(email: string): string | null {
@@ -98,7 +100,7 @@ export async function handleRegisterSubmit(
         setters.setResultMessage("Connecting to server...");
         
         // Nhấc máy gọi điện lên cổng 8000 của Backend
-        const response = await fetch("http://localhost:8000/api/auth/register", {
+        const response = await fetch(apiUrl("/api/auth/register"), {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
