@@ -5,7 +5,11 @@ const isVercelBuild = process.env.VERCEL === "1";
 const configuredApiOrigin = process.env.API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL;
 
 if (isProduction && isVercelBuild && !configuredApiOrigin) {
-  throw new Error("Missing API_BASE_URL (or NEXT_PUBLIC_API_BASE_URL) for production build.");
+  console.warn(
+    "⚠️  WARNING: API_BASE_URL (or NEXT_PUBLIC_API_BASE_URL) is not set. " +
+    "API calls will be forwarded to http://127.0.0.1:8000 which may not work in production. " +
+    "Set the environment variable in Vercel project settings."
+  );
 }
 
 const backendApiOrigin = (configuredApiOrigin || "http://127.0.0.1:8000").replace(/\/$/, "");
