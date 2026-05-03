@@ -1,0 +1,10 @@
+{
+  "python": ["py", "python3", "python2"],
+  "javascript": ["js", "node", "nodejs"],
+  "typescript": ["ts"],
+  "c++": ["cpp"],
+  "c#": ["csharp"],
+  "sql": ["postgresql", "mysql", "mariadb"],
+  "docker": ["containers"],
+  "kubernetes": ["k8s"]
+}

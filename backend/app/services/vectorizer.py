@@ -1,9 +1,9 @@
 import json
 import os
-from sentence_transformers import SentenceTransformer
 
 _model = None
 EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL", "intfloat/multilingual-e5-base")
+_HAVE_ST = None
 
 
 def _add_prefix(text: str, prefix: str) -> str:
@@ -11,11 +11,23 @@ def _add_prefix(text: str, prefix: str) -> str:
     return f"{prefix} {cleaned_text}" if cleaned_text else prefix
 
 
-def get_model() -> SentenceTransformer:
+def get_model():
     # lazy load, chỉ tải lần đầu dùng
     global _model
+    global _HAVE_ST
+    if _HAVE_ST is None:
+        try:
+            # import here to avoid hard dependency at module import time
+            from sentence_transformers import SentenceTransformer as _ST
+            _HAVE_ST = True
+        except Exception:
+            _HAVE_ST = False
+    if not _HAVE_ST:
+        raise ImportError("sentence-transformers not available in environment")
     if _model is None:
-        _model = SentenceTransformer(EMBEDDING_MODEL_NAME)
+        from sentence_transformers import SentenceTransformer as _ST
+
+        _model = _ST(EMBEDDING_MODEL_NAME)
     return _model
 
 

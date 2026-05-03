@@ -38,6 +38,14 @@ app.include_router(auth.router)
 app.include_router(admin.router)
 app.include_router(recruiter.router)
 
+# match route: CV vs JD matching endpoint
+try:
+    from app.routes import match
+
+    app.include_router(match.router)
+except Exception as exc:  # pragma: no cover
+    logger.exception("Skip loading match routes due to import error: %s", exc)
+
 # jobs/cvs phu thuoc them thu vien xu ly file va ML; neu thieu thi bo qua thay vi lam sap toan bo API
 try:
     from app.routes import jobs, cvs
