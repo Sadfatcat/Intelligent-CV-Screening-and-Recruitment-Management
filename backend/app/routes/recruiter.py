@@ -1,3 +1,4 @@
+import json
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import FileResponse
 import os
@@ -30,6 +31,34 @@ def _purge_activity_logs_for_target(session: Session, target_type: str, target_i
     ).all()
     for log in logs:
         session.delete(log)
+
+
+def parse_matching_detail(raw_detail: str | None):
+    if not raw_detail:
+        return None
+    try:
+        return json.loads(raw_detail)
+    except (TypeError, json.JSONDecodeError):
+        return None
+
+
+def extract_cv_experience_years(cv: CV | None, matching_detail: dict | None) -> float | None:
+    try:
+        from app.services.matcher import extract_experience_years
+
+        years = extract_experience_years(cv.parsed_text if cv else "")
+        if years > 0:
+            return years
+    except Exception:
+        pass
+
+    for value in (matching_detail or {}).get("passes", []):
+        if isinstance(value, str) and value.startswith("experience_years:"):
+            try:
+                return float(value.split(":", 1)[1])
+            except (TypeError, ValueError):
+                return None
+    return None
 
 
 @router.get("/{recruiter_id}/profile")
@@ -153,6 +182,7 @@ def list_job_applications_for_recruiter(
                 "candidate_name": cv.candidate_name if cv else None,
                 "candidate_email": cv.candidate_email if cv else None,
                 "candidate_phone": cv.candidate_phone if cv else None,
+                "matching_detail": parse_matching_detail(app.matching_detail),
             }
         )
 
@@ -334,6 +364,7 @@ def list_recruiter_cv_logs(recruiter_id: int, session: Session = Depends(get_ses
             continue
 
         cv = session.get(CV, application.cv_id) if application.cv_id else None
+        matching_detail = parse_matching_detail(application.matching_detail)
         result.append(
             {
                 "log_id": log.id,
@@ -347,6 +378,9 @@ def list_recruiter_cv_logs(recruiter_id: int, session: Session = Depends(get_ses
                 "candidate_phone": cv.candidate_phone if cv else None,
                 "status": application.status,
                 "ai_matching_score": application.ai_matching_score,
+                "matching_detail": matching_detail,
+                "cv_file_name": os.path.basename(cv.file_path) if cv and cv.file_path else None,
+                "experience_years": extract_cv_experience_years(cv, matching_detail),
             }
         )
 

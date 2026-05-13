@@ -13,6 +13,11 @@ from app.routes import auth, admin, recruiter
 logger = logging.getLogger(__name__)
 
 
+def get_cors_origins() -> list[str]:
+    raw_origins = os.getenv("CORS_ALLOW_ORIGINS", "*")
+    return [origin.strip().rstrip("/") for origin in raw_origins.split(",") if origin.strip()]
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     create_db_and_tables()
@@ -27,7 +32,7 @@ app.mount("/uploads", StaticFiles(directory="/app/uploads"), name="uploads")
 # mo cong cho frontend goi duoc
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=get_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

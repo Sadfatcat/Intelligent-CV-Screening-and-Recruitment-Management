@@ -36,6 +36,7 @@ class Job(SQLModel, table=True):
     jd_file_path: str | None = None
     jd_parsed_text: str | None = None
     jd_vector: str | None = None  # json string của vector 384 chiều
+    matching_config: str | None = None  # optional JSON string: weights + must_have
 
     recruiter: Optional[User] = Relationship(back_populates="jobs")
     applications: List["JobApplication"] = Relationship(back_populates="job")
@@ -64,6 +65,7 @@ class JobApplication(SQLModel, table=True):
     cv_id: Optional[int] = Field(default=None, foreign_key="cv.id")
 
     ai_matching_score: Optional[float] = None
+    matching_detail: Optional[str] = None
     status: str = Field(default="pending")  # pending | reviewed | accepted | rejected
 
     job: Optional[Job] = Relationship(back_populates="applications")

@@ -35,6 +35,15 @@ yarn-error.log*
 
 # backend virtual environment
 backend/.venv/
+.venv/
+
+# python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# local uploaded files
+backend/uploads/
 
 # vercel
 .vercel

@@ -7,7 +7,6 @@ import brightStyles from "./page.bright.module.css";
 import darkStyles from "./page.dark.module.css";
 import { handleRegisterSubmit } from "@/utils/registerHandler";
 import Navbar from "@/components/navbar/Navbar";
-// import ImageSlider from "@/components/ImageSlider";
 
 function RegisterCandidatePageContent() {
   const router = useRouter();

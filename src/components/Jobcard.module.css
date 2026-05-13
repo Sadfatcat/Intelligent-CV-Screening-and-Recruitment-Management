@@ -1,21 +1,37 @@
 .jobCard {
     flex: 0 0 280px;
-    border-radius: 16px;
-    padding: 16px;
-    background-color: #fff;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    border-radius: 24px;
+    padding: 18px;
+    background-color: #e2f5e9;
+    box-shadow: none;
     width: 280px;
-    border: 1px solid #ddd;
+    border: 1px solid rgba(18, 22, 29, 0.12);
     transition: all 0.3s ease;
 }
 
+.jobCard:nth-child(4n + 1) {
+    background-color: #e2f5e9;
+}
+
+.jobCard:nth-child(4n + 2) {
+    background-color: #e7e7ff;
+}
+
+.jobCard:nth-child(4n + 3) {
+    background-color: #e2f0ff;
+}
+
+.jobCard:nth-child(4n + 4) {
+    background-color: #ffe9e9;
+}
+
 .jobCard.active {
-    border: 2px solid #2563eb;
+    border: 2px solid #12161d;
 }
 
 .jobCard:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
 }
 
 .image {
@@ -28,21 +44,24 @@
 
 .title {
     margin: 0 0 8px 0;
+    color: #12161d;
+    font-family: "Newsreader", serif;
+    font-weight: 500;
 }
 
 .text {
     margin: 0 0 6px 0;
-    color: #444;
+    color: #4a4a4a;
 }
 
 .description {
     margin: 0;
-    color: #555;
+    color: #4a4a4a;
     font-size: 14px;
     line-height: 1.4;
 }
 
 .label {
     font-weight: 600;
-    color: #00888e;
+    color: #12161d;
 }

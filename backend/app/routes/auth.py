@@ -25,6 +25,12 @@ class UserLoginRequest(BaseModel):
     password: str
 
 
+class ChangePasswordRequest(BaseModel):
+    user_id: int
+    current_password: str
+    new_password: str
+
+
 class CandidateProfileUpdateRequest(BaseModel):
     full_name: Optional[str] = None
     phone: Optional[str] = None
@@ -97,7 +103,43 @@ def login_user(user_data: UserLoginRequest, session: Session = Depends(get_sessi
         "role": user.role,
         "email": user.email,
         "company_name": user.company_name,
+        "must_change_password": user.role == "recruiter" and verify_password("1", user.password_hash),
     }
+
+
+@router.post("/change-password")
+def change_password(payload: ChangePasswordRequest, session: Session = Depends(get_session)):
+    user = session.get(User, payload.user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="Không tìm thấy tài khoản")
+    if user.role != "recruiter":
+        raise HTTPException(status_code=403, detail="Chỉ recruiter được đổi mật khẩu tại luồng này")
+    if not verify_password(payload.current_password, user.password_hash):
+        raise HTTPException(status_code=400, detail="Mật khẩu hiện tại không đúng")
+
+    next_password = payload.new_password.strip()
+    if len(next_password) < 6:
+        raise HTTPException(status_code=400, detail="Mật khẩu mới cần ít nhất 6 ký tự")
+    if next_password == "1":
+        raise HTTPException(status_code=400, detail="Mật khẩu mới không được là mật khẩu mặc định")
+
+    user.password_hash = get_password_hash(next_password)
+    session.add(user)
+    session.commit()
+
+    session.add(
+        ActivityLog(
+            actor_user_id=user.id,
+            actor_role=user.role,
+            action="recruiter.password.change",
+            target_type="user",
+            target_id=user.id,
+            detail=f"Recruiter changed password: {user.email}",
+        )
+    )
+    session.commit()
+
+    return {"message": "Đổi mật khẩu thành công"}
 
 
 @router.put("/candidate/{candidate_id}/profile")

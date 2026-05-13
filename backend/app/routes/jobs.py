@@ -6,14 +6,16 @@ from sqlmodel import Session, select
 
 from app.database import get_session
 from app.models import ActivityLog, Job, User
+from app.services.matching_config import serialize_matching_config
 
 # prefix /api/jobs, tất cả route trong file này đều bắt đầu bằng /api/jobs/...
 router = APIRouter(prefix="/api/jobs", tags=["jobs"])
-PUBLIC_UPLOAD_BASE_URL = "http://localhost:8000"
+PUBLIC_UPLOAD_BASE_URL = os.getenv("PUBLIC_UPLOAD_BASE_URL", "").rstrip("/")
+ENABLE_UPLOAD_VECTORS = os.getenv("ENABLE_UPLOAD_VECTORS", "0") == "1"
 
 # thư mục lưu file JD trên server
-UPLOAD_DIR = "/app/uploads/jd"
-JOB_COVER_UPLOAD_DIR = "/app/uploads/job_cover"
+UPLOAD_DIR = os.getenv("JD_UPLOAD_DIR", "/app/uploads/jd")
+JOB_COVER_UPLOAD_DIR = os.getenv("JOB_COVER_UPLOAD_DIR", "/app/uploads/job_cover")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(JOB_COVER_UPLOAD_DIR, exist_ok=True)
 
@@ -32,7 +34,8 @@ def save_cover_image(cover_image: UploadFile | None) -> str | None:
     with open(file_path, "wb") as f:
         f.write(file_bytes)
 
-    return f"{PUBLIC_UPLOAD_BASE_URL}/uploads/job_cover/{safe_name}"
+    upload_path = f"/uploads/job_cover/{safe_name}"
+    return f"{PUBLIC_UPLOAD_BASE_URL}{upload_path}" if PUBLIC_UPLOAD_BASE_URL else upload_path
 
 
 @router.post("/upload-jd")
@@ -46,6 +49,7 @@ async def upload_jd(
     quantity: int = Form(...),
     direct_contact: str = Form(...),
     description: str = Form(...),
+    matching_config: str | None = Form(default=None),
     jd_file: UploadFile = File(...),
     cover_image: UploadFile | None = File(default=None),
     session: Session = Depends(get_session),
@@ -64,6 +68,11 @@ async def upload_jd(
     if not jd_file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="JD chỉ nhận file PDF")
 
+    try:
+        matching_config_json = serialize_matching_config(matching_config)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=f"matching_config không hợp lệ: {str(exc)}")
+
     file_bytes = await jd_file.read()
 
     # lưu file JD vào ổ cứng, đặt tên bằng uuid để tránh trùng
@@ -81,12 +90,14 @@ async def upload_jd(
     except Exception as e:
         raise HTTPException(status_code=422, detail=f"Không đọc được file JD: {str(e)}")
 
-    # lưu vector JD, nếu lỗi thì để None, không ảnh hưởng phần còn lại
-    try:
-        from app.services.vectorizer import text_to_vector_json
-        jd_vector_json = text_to_vector_json(parsed_text) if parsed_text else None
-    except Exception:
-        jd_vector_json = None
+    # Vector embedding khá nặng; mặc định tắt trong request upload để tránh timeout FE/proxy.
+    jd_vector_json = None
+    if ENABLE_UPLOAD_VECTORS:
+        try:
+            from app.services.vectorizer import text_to_vector_json
+            jd_vector_json = text_to_vector_json(parsed_text) if parsed_text else None
+        except Exception:
+            jd_vector_json = None
 
     new_job = Job(
         recruiter_id=recruiter_id,
@@ -102,6 +113,7 @@ async def upload_jd(
         jd_file_path=file_path,
         jd_parsed_text=parsed_text,
         jd_vector=jd_vector_json,
+        matching_config=matching_config_json,
     )
     session.add(new_job)
     session.commit()
@@ -123,6 +135,7 @@ async def upload_jd(
         "message": "Đăng JD thành công",
         "job_id": new_job.id,
         "vector_saved": jd_vector_json is not None,
+        "matching_config_saved": matching_config_json is not None,
     }
 
 

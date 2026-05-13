@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Newsreader:wght@500;600&display=swap");
 
 .container {
   --bg-1: #07111d;
@@ -510,9 +510,23 @@
   color: #e8f0f8;
 }
 
+.modalInput::placeholder {
+  color: #91a9bd;
+  opacity: 1;
+}
+
 .modalInput:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(63, 111, 143, 0.18);
+}
+
+.jobTitleInput {
+  background: rgba(23, 48, 74, 0.86);
+  color: #f0f7ff;
+  border-color: rgba(139, 182, 218, 0.42);
+  font-weight: 700;
+  opacity: 1;
+  cursor: default;
 }
 
 .phoneGroup {
@@ -526,6 +540,8 @@
   border: 1px solid rgba(129, 164, 194, 0.28);
   border-radius: 10px;
   background: rgba(20, 44, 67, 0.72);
+  color: #e8f0f8;
+  font-weight: 700;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -574,6 +590,12 @@
 
 .uploadText span {
   color: #e8f0f8;
+}
+
+.uploadTextSelected {
+  color: #86efac;
+  font-weight: 800;
+  word-break: break-word;
 }
 
 .uploadSubText {
@@ -643,6 +665,56 @@
   color: #ff9292;
 }
 
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  width: min(360px, calc(100vw - 32px));
+  border: 1px solid;
+  border-radius: 14px;
+  padding: 13px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.38);
+  animation: toastSlideIn 0.18s ease-out;
+}
+
+.toast strong {
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.toast span {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.toastSuccess {
+  border-color: rgba(34, 197, 94, 0.44);
+  background: #052e18;
+  color: #bbf7d0;
+}
+
+.toastError {
+  border-color: rgba(239, 68, 68, 0.44);
+  background: #3b0a0a;
+  color: #fecaca;
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @media (max-width: 1200px) {
   .container {
     flex-direction: column;
@@ -672,4 +744,148 @@
   .modalBody {
     flex-direction: column;
   }
+}
+
+/* Minimal Pattern: đồng bộ layout candidate với recruiter/admin. */
+.container {
+  --bg-1: #fbfaf7;
+  --bg-2: #fbfaf7;
+  --surface: #ffffff;
+  --surface-strong: #ffffff;
+  --line: rgba(18, 22, 29, 0.12);
+  --title: #12161d;
+  --text: #4a4a4a;
+  --muted: #666666;
+  --accent: #12161d;
+  --accent-hover: #2a2f38;
+  --chip: #f4f3f0;
+  gap: 24px;
+  background: #fbfaf7;
+  font-family: "Inter", sans-serif;
+}
+
+.leftTopBox,
+.leftMiddleBox,
+.leftBottomBox,
+.middle,
+.right,
+.companySection,
+.submittedJobsCard,
+.submittedJobItem,
+.modalContent,
+.modalUploadCol,
+.submitActionBox {
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.leftTopBox:hover,
+.leftMiddleBox:hover,
+.leftBottomBox:hover,
+.middle:hover,
+.right:hover,
+.companySection:hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+.searchInput,
+.modalInput,
+.phonePrefix {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--text);
+}
+
+.searchInput:focus,
+.modalInput:focus {
+  border-color: #12161d;
+  box-shadow: 0 0 0 3px rgba(18, 22, 29, 0.08);
+}
+
+.searchHint,
+.companyHeader span {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: #12161d;
+  background: #f4f3f0;
+}
+
+.companyHeader h3,
+.detailsTitle,
+.modalHeader h2 {
+  font-family: "Newsreader", serif;
+  color: #12161d;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.Linktext,
+.submittedJobsTitle,
+.submittedJobTitle,
+.userName,
+.detailsSection h4 {
+  color: #12161d;
+}
+
+.avatarCircle {
+  background: #b05a36;
+  box-shadow: none;
+}
+
+.applyButton,
+.submitModalBtn {
+  background: #12161d;
+  color: #ffffff;
+  border-radius: 12px;
+  box-shadow: none;
+  transition: all 0.3s ease;
+}
+
+.applyButton:hover,
+.submitModalBtn:hover {
+  background: #2a2f38;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+.modalOverlay {
+  background: rgba(18, 22, 29, 0.48);
+}
+
+.closeBtn {
+  border-radius: 12px;
+  background: #12161d;
+  color: #ffffff;
+}
+
+.modalUploadCol {
+  border-style: dashed;
+  background: #ffffff;
+}
+
+.uploadIcon,
+.uploadText,
+.uploadText span {
+  color: #b05a36;
+}
+
+.companyJobList,
+.jobList {
+  gap: 24px;
+}
+
+.companyJobList::-webkit-scrollbar-thumb,
+.jobList::-webkit-scrollbar-thumb {
+  background: #c8c8c8;
+  border-radius: 12px;
+}
+
+.companyJobList::-webkit-scrollbar-track,
+.jobList::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 12px;
 }

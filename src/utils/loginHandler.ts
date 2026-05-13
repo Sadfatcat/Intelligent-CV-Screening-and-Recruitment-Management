@@ -17,6 +17,7 @@ export interface SettersType {
 }
 
 import { apiUrl } from "./api";
+import { RECRUITER_PASSWORD_CHANGE_STORAGE_KEY, RECRUITER_SESSION_STORAGE_KEY } from "@/features/recruiter/constants/recruiterConstants";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -51,7 +52,7 @@ export async function handleLoginSubmit(
   email: string,
   password: string,
   setters: SettersType
-): Promise<boolean> {
+): Promise<{ success: boolean; redirectPath?: string }> {
   // Reset lỗi cũ
   setters.setEmailError("");
   setters.setPasswordError("");
@@ -63,7 +64,7 @@ export async function handleLoginSubmit(
   if (emailErrorMsg) {
     setters.setEmailError(emailErrorMsg);
     setters.setResultType("error");
-    return false;
+    return { success: false };
   }
 
   // --- PHẦN LIÊN KẾT FRONTEND & BACKEND API LOGIN ---
@@ -83,20 +84,36 @@ export async function handleLoginSubmit(
     if (!response.ok) {
       setters.setResultMessage(data.detail || "Login failed!");
       setters.setResultType("error");
-      return false;
+      return { success: false };
     }
 
     // Backend báo OK 200, thành công!
     setters.setResultMessage("Login successful!");
     setters.setResultType("success");
-    // Tuỳ vào logic ứng dụng (ví dụ lưu user_id/role vào Redux hoặc Context)
-    // Ở bản demo này, ta lưu response JSON vào localStorage để phiên làm việc nhớ
+    localStorage.removeItem("currentUser");
+    localStorage.removeItem(RECRUITER_SESSION_STORAGE_KEY);
+    localStorage.removeItem("adminUser");
+
+    if (data.role === "recruiter") {
+      if (data.must_change_password) {
+        localStorage.setItem(RECRUITER_PASSWORD_CHANGE_STORAGE_KEY, JSON.stringify(data));
+        return { success: true, redirectPath: "/recruiter/change-password" };
+      }
+      localStorage.setItem(RECRUITER_SESSION_STORAGE_KEY, JSON.stringify(data));
+      return { success: true, redirectPath: "/recruiter_UI" };
+    }
+
+    if (data.role === "admin") {
+      localStorage.setItem("adminUser", JSON.stringify(data));
+      return { success: true, redirectPath: "/admin/dashboard" };
+    }
+
     localStorage.setItem("currentUser", JSON.stringify(data));
 
-    return true;
+    return { success: true, redirectPath: "/candidate_UI" };
   } catch (error) {
     setters.setResultMessage("Error: Cannot connect to Backend.");
     setters.setResultType("error");
-    return false;
+    return { success: false };
   }
 }

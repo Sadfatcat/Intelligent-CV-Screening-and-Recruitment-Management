@@ -1,15 +1,13 @@
 "use client";
 
-import { Suspense, useEffect }  from "react";
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import brightStyles from "./page.bright.module.css";
-import darkStyles from "./page.dark.module.css";
 import { handleLoginSubmit } from "@/utils/loginHandler";
-import Navbar from "@/components/navbar/Navbar";
+import BrandLogo from "@/components/brand/BrandLogo";
 
-function LoginPageContent() {
+export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,34 +15,14 @@ function LoginPageContent() {
   const [passwordError, setPasswordError] = useState("");
   const [resultMessage, setResultMessage] = useState("");
   const [resultType, setResultType] = useState<"success" | "error" | "">("");
-  const [countdown, setCountdown] = useState<number | null>(null);
-  const [theme, setTheme] = useState<"bright" | "dark">("dark");
-  const searchParams = useSearchParams();
-
-  const styles = theme === "dark" ? darkStyles : brightStyles;
-
-  useEffect(() => {
-    const qsTheme = searchParams.get("theme");
-    setTheme(qsTheme === "bright" ? "bright" : "dark");
-  }, [searchParams]);
-
-  useEffect(() => {
-    if (countdown === null) return;
-
-    if (countdown > 0) {
-      const timer = setTimeout(() => {
-        setCountdown(countdown - 1);
-      }, 1000);
-      return () => clearTimeout(timer);
-    } else {
-      router.push("/candidate_UI");
-    }
-  }, [countdown, router]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const styles = brightStyles;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setIsSubmitting(true);
 
-    const isSuccess = await handleLoginSubmit(email, password, {
+    const result = await handleLoginSubmit(email, password, {
       setEmail,
       setPassword,
       setEmailError,
@@ -53,24 +31,24 @@ function LoginPageContent() {
       setResultType,
     });
 
-    if (isSuccess) {
-      setCountdown(3);
+    setIsSubmitting(false);
+    if (result.success && result.redirectPath) {
+      router.push(result.redirectPath);
     }
   }
 
   return (
     <div className={styles.container}>
-      <Navbar />
-      <div className={styles.board}>
-        <img src="/usthabove.jpeg" alt="Image" className={styles.image} />
-      </div>
       <div className={styles.login}>
         <form className={styles.loginForm} onSubmit={handleSubmit}>
-          <h1>Login</h1>
+          <div className={styles.loginHeader}>
+            <BrandLogo title="IntelliCV" subtitle="Unified Access" />
+            <p>Sign in with your candidate, recruiter, or admin account.</p>
+          </div>
 
           <input
             type="email"
-            placeholder="email"
+            placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -78,7 +56,7 @@ function LoginPageContent() {
 
           <input
             type="password"
-            placeholder="password"
+            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -90,31 +68,21 @@ function LoginPageContent() {
             }
           >
             {resultMessage}
-            {countdown !== null && resultType === "success" && (
-              <span style={{ display: "block", marginTop: "8px", fontWeight: "bold" }}>
-                Page switch after {countdown}...
-              </span>
-            )}
           </div>
 
-          <button type="submit" disabled={countdown !== null}>
-            {countdown !== null ? "Loading..." : "login"}
+          <button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Signing in..." : "Login"}
           </button>
 
           <p className={styles.linkText}>
             Don&apos;t have an account?{" "}
             <Link href="/register/candidate">Register here</Link>
           </p>
+          <p className={styles.linkText}>
+            Recruiter account? <Link href="/recruiter/login">Use recruiter login</Link>
+          </p>
         </form>
       </div>
     </div>
-  );
-}
-
-export default function LoginPage() {
-  return (
-    <Suspense fallback={<div />}>
-      <LoginPageContent />
-    </Suspense>
   );
 }

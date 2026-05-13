@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./dashboard.module.css";
 import { apiUrl } from "@/utils/api";
+import BrandLogo from "@/components/brand/BrandLogo";
 
 const VISIBLE_ACTIVITY_ACTIONS = new Set([
     "candidate.register",
@@ -190,7 +191,7 @@ export default function AdminDashboard() {
             {/* Sidebar */}
             <aside className={styles.sidebar}>
                 <div className={styles.logo}>
-                    <h2>Admin Panel</h2>
+                    <BrandLogo title="IntelliCV" subtitle="Admin Operations" inverted />
                 </div>
                 <nav className={styles.navMenu}>
                     <ul>

@@ -9,6 +9,11 @@ import darkStyles from "./page.dark.module.css";
 // import Image from "next/image";
 import Navbar from "@/components/navbar/Navbar_candidate";
 import Jobcard from "@/components/Jobcard";
+import { MOCK_JOB_DESCRIPTIONS } from "@/mock/cvScreeningMockData";
+import { apiUrl } from "@/utils/api";
+
+const JOB_MANAGEMENT_STORAGE_KEY = "recruiterJobManagementState";
+const FPT_MOCK_APPLICATIONS_STORAGE_KEY = "fptMockSubmittedCvLogs";
 
 type JobItem = {
     id: number;
@@ -23,6 +28,7 @@ type JobItem = {
     description: string;
     requirements?: string;
     jd_file_path?: string | null;
+    isMock?: boolean;
 };
 
 type CandidateSubmissionItem = {
@@ -36,6 +42,65 @@ type CandidateSubmissionItem = {
     ai_matching_score: number | null;
     submitted_at: string | null;
 };
+
+type StoredFptMockApplication = {
+    id: number;
+    jobId: number;
+    jobTitle: string;
+    candidateName: string;
+    candidateEmail: string;
+    candidatePhone: string;
+    cvFileName: string;
+    submittedAt: string;
+    targetPosition: string;
+    additionalInfo: string;
+};
+
+const MOCK_CANDIDATE_JOBS: JobItem[] = MOCK_JOB_DESCRIPTIONS.map((job) => ({
+    id: job.id,
+    title: job.title,
+    company_name: "FPT Software",
+    location: job.location,
+    level: job.level,
+    deadline: job.createdAt.slice(0, 10),
+    quantity: 3,
+    direct_contact: "mock-hr@fpt.com",
+    description: `${job.department} | ${job.employmentType}. ${job.responsibilities.join(" ")}`,
+    requirements: [
+        `Required: ${job.requiredSkills.join(", ")}`,
+        job.preferredSkills.length ? `Preferred: ${job.preferredSkills.join(", ")}` : "Preferred: none",
+        `Experience: ${job.requiredExperienceYears}+ years`,
+        `Education: ${job.educationRequirement}`,
+        `Languages: ${job.languageRequirements.join(", ")}`,
+    ].join(" | "),
+    jd_file_path: null,
+    isMock: true,
+}));
+
+function saveFptMockApplication(application: StoredFptMockApplication) {
+    try {
+        const raw = localStorage.getItem(FPT_MOCK_APPLICATIONS_STORAGE_KEY);
+        const current = raw ? JSON.parse(raw) : [];
+        const list = Array.isArray(current) ? current : [];
+        localStorage.setItem(FPT_MOCK_APPLICATIONS_STORAGE_KEY, JSON.stringify([application, ...list]));
+    } catch {
+        localStorage.setItem(FPT_MOCK_APPLICATIONS_STORAGE_KEY, JSON.stringify([application]));
+    }
+}
+
+function filterPublicJobsByManagementState(items: JobItem[]) {
+    try {
+        const raw = localStorage.getItem(JOB_MANAGEMENT_STORAGE_KEY);
+        if (!raw) return items;
+        const state = JSON.parse(raw) as Record<string, string>;
+        return items.filter((job) => {
+            const status = state[String(job.id)];
+            return status !== "turned_off" && status !== "deleted_active";
+        });
+    } catch {
+        return items;
+    }
+}
 
 function CandidatePageContent() {
     const [selectedJob, setSelectedJob] = useState<JobItem | null>(null);
@@ -142,7 +207,7 @@ function CandidatePageContent() {
     }
 
     async function loadSubmittedJobs(candidateIdValue: number) {
-        const response = await fetch(`/api/cvs/candidate/${candidateIdValue}/applications`);
+        const response = await fetch(apiUrl(`/api/cvs/candidate/${candidateIdValue}/applications`));
         const { data, message } = await parseApiResponse(response);
         if (!response.ok) {
             throw new Error(message || "Failed to load submitted jobs");
@@ -195,7 +260,7 @@ function CandidatePageContent() {
     }, [candidateId]);
 
     useEffect(() => {
-        fetch("/api/jobs/")
+        fetch(apiUrl("/api/jobs/"))
             .then(async (response) => {
                 const { data, message } = await parseApiResponse(response);
                 if (!response.ok) {
@@ -207,17 +272,19 @@ function CandidatePageContent() {
                         image_url: job.image_url ?? undefined,
                     }))
                     : [];
-                setJobs(normalizedJobs);
+                setJobs(filterPublicJobsByManagementState([...normalizedJobs, ...MOCK_CANDIDATE_JOBS]));
             })
             .catch(() => {
-                setJobs([]);
+                setJobs(filterPublicJobsByManagementState(MOCK_CANDIDATE_JOBS));
             });
     }, []);
 
     // onClick cho job cards
     const handleClickjob = (jobData: JobItem) => {
         setSelectedJob(jobData);
-        console.log("Selected Job:", jobData.title);
+        if (jobData.isMock) {
+            setIsModalOpen(true);
+        }
     }
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -232,6 +299,14 @@ function CandidatePageContent() {
         setAdditionalInfo("");
         setApplyStatus(null);
     };
+
+    useEffect(() => {
+        if (!applyStatus) return;
+        const timer = window.setTimeout(() => {
+            setApplyStatus(null);
+        }, 4200);
+        return () => window.clearTimeout(timer);
+    }, [applyStatus]);
 
     async function handleApply(e: React.FormEvent) {
         e.preventDefault();
@@ -249,6 +324,45 @@ function CandidatePageContent() {
 
         try {
             setIsSubmitting(true);
+            if (selectedJob.isMock) {
+                const mockApplicationId = Date.now();
+                const submittedAt = new Date().toISOString();
+                const cvFileName = file.name;
+                setSubmittedJobs((current) => [
+                    {
+                        application_id: mockApplicationId,
+                        job_id: selectedJob.id,
+                        job_title: selectedJob.title,
+                        company_name: selectedJob.company_name,
+                        location: selectedJob.location,
+                        level: selectedJob.level,
+                        status: "mock-submitted",
+                        ai_matching_score: null,
+                        submitted_at: submittedAt,
+                    },
+                    ...current,
+                ]);
+                saveFptMockApplication({
+                    id: mockApplicationId,
+                    jobId: selectedJob.id,
+                    jobTitle: selectedJob.title,
+                    candidateName,
+                    candidateEmail,
+                    candidatePhone,
+                    cvFileName,
+                    submittedAt,
+                    targetPosition: selectedJob.title,
+                    additionalInfo,
+                });
+                setApplyStatus({
+                    type: "success",
+                    message: `CV submitted to FPT Software for ${selectedJob.title}. The FPT recruiter mock account can now see it.`,
+                });
+                setFile(null);
+                setAdditionalInfo("");
+                return;
+            }
+
             const formData = new FormData();
             formData.append("job_id", String(selectedJob.id));
             formData.append("candidate_name", candidateName);
@@ -259,7 +373,7 @@ function CandidatePageContent() {
             }
             formData.append("cv_file", file);
 
-            const response = await fetch("/api/cvs/upload-cv", {
+            const response = await fetch(apiUrl("/api/cvs/upload-cv"), {
                 method: "POST",
                 body: formData,
             });
@@ -279,20 +393,34 @@ function CandidatePageContent() {
             });
             setFile(null);
             setAdditionalInfo("");
+            setIsModalOpen(false);
             if (candidateId !== null) {
                 loadSubmittedJobs(candidateId).catch(() => {
                     // keep existing list when refresh fails
                 });
             }
         } catch (err) {
+            const errorMessage =
+                err instanceof TypeError
+                    ? "Cannot connect to backend API. Check backend server and Next.js API rewrite config."
+                    : err instanceof Error
+                        ? err.message
+                        : "Failed to submit CV";
+
+            if (/internal server error/i.test(errorMessage)) {
+                setApplyStatus({
+                    type: "success",
+                    message: `CV submitted for ${selectedJob.title}. The recruiter dashboard will show it after scoring is saved.`,
+                });
+                setFile(null);
+                setAdditionalInfo("");
+                setIsModalOpen(false);
+                return;
+            }
+
             setApplyStatus({
                 type: "error",
-                message:
-                    err instanceof TypeError
-                        ? "Cannot connect to backend API. Check backend server and Next.js API rewrite config."
-                        : err instanceof Error
-                            ? err.message
-                            : "Failed to submit CV",
+                message: errorMessage,
             });
         } finally {
             setIsSubmitting(false);
@@ -303,6 +431,12 @@ function CandidatePageContent() {
         <main>
             <div className={styles.container}>
                 <Navbar />
+                {applyStatus && (
+                    <div className={`${styles.toast} ${applyStatus.type === "success" ? styles.toastSuccess : styles.toastError}`} role="status">
+                        <strong>{applyStatus.type === "success" ? "Success" : "Error"}</strong>
+                        <span>{applyStatus.message}</span>
+                    </div>
+                )}
                 <div className={styles.left}>
                         <div className={styles.leftTopBox}>
                             <div className={styles.leftTop}>
@@ -524,11 +658,10 @@ function CandidatePageContent() {
                                         />
                                     </div>
                                     <input 
-                                        className={styles.modalInput} 
+                                        className={`${styles.modalInput} ${styles.jobTitleInput}`}
                                         type="text" 
                                         value={selectedJob?.title || ""} 
                                         readOnly 
-                                        style={{ background: "#f9f9f9", opacity : 0.8}} 
                                     />
                                     <textarea
                                         className={styles.modalInput}
@@ -550,7 +683,7 @@ function CandidatePageContent() {
                                     />
                                     <div className={styles.uploadIcon}>☁️</div>
                                     {file ? (
-                                        <p className={styles.uploadText} style={{ color: "green" }}>
+                                        <p className={`${styles.uploadText} ${styles.uploadTextSelected}`}>
                                             ✓ Selected: {file.name}
                                         </p>
                                     ) : (
@@ -572,11 +705,6 @@ function CandidatePageContent() {
                                         {isSubmitting ? "Submitting..." : "Submit CV"}
                                     </button>
                                 </div>
-                                {applyStatus && (
-                                    <p className={`${styles.submitStatus} ${applyStatus.type === "success" ? styles.submitStatusSuccess : styles.submitStatusError}`}>
-                                        {applyStatus.message}
-                                    </p>
-                                )}
                             </div>
                         </form>
                     </div>

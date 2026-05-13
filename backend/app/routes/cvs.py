@@ -1,3 +1,5 @@
+import json
+import logging
 import os
 import uuid
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
@@ -8,15 +10,18 @@ from typing import Optional
 from app.database import get_session
 from app.models import ActivityLog, CV, Job, JobApplication, User
 
+logger = logging.getLogger(__name__)
+
 # prefix /api/cvs, tất cả route trong file này đều bắt đầu bằng /api/cvs/...
 router = APIRouter(prefix="/api/cvs", tags=["cvs"])
 
 # thư mục lưu file cv trên server
-UPLOAD_DIR = "/app/uploads/cv"
+UPLOAD_DIR = os.getenv("CV_UPLOAD_DIR", "/app/uploads/cv")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # các định dạng file được chấp nhận
 ALLOWED_EXTENSIONS = {".pdf", ".docx", ".jpg", ".jpeg", ".png"}
+ENABLE_UPLOAD_VECTORS = os.getenv("ENABLE_UPLOAD_VECTORS", "0") == "1"
 
 
 @router.post("/upload-cv")
@@ -60,15 +65,37 @@ async def upload_cv(
     except Exception as e:
         raise HTTPException(status_code=422, detail=f"Không đọc được CV: {str(e)}")
 
-    # lưu vector cv, nếu lỗi thì để None, không ảnh hưởng phần còn lại
-    try:
-        from app.services.vectorizer import text_to_vector_json
-        cv_vector_json = text_to_vector_json(parsed_text) if parsed_text else None
-    except Exception:
-        cv_vector_json = None
+    # Vector embedding khá nặng; mặc định tắt trong request upload để tránh timeout FE/proxy.
+    cv_vector_json = None
+    if ENABLE_UPLOAD_VECTORS:
+        try:
+            from app.services.vectorizer import text_to_vector_json
+            cv_vector_json = text_to_vector_json(parsed_text) if parsed_text else None
+        except Exception:
+            cv_vector_json = None
 
     matching_score = None
-    if job.jd_vector and cv_vector_json:
+    matching_detail_json = None
+    if parsed_text and job.jd_parsed_text:
+        try:
+            from app.services.matching_config import parse_matching_config
+            from app.services.matcher import score_cv_vs_jd
+
+            config = parse_matching_config(job.matching_config, strict=False)
+            matching_detail = score_cv_vs_jd(
+                parsed_text,
+                job.jd_parsed_text,
+                weights=config.get("weights"),
+                must_have=config.get("must_have"),
+            )
+            matching_score = matching_detail.get("final_score")
+            matching_detail["overall_score"] = matching_score
+            matching_detail["final_score"] = matching_score
+            matching_detail_json = json.dumps(matching_detail, ensure_ascii=False)
+        except Exception as exc:
+            logger.exception("Detailed CV/JD matcher failed for job_id=%s: %s", job_id, exc)
+
+    if matching_score is None and job.jd_vector and cv_vector_json:
         try:
             from app.services.ai_service import calculate_match_score_from_vectors
 
@@ -99,6 +126,7 @@ async def upload_cv(
         cv_id=new_cv.id,
         status="pending",
         ai_matching_score=matching_score,
+        matching_detail=matching_detail_json,
     )
     session.add(application)
     try:
@@ -130,6 +158,7 @@ async def upload_cv(
         "job_title": job.title,
         "vector_saved": cv_vector_json is not None,
         "matching_score": matching_score,
+        "matching_detail": json.loads(matching_detail_json) if matching_detail_json else None,
     }
 
 
