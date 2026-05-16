@@ -59,6 +59,7 @@ def _run_upload(session: Session, recruiter_id: int, matching_config: str | None
             level="Mid",
             deadline="2026-12-31",
             quantity=1,
+            salary="15-25 million VND",
             direct_contact="hr@example.com",
             description="Backend role",
             matching_config=matching_config,

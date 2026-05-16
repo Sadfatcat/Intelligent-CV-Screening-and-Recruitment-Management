@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "../../app/recruiter_UI/page.module.css";
 import { RecruiterSidebar } from "./components/RecruiterSidebar";
@@ -64,6 +64,7 @@ export default function RecruiterUIPage() {
     const [level, setLevel] = useState("Junior");
     const [deadline, setDeadline] = useState("");
     const [quantity, setQuantity] = useState(1);
+    const [salary, setSalary] = useState("");
     const [directContact, setDirectContact] = useState("");
     const [description, setDescription] = useState("");
     const [jdFile, setJdFile] = useState<File | null>(null);
@@ -92,6 +93,7 @@ export default function RecruiterUIPage() {
     const [jobManagementState, setJobManagementState] = useState<Record<number, JobManagementStatus>>({});
     const [storedFptCvLogs, setStoredFptCvLogs] = useState<CVLogItem[]>([]);
     const [isScoringSummaryOpen, setIsScoringSummaryOpen] = useState(false);
+    const recruiterCvDetailHistoryRef = useRef(false);
 
     const [message, setMessage] = useState("");
     const [messageType, setMessageType] = useState<"success" | "error" | "">("");
@@ -146,7 +148,7 @@ export default function RecruiterUIPage() {
 
     useEffect(() => {
         if (isSessionChecked && !session) {
-            router.replace("/recruiter/login");
+            router.replace("/login");
         }
     }, [isSessionChecked, router, session]);
 
@@ -269,7 +271,7 @@ export default function RecruiterUIPage() {
         setIsUploadPopupOpen(false);
         setMessage("Logged out");
         setMessageType("success");
-        router.push("/recruiter/login");
+        router.push("/login");
     }
 
     function getManagedJobStatus(jobId: number): JobManagementStatus {
@@ -316,6 +318,7 @@ export default function RecruiterUIPage() {
                 level,
                 deadline,
                 quantity,
+                salary,
                 directContact,
                 description,
                 jdFile,
@@ -330,6 +333,7 @@ export default function RecruiterUIPage() {
             setLevel("Junior");
             setDeadline("");
             setQuantity(1);
+            setSalary("");
             setDirectContact("");
             setDescription("");
             setJdFile(null);
@@ -508,6 +512,40 @@ export default function RecruiterUIPage() {
         setIsScoringSummaryOpen(true);
     }
 
+    function openScreeningDetail(log: CVLogItem) {
+        if (typeof window !== "undefined" && !recruiterCvDetailHistoryRef.current) {
+            window.history.pushState({ ...(window.history.state || {}), intelliCvRecruiterCvDetail: true }, "", window.location.href);
+            recruiterCvDetailHistoryRef.current = true;
+        }
+
+        setSelectedScreeningLog(log);
+        setSelectedJobId(log.job_id);
+        setSelectedLog(null);
+        setScoringSubTab("detail");
+    }
+
+    function handleBackFromScreeningDetail() {
+        if (typeof window !== "undefined" && recruiterCvDetailHistoryRef.current) {
+            window.history.back();
+            return;
+        }
+
+        setSelectedScreeningLog(null);
+        setScoringSubTab("cvs");
+    }
+
+    useEffect(() => {
+        function handlePopState() {
+            if (!recruiterCvDetailHistoryRef.current) return;
+            recruiterCvDetailHistoryRef.current = false;
+            setSelectedScreeningLog(null);
+            setScoringSubTab("cvs");
+        }
+
+        window.addEventListener("popstate", handlePopState);
+        return () => window.removeEventListener("popstate", handlePopState);
+    }, []);
+
     function submitJobSearch(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         const nextTerm = jdSearchInput.trim();
@@ -639,6 +677,7 @@ export default function RecruiterUIPage() {
                                                 <th>Company</th>
                                                 <th>Level</th>
                                                 <th>Location</th>
+                                                <th>Salary</th>
                                                 <th>Status</th>
                                                 <th>CVs</th>
                                                 <th>Scored</th>
@@ -660,6 +699,7 @@ export default function RecruiterUIPage() {
                                                         <td>{job.company_name}</td>
                                                         <td>{job.level}</td>
                                                         <td>{job.location}</td>
+                                                        <td>{job.salary || "-"}</td>
                                                         <td>
                                                             <span className={`${styles.jobStatusPill} ${getJobManagementClass(jobStatus)}`}>
                                                                 {getJobManagementLabel(jobStatus)}
@@ -710,7 +750,7 @@ export default function RecruiterUIPage() {
                                             })}
                                             {paginatedScreeningJobs.length === 0 && (
                                                 <tr>
-                                                    <td colSpan={8}>
+                                                    <td colSpan={9}>
                                                         {jdSearchTerm ? "No matching job found." : "Empty job list."}
                                                     </td>
                                                 </tr>
@@ -834,12 +874,7 @@ export default function RecruiterUIPage() {
                                                         <tr
                                                             key={log.log_id}
                                                             className={styles.clickableRow}
-                                                            onClick={() => {
-                                                                setSelectedScreeningLog(log);
-                                                                setSelectedJobId(log.job_id);
-                                                                setSelectedLog(null);
-                                                                setScoringSubTab("detail");
-                                                            }}
+                                                            onClick={() => openScreeningDetail(log)}
                                                         >
                                                             <td className={styles.tableSoftText}>#{index + 1}</td>
                                                             <td><strong>{log.candidate_name || "-"}</strong></td>
@@ -890,10 +925,7 @@ export default function RecruiterUIPage() {
                                                 {getJobManagementLabel(getManagedJobStatus(selectedScreeningLog.job_id))}
                                             </span>
                                         </div>
-                                        <button className={styles.clearFilterBtn} type="button" onClick={() => {
-                                            setSelectedScreeningLog(null);
-                                            setScoringSubTab("cvs");
-                                        }}>
+                                        <button className={styles.clearFilterBtn} type="button" onClick={handleBackFromScreeningDetail}>
                                             Back to Submitted CVs
                                         </button>
                                     </div>
@@ -1044,6 +1076,7 @@ export default function RecruiterUIPage() {
                                             <span className={styles.jobItemTitle}>{job.title}</span>
                                             <span className={styles.jobItemMeta}>
                                                 {job.company_name || "Unknown company"} · {job.level || "No level"} · {jobLogs.length} CVs
+                                                {job.salary ? ` · ${job.salary}` : ""}
                                             </span>
                                         </button>
                                         <div className={styles.jobItemRight}>
@@ -1312,6 +1345,13 @@ export default function RecruiterUIPage() {
                                         />
                                         <input className={styles.modalInput} value={directContact} onChange={(e) => setDirectContact(e.target.value)} placeholder="Direct contact" required />
                                     </div>
+                                    <input
+                                        className={styles.modalInput}
+                                        value={salary}
+                                        onChange={(e) => setSalary(e.target.value)}
+                                        placeholder="Salary, e.g. 15-25 million VND or Negotiable"
+                                        required
+                                    />
                                     <textarea className={styles.modalInput} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Job description" required />
                                 </div>
 

@@ -117,67 +117,6 @@
   gap: 12px;
 }
 
-.submittedJobsCard {
-  margin-top: 4px;
-  border: 1px solid rgba(18, 76, 89, 0.16);
-  border-radius: 14px;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.72);
-}
-
-.submittedJobsTitle {
-  margin: 0 0 8px;
-  color: var(--title);
-  font-size: 14px;
-  font-weight: 800;
-}
-
-.submittedJobsEmpty {
-  margin: 0;
-  color: var(--muted);
-  font-size: 13px;
-}
-
-.submittedJobsList {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-height: 190px;
-  overflow-y: auto;
-}
-
-.submittedJobItem {
-  width: 100%;
-  text-align: left;
-  border: 1px solid rgba(18, 76, 89, 0.14);
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 10px;
-  padding: 9px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.submittedJobItem:hover {
-  border-color: rgba(13, 177, 144, 0.55);
-  box-shadow: 0 8px 14px rgba(13, 177, 144, 0.16);
-}
-
-.submittedJobTitle {
-  color: var(--title);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.submittedJobMeta {
-  color: var(--text);
-  font-size: 12px;
-}
-
 .leftBottomBox {
   padding: 18px;
 }
@@ -332,6 +271,373 @@
 .jobList::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.4);
   border-radius: 999px;
+}
+
+.workspace {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: hidden;
+}
+
+.subTabBar {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid rgba(18, 76, 89, 0.16);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.subTabButton {
+  border: 0;
+  border-radius: 9px;
+  padding: 10px 14px;
+  background: transparent;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.subTabButtonActive,
+.subTabButton:hover {
+  background: rgba(13, 177, 144, 0.12);
+  color: var(--title);
+}
+
+.appliedWorkspace {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.appliedHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.appliedHeader h2 {
+  margin: 0;
+  color: var(--title);
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.appliedHeader p {
+  margin: 4px 0 0;
+  color: var(--text);
+  opacity: 0.75;
+  font-size: 14px;
+}
+
+.appliedHeader > span {
+  color: var(--title);
+  border: 1px solid rgba(18, 76, 89, 0.16);
+  border-radius: 999px;
+  padding: 7px 11px;
+  background: rgba(13, 177, 144, 0.1);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.legendRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.legendRow span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.legendChipGood {
+  background: #dcfce7;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+.legendChipSkill {
+  background: #fef3c7;
+  border-color: #fde68a;
+  color: #92400e;
+}
+
+.legendChipRequirement {
+  background: #fee2e2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+.legendChipScore {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text);
+  padding: 0;
+}
+
+.legendIcon,
+.criteriaIcon {
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.criteriaIconGood {
+  background: #16a34a;
+  border: 1px solid #15803d;
+}
+
+.criteriaIconSkill {
+  background: #f59e0b;
+  border: 1px solid #d97706;
+  color: #ffffff;
+}
+
+.criteriaIconRequirement {
+  background: #dc2626;
+  border: 1px solid #b91c1c;
+}
+
+.scoreLegend,
+.scorePill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 92px;
+  min-height: 22px;
+  border-radius: 999px;
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.scorePassed {
+  background: #dfeee6;
+  color: #17623d;
+  border: 1px solid #c8e0d2;
+}
+
+.scoreBorderline {
+  background: #f6e6df;
+  color: #9a3f12;
+  border: 1px solid #edd1c4;
+}
+
+.scoreFailed {
+  background: #f1dfe2;
+  color: #991b1b;
+  border: 1px solid #e8c7cc;
+}
+
+.scorePending {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.appliedEmpty {
+  min-height: 260px;
+  border: 1px dashed rgba(18, 76, 89, 0.22);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--muted);
+}
+
+.appliedList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.applicationCard {
+  border: 1px solid rgba(18, 76, 89, 0.14);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.76);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.applicationHero {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  gap: 14px;
+  align-items: stretch;
+}
+
+.applicationImage,
+.applicationImageFallback {
+  width: 100%;
+  height: 160px;
+  border-radius: 12px;
+}
+
+.applicationImage {
+  object-fit: cover;
+}
+
+.applicationImageFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(13, 177, 144, 0.12);
+  color: var(--title);
+  font-size: 42px;
+  font-weight: 900;
+}
+
+.applicationIntro {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.applicationTitleRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 112px;
+  gap: 12px;
+}
+
+.applicationTitleRow h3 {
+  margin: 0;
+  color: var(--title);
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.applicationTitleRow p,
+.applicationDescription {
+  margin: 4px 0 0;
+  color: var(--text);
+  line-height: 1.45;
+  opacity: 0.75;
+}
+
+.scoreBox {
+  border: 1px solid rgba(18, 76, 89, 0.14);
+  border-radius: 14px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.88);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.scoreBox strong {
+  color: var(--title);
+  font-size: 28px;
+  line-height: 1;
+}
+
+.scoreBox small {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.applicationMetaGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.applicationMetaGrid span {
+  border: 1px solid rgba(18, 76, 89, 0.12);
+  border-radius: 10px;
+  padding: 8px 10px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+  font-weight: 800;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.criteriaGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.criteriaBlock {
+  border: 1px solid rgba(18, 76, 89, 0.12);
+  border-radius: 14px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.82);
+  min-width: 0;
+}
+
+.criteriaBlock h4 {
+  margin: 0 0 10px;
+  color: var(--title);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.criteriaList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.criteriaItem {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  color: rgba(74, 74, 74, 0.75);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+
+.criteriaMore,
+.criteriaEmpty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .right {
@@ -745,6 +1051,13 @@
   .modalBody {
     flex-direction: column;
   }
+
+  .applicationHero,
+  .applicationTitleRow,
+  .criteriaGrid,
+  .applicationMetaGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Minimal Pattern: đồng bộ layout candidate với recruiter/admin. */
@@ -771,8 +1084,9 @@
 .middle,
 .right,
 .companySection,
-.submittedJobsCard,
-.submittedJobItem,
+.subTabBar,
+.applicationCard,
+.criteriaBlock,
 .modalContent,
 .modalUploadCol,
 .submitActionBox {
@@ -825,8 +1139,6 @@
 }
 
 .Linktext,
-.submittedJobsTitle,
-.submittedJobTitle,
 .userName,
 .detailsSection h4 {
   color: #12161d;

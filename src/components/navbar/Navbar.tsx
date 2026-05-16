@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import BrandLogo from "@/components/brand/BrandLogo";
+import BrandLogoFull from "@/components/brand/BrandLogoFull";
 
 const navItems = [
   { label: "About Us", href: "https://usth.edu.vn/gioi-thieu/gioi-thieu-chung-ve-usth/" },
@@ -19,7 +19,7 @@ export default function Navbar() {
     <nav style={styles.navbar}>
       <div style={styles.container}>
         <a style={styles.logo}>
-          <BrandLogo title="IntelliCV" compact />
+          <BrandLogoFull iconSize={46} />
         </a>
 
         <div style={styles.rightArea}>

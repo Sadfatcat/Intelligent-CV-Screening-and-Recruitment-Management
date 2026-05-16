@@ -13,8 +13,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Intelligent CV Screening",
-  description: "An intelligent system for screening CVs",
+  title: "intelliCV",
+  description: "CV screening and recruitment management",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
 export default function RootLayout({

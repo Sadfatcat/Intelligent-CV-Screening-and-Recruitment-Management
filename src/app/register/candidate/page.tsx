@@ -1,12 +1,12 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import brightStyles from "./page.bright.module.css";
-import darkStyles from "./page.dark.module.css";
 import { handleRegisterSubmit } from "@/utils/registerHandler";
-import Navbar from "@/components/navbar/Navbar";
+import BrandLogoFull from "@/components/brand/BrandLogoFull";
+import BackButton from "@/components/navigation/BackButton";
 
 function RegisterCandidatePageContent() {
   const router = useRouter();
@@ -17,15 +17,7 @@ function RegisterCandidatePageContent() {
   const [passwordError, setPasswordError] = useState("");
   const [resultMessage, setResultMessage] = useState("");
   const [resultType, setResultType] = useState<"success" | "error" | "">("");
-  const [theme, setTheme] = useState<"bright" | "dark">("dark");
-  const searchParams = useSearchParams();
-
-  const styles = theme === "dark" ? darkStyles : brightStyles;
-
-  useEffect(() => {
-    const qsTheme = searchParams.get("theme");
-    setTheme(qsTheme === "bright" ? "bright" : "dark");
-  }, [searchParams]);
+  const styles = brightStyles;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     await handleRegisterSubmit(
@@ -49,56 +41,57 @@ function RegisterCandidatePageContent() {
     );
   }
   return (
-    <>
-      <Navbar />
-      <div className={styles.container}>
-        <div className={styles.register}>
-          <form className={styles.registerForm} onSubmit={handleSubmit}>
-            <h1>Register</h1>
+    <div className={styles.container}>
+      <div className={styles.register}>
+        <form className={styles.registerForm} onSubmit={handleSubmit}>
+          <div className={styles.registerHeader}>
+            <BackButton fallbackHref="/candidate_UI" className={styles.backButton} />
+            <BrandLogoFull iconSize={56} />
+            <p>Create a candidate account to submit CVs and track applied jobs.</p>
+          </div>
 
-            <input
-              type="email"
-              placeholder="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <div className={styles.error}>{emailError}</div>
 
-            <input
-              type="password"
-              placeholder="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <div className={styles.error}>{passwordError}</div>
 
-            <input
-              type="password"
-              placeholder="confirm password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-            <div className={styles.error}>{emailError}</div>
-            <div className={styles.error}>{passwordError}</div>
+          <input
+            type="password"
+            placeholder="Confirm password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
 
-            <div
-              className={
-                resultType === "success" ? styles.success : styles.error
-              }
-            >
-              {resultMessage}
-            </div>
+          <div
+            className={
+              resultType === "success" ? styles.success : styles.error
+            }
+          >
+            {resultMessage}
+          </div>
 
-            <button type="submit">register</button>
+          <button type="submit">Create account</button>
 
-            <p className={styles.linkText}>
-              Already have an account? <Link href="/login">Login here</Link>
-            </p>
-          </form>
-        </div>
-        <div className={styles.rightside}>
-          <img src = "/nghich1.png" alt="Image" className={styles.image} />
-        </div>
+          <p className={styles.linkText}>
+            Already have an account? <Link href="/login">Login here</Link>
+          </p>
+          <p className={styles.linkText}>
+            Recruiter accounts are created by an admin.
+          </p>
+        </form>
       </div>
-    </>
+    </div>
   );
 }
 

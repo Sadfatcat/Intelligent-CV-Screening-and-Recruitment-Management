@@ -3,6 +3,7 @@ import logging
 import os
 import uuid
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from sqlalchemy import func, or_
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select
 from typing import Optional
@@ -43,12 +44,12 @@ async def upload_cv(
     # kiểm tra job có tồn tại không
     job = session.get(Job, job_id)
     if not job:
-        raise HTTPException(status_code=404, detail=f"Không tìm thấy job id={job_id}")
+        raise HTTPException(status_code=404, detail=f"Job id={job_id} not found")
 
     # kiểm tra định dạng file
     ext = os.path.splitext(cv_file.filename)[1].lower()
     if ext not in ALLOWED_EXTENSIONS:
-        raise HTTPException(status_code=400, detail=f"Không nhận file '{ext}', chỉ nhận: PDF, DOCX, JPG, PNG")
+        raise HTTPException(status_code=400, detail=f"Unsupported file type '{ext}'. Accepted formats: PDF, DOCX, JPG, PNG")
 
     file_bytes = await cv_file.read()
 
@@ -63,7 +64,7 @@ async def upload_cv(
         from app.services.extractor import extract_text
         parsed_text = extract_text(file_bytes, cv_file.filename)
     except Exception as e:
-        raise HTTPException(status_code=422, detail=f"Không đọc được CV: {str(e)}")
+        raise HTTPException(status_code=422, detail=f"Could not read CV: {str(e)}")
 
     # Vector embedding khá nặng; mặc định tắt trong request upload để tránh timeout FE/proxy.
     cv_vector_json = None
@@ -152,7 +153,7 @@ async def upload_cv(
         session.rollback()
 
     return {
-        "message": "Nộp hồ sơ thành công",
+        "message": "Application submitted successfully",
         "cv_id": new_cv.id,
         "application_id": application.id,
         "job_title": job.title,
@@ -166,7 +167,7 @@ async def upload_cv(
 def list_cvs_for_job(job_id: int, session: Session = Depends(get_session)):
     job = session.get(Job, job_id)
     if not job:
-        raise HTTPException(status_code=404, detail="Không tìm thấy job")
+        raise HTTPException(status_code=404, detail="Job not found")
 
     applications = session.exec(
         select(JobApplication).where(JobApplication.job_id == job_id)
@@ -195,9 +196,17 @@ def list_cvs_for_job(job_id: int, session: Session = Depends(get_session)):
 def list_candidate_applications(candidate_id: int, session: Session = Depends(get_session)):
     candidate = session.get(User, candidate_id)
     if not candidate or candidate.role != "candidate":
-        raise HTTPException(status_code=404, detail="Không tìm thấy candidate")
+        raise HTTPException(status_code=404, detail="Candidate not found")
 
-    cvs = session.exec(select(CV).where(CV.candidate_id == candidate_id)).all()
+    candidate_email = (candidate.email or "").strip().lower()
+    cvs = session.exec(
+        select(CV).where(
+            or_(
+                CV.candidate_id == candidate_id,
+                func.lower(CV.candidate_email) == candidate_email,
+            )
+        )
+    ).all()
     cv_ids = [cv.id for cv in cvs if cv.id is not None]
     if not cv_ids:
         return {"candidate_id": candidate_id, "total": 0, "applications": []}
@@ -217,6 +226,13 @@ def list_candidate_applications(candidate_id: int, session: Session = Depends(ge
         if not job:
             continue
 
+        matching_detail = None
+        if app.matching_detail:
+            try:
+                matching_detail = json.loads(app.matching_detail)
+            except json.JSONDecodeError:
+                matching_detail = None
+
         submit_log = session.exec(
             select(ActivityLog)
             .where(
@@ -235,8 +251,15 @@ def list_candidate_applications(candidate_id: int, session: Session = Depends(ge
                 "company_name": job.company_name,
                 "location": job.location,
                 "level": job.level,
+                "deadline": job.deadline,
+                "quantity": job.quantity,
+                "salary": job.salary,
+                "direct_contact": job.direct_contact,
+                "image_url": job.image_url,
+                "description": job.description,
                 "status": app.status,
                 "ai_matching_score": app.ai_matching_score,
+                "matching_detail": matching_detail,
                 "submitted_at": submit_log.created_at if submit_log else None,
             }
         )

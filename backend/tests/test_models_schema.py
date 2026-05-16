@@ -32,6 +32,20 @@ def test_job_has_optional_matching_config_field():
     assert job.matching_config == '{"weights": {"technical_skills": 1.0}}'
 
 
+def test_job_has_optional_salary_field():
+    job = Job(
+        title="Backend Engineer",
+        company_name="Tech Co",
+        location="Remote",
+        level="Mid",
+        deadline="2026-12-31",
+        description="Backend role",
+        salary="15-25 million VND",
+    )
+
+    assert job.salary == "15-25 million VND"
+
+
 def test_startup_migration_adds_matching_detail_non_destructively():
     database_py = Path(__file__).resolve().parents[1] / "app" / "database.py"
     source = database_py.read_text(encoding="utf-8")
@@ -44,6 +58,13 @@ def test_startup_migration_adds_matching_config_non_destructively():
     source = database_py.read_text(encoding="utf-8")
 
     assert "ALTER TABLE job ADD COLUMN IF NOT EXISTS matching_config TEXT" in source
+
+
+def test_startup_migration_adds_salary_non_destructively():
+    database_py = Path(__file__).resolve().parents[1] / "app" / "database.py"
+    source = database_py.read_text(encoding="utf-8")
+
+    assert "ALTER TABLE job ADD COLUMN IF NOT EXISTS salary VARCHAR" in source
 
 
 def test_model_imports_do_not_fail():

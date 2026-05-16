@@ -74,6 +74,7 @@ export async function uploadJobDescription(payload: UploadJobDescriptionPayload)
     formData.append("level", payload.level);
     formData.append("deadline", payload.deadline);
     formData.append("quantity", String(payload.quantity));
+    formData.append("salary", payload.salary);
     formData.append("direct_contact", payload.directContact);
     formData.append("description", payload.description);
     formData.append("jd_file", payload.jdFile);

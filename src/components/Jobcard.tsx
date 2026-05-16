@@ -14,6 +14,7 @@ type JobCardProps = {
         level: string;
         deadline: string;
         quantity?: number | null;
+        salary?: string | null;
         direct_contact?: string | null;
         image_url?: string;
         description: string;
@@ -57,6 +58,10 @@ export default function JobCard({
 
             <p className={styles.text}>
                 <span className={styles.label}>Quantity:</span> {job.quantity ?? "-"}
+            </p>
+
+            <p className={styles.salary}>
+                <span className={styles.label}>Salary:</span> {job.salary || "-"}
             </p>
 
             <p className={styles.text}>

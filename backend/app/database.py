@@ -10,7 +10,7 @@ load_dotenv(BASE_DIR / ".env")
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if not DATABASE_URL:
-    raise ValueError("Không tìm thấy DATABASE_URL trong .env")
+    raise ValueError("DATABASE_URL was not found in .env")
 
 engine = create_engine(DATABASE_URL, echo=True)
 
@@ -26,6 +26,7 @@ def run_startup_migrations():
         "ALTER TABLE job ADD COLUMN IF NOT EXISTS jd_parsed_text TEXT",
         "ALTER TABLE job ADD COLUMN IF NOT EXISTS jd_vector TEXT",
         "ALTER TABLE job ADD COLUMN IF NOT EXISTS quantity INTEGER",
+        "ALTER TABLE job ADD COLUMN IF NOT EXISTS salary VARCHAR",
         "ALTER TABLE job ADD COLUMN IF NOT EXISTS direct_contact VARCHAR",
         "ALTER TABLE job ADD COLUMN IF NOT EXISTS image_url VARCHAR",
         "ALTER TABLE job ADD COLUMN IF NOT EXISTS matching_config TEXT",

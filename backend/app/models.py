@@ -28,6 +28,7 @@ class Job(SQLModel, table=True):
     level: str
     deadline: str
     quantity: int | None = None
+    salary: str | None = None
     direct_contact: str | None = None
     image_url: str | None = None
     description: str

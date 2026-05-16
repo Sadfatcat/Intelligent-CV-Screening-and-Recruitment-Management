@@ -39,4 +39,4 @@ def extract_text(file_bytes: bytes, filename: str) -> str:
     elif name.endswith((".jpg", ".jpeg", ".png")):
         return extract_text_from_image(file_bytes)
     else:
-        raise ValueError(f"Định dạng không hỗ trợ: {filename}")
+        raise ValueError(f"Unsupported file format: {filename}")

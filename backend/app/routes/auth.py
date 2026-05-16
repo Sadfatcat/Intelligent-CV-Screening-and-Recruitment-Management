@@ -41,12 +41,12 @@ class CandidateProfileUpdateRequest(BaseModel):
 def register_user(user_data: UserRegisterRequest, session: Session = Depends(get_session)):
     # workflow mới: candidate tự đăng ký, recruiter do admin tạo
     if user_data.role != "candidate":
-        raise HTTPException(status_code=403, detail="Chỉ candidate được tự đăng ký")
+        raise HTTPException(status_code=403, detail="Only candidates can self-register")
 
     # kiểm tra email đã tồn tại chưa
     existing = session.exec(select(User).where(User.email == user_data.email)).first()
     if existing:
-        raise HTTPException(status_code=400, detail="Email này đã được đăng ký")
+        raise HTTPException(status_code=400, detail="This email is already registered")
 
     new_user = User(
         email=user_data.email,
@@ -72,7 +72,7 @@ def register_user(user_data: UserRegisterRequest, session: Session = Depends(get
     )
     session.commit()
 
-    return {"message": "Đăng ký thành công", "user_id": new_user.id, "role": new_user.role}
+    return {"message": "Registration successful", "user_id": new_user.id, "role": new_user.role}
 
 
 @router.post("/login")
@@ -80,10 +80,10 @@ def login_user(user_data: UserLoginRequest, session: Session = Depends(get_sessi
     user = session.exec(select(User).where(User.email == user_data.email)).first()
 
     if not user:
-        raise HTTPException(status_code=400, detail="Không tìm thấy tài khoản")
+        raise HTTPException(status_code=400, detail="Account not found")
 
     if not verify_password(user_data.password, user.password_hash):
-        raise HTTPException(status_code=400, detail="Sai mật khẩu")
+        raise HTTPException(status_code=400, detail="Incorrect password")
 
     session.add(
         ActivityLog(
@@ -98,7 +98,7 @@ def login_user(user_data: UserLoginRequest, session: Session = Depends(get_sessi
     session.commit()
 
     return {
-        "message": "Đăng nhập thành công",
+        "message": "Login successful",
         "user_id": user.id,
         "role": user.role,
         "email": user.email,
@@ -111,17 +111,17 @@ def login_user(user_data: UserLoginRequest, session: Session = Depends(get_sessi
 def change_password(payload: ChangePasswordRequest, session: Session = Depends(get_session)):
     user = session.get(User, payload.user_id)
     if not user:
-        raise HTTPException(status_code=404, detail="Không tìm thấy tài khoản")
+        raise HTTPException(status_code=404, detail="Account not found")
     if user.role != "recruiter":
-        raise HTTPException(status_code=403, detail="Chỉ recruiter được đổi mật khẩu tại luồng này")
+        raise HTTPException(status_code=403, detail="Only recruiters can change password in this flow")
     if not verify_password(payload.current_password, user.password_hash):
-        raise HTTPException(status_code=400, detail="Mật khẩu hiện tại không đúng")
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
 
     next_password = payload.new_password.strip()
     if len(next_password) < 6:
-        raise HTTPException(status_code=400, detail="Mật khẩu mới cần ít nhất 6 ký tự")
+        raise HTTPException(status_code=400, detail="New password must be at least 6 characters")
     if next_password == "1":
-        raise HTTPException(status_code=400, detail="Mật khẩu mới không được là mật khẩu mặc định")
+        raise HTTPException(status_code=400, detail="New password cannot be the default password")
 
     user.password_hash = get_password_hash(next_password)
     session.add(user)
@@ -139,7 +139,7 @@ def change_password(payload: ChangePasswordRequest, session: Session = Depends(g
     )
     session.commit()
 
-    return {"message": "Đổi mật khẩu thành công"}
+    return {"message": "Password changed successfully"}
 
 
 @router.put("/candidate/{candidate_id}/profile")
@@ -150,9 +150,9 @@ def update_candidate_profile(
 ):
     user = session.get(User, candidate_id)
     if not user:
-        raise HTTPException(status_code=404, detail="Không tìm thấy tài khoản")
+        raise HTTPException(status_code=404, detail="Account not found")
     if user.role != "candidate":
-        raise HTTPException(status_code=403, detail="Chỉ candidate được cập nhật hồ sơ cá nhân")
+        raise HTTPException(status_code=403, detail="Only candidates can update their profile")
 
     if payload.full_name is not None:
         user.full_name = payload.full_name
@@ -178,7 +178,7 @@ def update_candidate_profile(
     session.commit()
 
     return {
-        "message": "Cập nhật hồ sơ thành công",
+        "message": "Profile updated successfully",
         "user_id": user.id,
         "role": user.role,
         "full_name": user.full_name,

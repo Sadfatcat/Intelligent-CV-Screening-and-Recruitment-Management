@@ -15,6 +15,7 @@ export type RecruiterJob = {
     level: string;
     deadline: string;
     quantity?: number | null;
+    salary?: string | null;
     direct_contact?: string | null;
     image_url?: string | null;
     isMock?: boolean;
@@ -128,6 +129,7 @@ export type UploadJobDescriptionPayload = {
     level: string;
     deadline: string;
     quantity: number;
+    salary: string;
     directContact: string;
     description: string;
     jdFile: File;

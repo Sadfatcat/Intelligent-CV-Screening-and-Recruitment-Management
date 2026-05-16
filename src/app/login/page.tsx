@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import brightStyles from "./page.bright.module.css";
 import { handleLoginSubmit } from "@/utils/loginHandler";
-import BrandLogo from "@/components/brand/BrandLogo";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -38,13 +37,15 @@ export default function LoginPage() {
   }
 
   return (
-    <div className={styles.container}>
-      <div className={styles.login}>
+    <div className={`${styles.page} ${styles.loginPage}`}>
+      <div className={`${styles.card} ${styles.loginWrap}`}>
+        <div className={styles.loginHeader}>
+          <p className={styles.loginEyebrow}>Unified Access</p>
+          <h1 className={styles.title}>IntelliCV Login</h1>
+          <p className={styles.subtleText}>Sign in as candidate, recruiter, or admin to continue to your workspace.</p>
+        </div>
+
         <form className={styles.loginForm} onSubmit={handleSubmit}>
-          <div className={styles.loginHeader}>
-            <BrandLogo title="IntelliCV" subtitle="Unified Access" />
-            <p>Sign in with your candidate, recruiter, or admin account.</p>
-          </div>
 
           <input
             type="email"
@@ -70,7 +71,7 @@ export default function LoginPage() {
             {resultMessage}
           </div>
 
-          <button type="submit" disabled={isSubmitting}>
+          <button className={styles.button} type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Signing in..." : "Login"}
           </button>
 
@@ -79,7 +80,7 @@ export default function LoginPage() {
             <Link href="/register/candidate">Register here</Link>
           </p>
           <p className={styles.linkText}>
-            Recruiter account? <Link href="/recruiter/login">Use recruiter login</Link>
+            Admin and recruiter accounts use this same login.
           </p>
         </form>
       </div>

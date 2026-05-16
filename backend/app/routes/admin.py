@@ -25,7 +25,7 @@ class CreateRecruiterRequest(BaseModel):
 def require_admin(admin_id: int, session: Session) -> User:
     admin = session.get(User, admin_id)
     if not admin or admin.role != "admin":
-        raise HTTPException(status_code=403, detail="Chỉ admin được phép thực hiện")
+        raise HTTPException(status_code=403, detail="Only admins can perform this action")
     return admin
 
 
@@ -86,7 +86,7 @@ def create_recruiter(payload: CreateRecruiterRequest, session: Session = Depends
 
     existing = session.exec(select(User).where(User.email == payload.email)).first()
     if existing:
-        raise HTTPException(status_code=400, detail="Email này đã tồn tại")
+        raise HTTPException(status_code=400, detail="This email already exists")
 
     recruiter = User(
         email=payload.email,
@@ -115,7 +115,7 @@ def create_recruiter(payload: CreateRecruiterRequest, session: Session = Depends
     session.commit()
 
     return {
-        "message": "Tạo tài khoản recruiter thành công",
+        "message": "Recruiter account created successfully",
         "recruiter_id": recruiter.id,
         "email": recruiter.email,
         "company_name": recruiter.company_name,
@@ -174,7 +174,7 @@ def admin_delete_job(job_id: int, admin_id: int = Query(...), session: Session =
 
     job = session.get(Job, job_id)
     if not job:
-        raise HTTPException(status_code=404, detail="Không tìm thấy job")
+        raise HTTPException(status_code=404, detail="Job not found")
 
     cleanup = _delete_job_and_dependencies(session, job)
     session.commit()
@@ -192,7 +192,7 @@ def admin_delete_job(job_id: int, admin_id: int = Query(...), session: Session =
     session.commit()
 
     return {
-        "message": "Đã xoá job",
+        "message": "Job deleted",
         "job_id": job_id,
         "deleted_applications": cleanup["deleted_applications"],
     }
@@ -208,9 +208,9 @@ def admin_delete_candidate(
 
     candidate = session.get(User, candidate_id)
     if not candidate:
-        raise HTTPException(status_code=404, detail="Không tìm thấy candidate")
+        raise HTTPException(status_code=404, detail="Candidate not found")
     if candidate.role != "candidate":
-        raise HTTPException(status_code=400, detail="User này không phải candidate")
+        raise HTTPException(status_code=400, detail="This user is not a candidate")
 
     cvs = session.exec(select(CV).where(CV.candidate_id == candidate_id)).all()
     deleted_cv_ids = []
@@ -252,7 +252,7 @@ def admin_delete_candidate(
     session.commit()
 
     return {
-        "message": "Đã xoá candidate",
+        "message": "Candidate deleted",
         "candidate_id": candidate_id,
         "deleted_cvs": len(deleted_cv_ids),
         "deleted_applications": len(deleted_application_ids),
@@ -269,9 +269,9 @@ def admin_delete_recruiter(
 
     recruiter = session.get(User, recruiter_id)
     if not recruiter:
-        raise HTTPException(status_code=404, detail="Không tìm thấy recruiter")
+        raise HTTPException(status_code=404, detail="Recruiter not found")
     if recruiter.role != "recruiter":
-        raise HTTPException(status_code=400, detail="User này không phải recruiter")
+        raise HTTPException(status_code=400, detail="This user is not a recruiter")
 
     jobs = session.exec(select(Job).where(Job.recruiter_id == recruiter_id)).all()
     deleted_job_ids = []
@@ -303,7 +303,7 @@ def admin_delete_recruiter(
     session.commit()
 
     return {
-        "message": "Đã xoá recruiter/company",
+        "message": "Recruiter/company deleted",
         "recruiter_id": recruiter_id,
         "deleted_jobs": len(deleted_job_ids),
         "deleted_applications": deleted_applications,

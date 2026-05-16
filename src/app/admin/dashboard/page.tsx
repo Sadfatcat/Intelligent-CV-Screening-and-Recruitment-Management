@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./dashboard.module.css";
 import { apiUrl } from "@/utils/api";
-import BrandLogo from "@/components/brand/BrandLogo";
+import BrandLogoIcon from "@/components/brand/BrandLogoIcon";
 
 const VISIBLE_ACTIVITY_ACTIONS = new Set([
     "candidate.register",
@@ -35,13 +35,13 @@ export default function AdminDashboard() {
     useEffect(() => {
         const adminRaw = localStorage.getItem("adminUser");
         if (!adminRaw) {
-            router.push("/admin/login");
+            router.push("/login");
             return;
         }
 
         const parsed = JSON.parse(adminRaw);
         if (parsed.role !== "admin") {
-            router.push("/admin/login");
+            router.push("/login");
             return;
         }
 
@@ -86,7 +86,7 @@ export default function AdminDashboard() {
 
     const handleLogout = () => {
         localStorage.removeItem("adminUser");
-        router.push("/admin/login");
+        router.push("/login");
     };
 
     async function handleCreateRecruiter(e: React.FormEvent<HTMLFormElement>) {
@@ -191,7 +191,7 @@ export default function AdminDashboard() {
             {/* Sidebar */}
             <aside className={styles.sidebar}>
                 <div className={styles.logo}>
-                    <BrandLogo title="IntelliCV" subtitle="Admin Operations" inverted />
+                    <BrandLogoIcon size={82} color="#ffffff" accentColor="#ffffff" title="intelliCV admin" style={{ margin: "0 auto" }} />
                 </div>
                 <nav className={styles.navMenu}>
                     <ul>

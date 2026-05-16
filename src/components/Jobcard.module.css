@@ -54,6 +54,12 @@
     color: #4a4a4a;
 }
 
+.salary {
+    margin: 0 0 8px 0;
+    color: #0f766e;
+    font-weight: 700;
+}
+
 .description {
     margin: 0;
     color: #4a4a4a;

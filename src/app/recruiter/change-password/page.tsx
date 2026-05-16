@@ -7,6 +7,7 @@ import { RecruiterToast } from "../../../features/recruiter/components/Recruiter
 import { RECRUITER_PASSWORD_CHANGE_STORAGE_KEY, RECRUITER_SESSION_STORAGE_KEY } from "../../../features/recruiter/constants/recruiterConstants";
 import { changeRecruiterPassword } from "../../../features/recruiter/services/recruiterApi";
 import type { RecruiterSession } from "../../../features/recruiter/types/recruiterTypes";
+import BackButton from "../../../components/navigation/BackButton";
 
 // Recruiter Password Change: bắt đổi mật khẩu mặc định trước khi vào workspace.
 export default function RecruiterChangePasswordPage() {
@@ -22,20 +23,20 @@ export default function RecruiterChangePasswordPage() {
     useEffect(() => {
         const raw = localStorage.getItem(RECRUITER_PASSWORD_CHANGE_STORAGE_KEY);
         if (!raw) {
-            router.replace("/recruiter/login");
+            router.replace("/login");
             return;
         }
 
         try {
             const parsed = JSON.parse(raw) as RecruiterSession;
             if (parsed.role !== "recruiter" || !parsed.must_change_password) {
-                router.replace("/recruiter/login");
+                router.replace("/login");
                 return;
             }
             setPendingSession(parsed);
         } catch {
             localStorage.removeItem(RECRUITER_PASSWORD_CHANGE_STORAGE_KEY);
-            router.replace("/recruiter/login");
+            router.replace("/login");
         }
     }, [router]);
 
@@ -73,6 +74,7 @@ export default function RecruiterChangePasswordPage() {
         <div className={`${styles.page} ${styles.loginPage}`}>
             <div className={`${styles.card} ${styles.loginWrap}`}>
                 <div className={styles.loginHeader}>
+                    <BackButton fallbackHref="/recruiter_UI" className={styles.clearFilterBtn} />
                     <p className={styles.loginEyebrow}>Recruiter Security</p>
                     <h1 className={styles.title}>Change Password</h1>
                     <p className={styles.subtleText}>This recruiter account is using the default password. Create a new password before opening the workspace.</p>

@@ -1,53 +1,99 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Newsreader:wght@500;600&display=swap");
 
-.container {
+.page {
+  --bg: #fbfaf7;
+  --surface: #ffffff;
+  --surface-solid: #ffffff;
+  --text: #12161d;
+  --body-text: #4a4a4a;
+  --muted: #666666;
+  --line: rgba(18, 22, 29, 0.12);
+  --control-bg-soft: #f4f3f0;
+  --primary-a: #12161d;
+  --primary-c: #b05a36;
+  --danger: #a63127;
   min-height: 100vh;
+  font-family: "Inter", sans-serif;
+  color: var(--body-text);
+  background: var(--bg);
+}
+
+.loginPage {
+  padding: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
-  background: #fbfaf7;
-  color: #4a4a4a;
-  font-family: "Inter", sans-serif;
 }
 
-.login {
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: #006a4e;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+.loginWrap {
   width: 100%;
   max-width: 460px;
+}
+
+.loginHeader {
+  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.loginEyebrow {
+  margin: 0;
+  align-self: flex-start;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  background: var(--control-bg-soft);
+}
+
+.title {
+  margin: 0;
+  font-family: "Newsreader", serif;
+  font-size: 1.9rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--text);
+}
+
+.subtleText {
+  margin: 0 0 10px;
+  color: var(--muted);
+  line-height: 1.5;
 }
 
 .loginForm {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  width: 100%;
-  padding: 26px;
-  border: 1px solid rgba(18, 22, 29, 0.12);
-  border-radius: 24px;
-  background: #ffffff;
-}
-
-.loginHeader {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 4px;
-}
-
-.loginHeader p {
-  margin: 0;
-  color: #666666;
-  line-height: 1.5;
 }
 
 .loginForm input {
   width: 100%;
-  padding: 13px 14px;
-  border: 1px solid rgba(18, 22, 29, 0.12);
+  border: 1px solid var(--line);
   border-radius: 12px;
-  background: #ffffff;
-  color: #12161d;
-  font-size: 15px;
+  padding: 12px 13px;
+  font-size: 14px;
+  background: var(--surface-solid);
+  color: var(--text);
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -57,36 +103,34 @@
 }
 
 .loginForm input:focus {
-  border-color: #12161d;
-  box-shadow: 0 0 0 4px rgba(18, 22, 29, 0.08);
+  border-color: var(--primary-c);
+  box-shadow: 0 0 0 3px rgba(176, 90, 54, 0.12);
 }
 
-.loginForm button {
-  width: 100%;
-  padding: 13px 16px;
+.button {
   border: none;
   border-radius: 12px;
-  background: #12161d;
+  padding: 12px 24px;
   color: #ffffff;
-  font-size: 15px;
   font-weight: 700;
   cursor: pointer;
+  background: var(--primary-a);
   transition: all 0.3s ease;
 }
 
-.loginForm button:hover:not(:disabled) {
+.button:hover:not(:disabled) {
   transform: translateY(-1px);
-  background: #2a2f38;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
 }
 
-.loginForm button:disabled {
+.button:disabled {
   cursor: not-allowed;
   opacity: 0.72;
 }
 
 .error {
   min-height: 16px;
-  color: #a63127;
+  color: var(--danger);
   font-size: 12px;
 }
 
@@ -98,13 +142,13 @@
 
 .linkText {
   margin: 2px 0 0;
-  color: #666666;
+  color: var(--muted);
   font-size: 14px;
   text-align: center;
 }
 
 .linkText a {
-  color: #12161d;
+  color: var(--text);
   font-weight: 700;
   text-decoration: none;
 }

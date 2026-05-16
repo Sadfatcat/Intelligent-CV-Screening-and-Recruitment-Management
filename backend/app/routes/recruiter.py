@@ -18,7 +18,7 @@ class UpdateApplicationStatusRequest(BaseModel):
 def require_recruiter(recruiter_id: int, session: Session) -> User:
     recruiter = session.get(User, recruiter_id)
     if not recruiter or recruiter.role != "recruiter":
-        raise HTTPException(status_code=403, detail="Chỉ recruiter được phép thực hiện")
+        raise HTTPException(status_code=403, detail="Only recruiters can perform this action")
     return recruiter
 
 
@@ -86,6 +86,7 @@ def list_recruiter_jobs(recruiter_id: int, session: Session = Depends(get_sessio
             "level": j.level,
             "deadline": j.deadline,
             "quantity": j.quantity,
+            "salary": j.salary,
             "direct_contact": j.direct_contact,
             "image_url": j.image_url,
         }
@@ -103,9 +104,9 @@ def delete_recruiter_job(
 
     job = session.get(Job, job_id)
     if not job:
-        raise HTTPException(status_code=404, detail="Không tìm thấy job")
+        raise HTTPException(status_code=404, detail="Job not found")
     if job.recruiter_id != recruiter_id:
-        raise HTTPException(status_code=403, detail="Bạn không có quyền xoá JD này")
+        raise HTTPException(status_code=403, detail="You do not have permission to delete this JD")
 
     if job.jd_file_path and os.path.exists(job.jd_file_path):
         try:
@@ -150,7 +151,7 @@ def delete_recruiter_job(
     session.commit()
 
     return {
-        "message": "Xoá JD thành công",
+        "message": "JD deleted successfully",
         "job_id": job_id,
         "deleted_applications": len(deleted_application_ids),
     }
@@ -165,9 +166,9 @@ def list_job_applications_for_recruiter(
     require_recruiter(recruiter_id, session)
     job = session.get(Job, job_id)
     if not job:
-        raise HTTPException(status_code=404, detail="Không tìm thấy job")
+        raise HTTPException(status_code=404, detail="Job not found")
     if job.recruiter_id != recruiter_id:
-        raise HTTPException(status_code=403, detail="Bạn không có quyền với JD này")
+        raise HTTPException(status_code=403, detail="You do not have permission to access this JD")
 
     applications = session.exec(select(JobApplication).where(JobApplication.job_id == job_id)).all()
     result = []
@@ -199,17 +200,17 @@ def update_application_status(
     recruiter = require_recruiter(recruiter_id, session)
 
     if payload.status not in {"pending", "reviewed", "accepted", "rejected"}:
-        raise HTTPException(status_code=400, detail="Status không hợp lệ")
+        raise HTTPException(status_code=400, detail="Invalid status")
 
     application = session.get(JobApplication, application_id)
     if not application:
-        raise HTTPException(status_code=404, detail="Không tìm thấy application")
+        raise HTTPException(status_code=404, detail="Application not found")
 
     job = session.get(Job, application.job_id)
     if not job:
-        raise HTTPException(status_code=404, detail="Không tìm thấy job")
+        raise HTTPException(status_code=404, detail="Job not found")
     if job.recruiter_id != recruiter_id:
-        raise HTTPException(status_code=403, detail="Bạn không có quyền với application này")
+        raise HTTPException(status_code=403, detail="You do not have permission to access this application")
 
     application.status = payload.status
     session.add(application)
@@ -228,7 +229,7 @@ def update_application_status(
     )
     session.commit()
 
-    return {"message": "Cập nhật trạng thái thành công", "application_id": application.id, "status": application.status}
+    return {"message": "Status updated successfully", "application_id": application.id, "status": application.status}
 
 
 @router.delete("/{recruiter_id}/applications/{application_id}")
@@ -241,13 +242,13 @@ def delete_application_and_cv(
 
     application = session.get(JobApplication, application_id)
     if not application:
-        raise HTTPException(status_code=404, detail="Không tìm thấy application")
+        raise HTTPException(status_code=404, detail="Application not found")
 
     job = session.get(Job, application.job_id) if application.job_id else None
     if not job:
-        raise HTTPException(status_code=404, detail="Không tìm thấy job")
+        raise HTTPException(status_code=404, detail="Job not found")
     if job.recruiter_id != recruiter_id:
-        raise HTTPException(status_code=403, detail="Bạn không có quyền xoá application này")
+        raise HTTPException(status_code=403, detail="You do not have permission to delete this application")
 
     cv = session.get(CV, application.cv_id) if application.cv_id else None
     cv_id = cv.id if cv else None
@@ -289,7 +290,7 @@ def delete_application_and_cv(
     session.commit()
 
     return {
-        "message": "Xoá CV nộp thành công",
+        "message": "Submitted CV deleted successfully",
         "application_id": application_id,
         "deleted_cv": delete_cv_record,
     }
@@ -306,19 +307,19 @@ def view_application_cv_file(
 
     application = session.get(JobApplication, application_id)
     if not application:
-        raise HTTPException(status_code=404, detail="Không tìm thấy application")
+        raise HTTPException(status_code=404, detail="Application not found")
 
     job = session.get(Job, application.job_id) if application.job_id else None
     if not job:
-        raise HTTPException(status_code=404, detail="Không tìm thấy job")
+        raise HTTPException(status_code=404, detail="Job not found")
     if job.recruiter_id != recruiter_id:
-        raise HTTPException(status_code=403, detail="Bạn không có quyền xem CV này")
+        raise HTTPException(status_code=403, detail="You do not have permission to view this CV")
 
     cv = session.get(CV, application.cv_id) if application.cv_id else None
     if not cv or not cv.file_path:
-        raise HTTPException(status_code=404, detail="Không tìm thấy file CV")
+        raise HTTPException(status_code=404, detail="CV file not found")
     if not os.path.exists(cv.file_path):
-        raise HTTPException(status_code=404, detail="File CV không tồn tại trên server")
+        raise HTTPException(status_code=404, detail="CV file no longer exists on the server")
 
     ext = os.path.splitext(cv.file_path)[1].lower()
     media_type_map = {

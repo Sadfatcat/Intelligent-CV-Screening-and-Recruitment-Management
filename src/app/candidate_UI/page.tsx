@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import brightStyles from "./page.bright.module.css";
@@ -23,6 +23,7 @@ type JobItem = {
     level: string;
     deadline: string;
     quantity?: number | null;
+    salary?: string | null;
     direct_contact?: string | null;
     image_url?: string;
     description: string;
@@ -38,9 +39,38 @@ type CandidateSubmissionItem = {
     company_name: string;
     location: string;
     level: string;
+    deadline?: string | null;
+    quantity?: number | null;
+    salary?: string | null;
+    direct_contact?: string | null;
+    image_url?: string | null;
+    description?: string | null;
     status: string;
     ai_matching_score: number | null;
+    matching_detail?: MatchingDetail | null;
     submitted_at: string | null;
+};
+
+type MatchingSection = {
+    key: string;
+    label: string;
+    score?: number | null;
+    good?: string[];
+    missing?: string[];
+    explanation?: string | null;
+};
+
+type MatchingDetail = {
+    overall_score?: number | null;
+    final_score?: number | null;
+    sections?: MatchingSection[];
+    good_points?: string[];
+    missing_points?: string[];
+    must_have?: {
+        matched?: string[];
+        missing?: string[];
+        penalty_applied?: number | null;
+    };
 };
 
 type StoredFptMockApplication = {
@@ -64,6 +94,7 @@ const MOCK_CANDIDATE_JOBS: JobItem[] = MOCK_JOB_DESCRIPTIONS.map((job) => ({
     level: job.level,
     deadline: job.createdAt.slice(0, 10),
     quantity: 3,
+    salary: "Negotiable",
     direct_contact: "mock-hr@fpt.com",
     description: `${job.department} | ${job.employmentType}. ${job.responsibilities.join(" ")}`,
     requirements: [
@@ -120,6 +151,8 @@ function CandidatePageContent() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [theme, setTheme] = useState<"bright" | "dark">("dark");
     const [showAllCategories, setShowAllCategories] = useState(false);
+    const [activeSubTab, setActiveSubTab] = useState<"jobs" | "applications">("jobs");
+    const candidateJobDetailHistoryRef = useRef(false);
     const searchParams = useSearchParams();
 
     async function parseApiResponse(response: Response): Promise<{ data: unknown; message: string }> {
@@ -201,9 +234,102 @@ function CandidatePageContent() {
         });
     }
 
-    function formatScore(value: number | null) {
+    function normalizeScore(value: number | null | undefined) {
+        if (typeof value !== "number" || Number.isNaN(value)) return null;
+        return Math.min(100, Math.max(0, value));
+    }
+
+    function formatScore(value: number | null | undefined) {
         if (value === null || Number.isNaN(value)) return "-";
-        return value.toFixed(3);
+        return normalizeScore(value)?.toFixed(0) || "-";
+    }
+
+    function getScoreStatus(value: number | null | undefined) {
+        const score = normalizeScore(value);
+        if (score === null) return "pending";
+        if (score >= 85) return "passed";
+        if (score >= 50) return "borderline";
+        return "failed";
+    }
+
+    function getScoreStatusLabel(value: number | null | undefined) {
+        const status = getScoreStatus(value);
+        if (status === "passed") return "Passed";
+        if (status === "borderline") return "Borderline";
+        if (status === "failed") return "Failed";
+        return "Pending";
+    }
+
+    function getImageUrl(value: string | null | undefined) {
+        if (!value) return "";
+        if (/^https?:\/\//i.test(value)) return value;
+        return apiUrl(value);
+    }
+
+    function uniqueItems(items: Array<string | null | undefined>) {
+        return Array.from(
+            new Set(
+                items
+                    .map((item) => (item || "").trim())
+                    .filter(Boolean)
+            )
+        );
+    }
+
+    function getSectionsByKey(detail: MatchingDetail | null | undefined, keys: string[]) {
+        return (detail?.sections || []).filter((section) => keys.includes(section.key));
+    }
+
+    function getSectionPoints(detail: MatchingDetail | null | undefined, keys: string[], field: "good" | "missing") {
+        return getSectionsByKey(detail, keys).flatMap((section) => section[field] || []);
+    }
+
+    function getFulfilledCriteria(detail: MatchingDetail | null | undefined) {
+        const sectionGood = (detail?.sections || [])
+            .filter((section) => (section.good || []).length > 0)
+            .flatMap((section) => {
+                const label = section.label || section.key;
+                return (section.good || []).map((point) => `${label}: ${point}`);
+            });
+
+        return uniqueItems([...(detail?.good_points || []), ...(detail?.must_have?.matched || []), ...sectionGood]);
+    }
+
+    function getMissingSkills(detail: MatchingDetail | null | undefined) {
+        return uniqueItems([
+            ...getSectionPoints(detail, ["skills", "technical_skills", "tools"], "missing"),
+            ...(detail?.missing_points || []).filter((point) => /skill|tool|framework|language|stack/i.test(point)),
+        ]);
+    }
+
+    function getMissingRequirements(detail: MatchingDetail | null | undefined) {
+        return uniqueItems([
+            ...getSectionPoints(detail, ["requirements", "education", "experience", "languages"], "missing"),
+            ...(detail?.must_have?.missing || []),
+        ]);
+    }
+
+    function renderCriteriaList(items: string[], kind: "good" | "skill" | "requirement", emptyText: string) {
+        if (items.length === 0) {
+            return <p className={styles.criteriaEmpty}>{emptyText}</p>;
+        }
+
+        const visibleItems = items.slice(0, 5);
+        const overflow = items.length - visibleItems.length;
+
+        return (
+            <ul className={styles.criteriaList}>
+                {visibleItems.map((item) => (
+                    <li className={styles.criteriaItem} key={`${kind}-${item}`}>
+                        <span className={`${styles.criteriaIcon} ${styles[`criteriaIcon${kind[0].toUpperCase()}${kind.slice(1)}`]}`}>
+                            {kind === "good" ? "✓" : "✕"}
+                        </span>
+                        <span>{item}</span>
+                    </li>
+                ))}
+                {overflow > 0 && <li className={styles.criteriaMore}>+{overflow} more</li>}
+            </ul>
+        );
     }
 
     async function loadSubmittedJobs(candidateIdValue: number) {
@@ -281,11 +407,37 @@ function CandidatePageContent() {
 
     // onClick cho job cards
     const handleClickjob = (jobData: JobItem) => {
+        if (typeof window !== "undefined" && !candidateJobDetailHistoryRef.current) {
+            window.history.pushState({ ...(window.history.state || {}), intelliCvCandidateJobDetail: true }, "", window.location.href);
+            candidateJobDetailHistoryRef.current = true;
+        }
         setSelectedJob(jobData);
         if (jobData.isMock) {
             setIsModalOpen(true);
         }
     }
+
+    function handleBackFromJobDetail() {
+        if (typeof window !== "undefined" && candidateJobDetailHistoryRef.current) {
+            window.history.back();
+            return;
+        }
+
+        setSelectedJob(null);
+        setIsModalOpen(false);
+    }
+
+    useEffect(() => {
+        function handlePopState() {
+            if (!candidateJobDetailHistoryRef.current) return;
+            candidateJobDetailHistoryRef.current = false;
+            setSelectedJob(null);
+            setIsModalOpen(false);
+        }
+
+        window.addEventListener("popstate", handlePopState);
+        return () => window.removeEventListener("popstate", handlePopState);
+    }, []);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length > 0) {
@@ -336,6 +488,12 @@ function CandidatePageContent() {
                         company_name: selectedJob.company_name,
                         location: selectedJob.location,
                         level: selectedJob.level,
+                        deadline: selectedJob.deadline,
+                        quantity: selectedJob.quantity,
+                        salary: selectedJob.salary,
+                        direct_contact: selectedJob.direct_contact,
+                        image_url: selectedJob.image_url,
+                        description: selectedJob.description,
                         status: "mock-submitted",
                         ai_matching_score: null,
                         submitted_at: submittedAt,
@@ -482,35 +640,6 @@ function CandidatePageContent() {
                             </button>
                         </div>
 
-                        {candidateId !== null && (
-                            <div className={styles.submittedJobsCard}>
-                                <h4 className={styles.submittedJobsTitle}>Submitted CV Jobs</h4>
-                                {submittedJobs.length === 0 ? (
-                                    <p className={styles.submittedJobsEmpty}>You have not submitted any CV yet.</p>
-                                ) : (
-                                    <ul className={styles.submittedJobsList}>
-                                        {submittedJobs.map((item) => (
-                                            <li key={item.application_id}>
-                                                <button
-                                                    type="button"
-                                                    className={styles.submittedJobItem}
-                                                    onClick={() => {
-                                                        const matchedJob = jobs.find((job) => job.id === item.job_id) || null;
-                                                        setSelectedJob(matchedJob);
-                                                    }}
-                                                >
-                                                    <span className={styles.submittedJobTitle}>{item.job_title}</span>
-                                                    <span className={styles.submittedJobMeta}>{item.company_name} | {item.level}</span>
-                                                    <span className={styles.submittedJobMeta}>Status: {item.status}</span>
-                                                    <span className={styles.submittedJobMeta}>Score: {formatScore(item.ai_matching_score)}</span>
-                                                    <span className={styles.submittedJobMeta}>Submitted: {formatSubmittedTime(item.submitted_at)}</span>
-                                                </button>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                            </div>
-                        )}
                     </div>
                     <div className={styles.leftBottomBox}>
                         <div className={styles.leftBottomUser}>
@@ -525,43 +654,156 @@ function CandidatePageContent() {
                     </div>
                 </div>
                 <div className={styles.middle}>
-                    {groupedJobsByCompany.length > 0 ? (
-                        <div className={styles.companySections}>
-                            {groupedJobsByCompany.map(([companyName, companyJobs]) => (
-                                <section key={companyName} className={styles.companySection}>
-                                    <div className={styles.companyHeader}>
-                                        <h3>{companyName}</h3>
-                                        <span>{companyJobs.length} jobs</span>
-                                    </div>
-
-                                    <div className={styles.companyJobList}>
-                                        {companyJobs.map((job) => (
-                                            <Jobcard
-                                                key={job.id}
-                                                job={job}
-                                                isActive={selectedJob?.id === job.id}
-                                                onClick={() => handleClickjob(job)}
-                                            />
-                                        ))}
-                                    </div>
-                                </section>
-                            ))}
+                    <div className={styles.workspace}>
+                        <div className={styles.subTabBar}>
+                            <button
+                                type="button"
+                                className={`${styles.subTabButton} ${activeSubTab === "jobs" ? styles.subTabButtonActive : ""}`}
+                                onClick={() => setActiveSubTab("jobs")}
+                            >
+                                Browse Jobs
+                            </button>
+                            <button
+                                type="button"
+                                className={`${styles.subTabButton} ${activeSubTab === "applications" ? styles.subTabButtonActive : ""}`}
+                                onClick={() => setActiveSubTab("applications")}
+                            >
+                                Applied CVs
+                            </button>
                         </div>
-                    ) : (
-                        <p style={{ textAlign: "center", marginTop: "20px" }}>No jobs found in this category.</p>
-                    )}
+
+                        {activeSubTab === "jobs" ? (
+                            groupedJobsByCompany.length > 0 ? (
+                                <div className={styles.companySections}>
+                                    {groupedJobsByCompany.map(([companyName, companyJobs]) => (
+                                        <section key={companyName} className={styles.companySection}>
+                                            <div className={styles.companyHeader}>
+                                                <h3>{companyName}</h3>
+                                                <span>{companyJobs.length} jobs</span>
+                                            </div>
+
+                                            <div className={styles.companyJobList}>
+                                                {companyJobs.map((job) => (
+                                                    <Jobcard
+                                                        key={job.id}
+                                                        job={job}
+                                                        isActive={selectedJob?.id === job.id}
+                                                        onClick={() => handleClickjob(job)}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </section>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p style={{ textAlign: "center", marginTop: "20px" }}>No jobs found in this category.</p>
+                            )
+                        ) : (
+                            <div className={styles.appliedWorkspace}>
+                                <div className={styles.appliedHeader}>
+                                    <div>
+                                        <h2>Applied CVs</h2>
+                                        <p>Review the jobs you applied to and the CV/JD matching result.</p>
+                                    </div>
+                                    <span>{submittedJobs.length} applications</span>
+                                </div>
+                                <div className={styles.legendRow}>
+                                    <span className={styles.legendChipGood}><i className={`${styles.legendIcon} ${styles.criteriaIconGood}`}>✓</i>Matched criteria</span>
+                                    <span className={styles.legendChipSkill}><i className={`${styles.legendIcon} ${styles.criteriaIconSkill}`}>✕</i>Missing skill, can be improved</span>
+                                    <span className={styles.legendChipRequirement}><i className={`${styles.legendIcon} ${styles.criteriaIconRequirement}`}>✕</i>Missing required condition</span>
+                                    <span className={styles.legendChipScore}><i className={`${styles.scoreLegend} ${styles.scorePassed}`}>Passed</i></span>
+                                    <span className={styles.legendChipScore}><i className={`${styles.scoreLegend} ${styles.scoreBorderline}`}>Borderline</i></span>
+                                    <span className={styles.legendChipScore}><i className={`${styles.scoreLegend} ${styles.scoreFailed}`}>Failed</i></span>
+                                </div>
+
+                                {submittedJobs.length === 0 ? (
+                                    <div className={styles.appliedEmpty}>
+                                        <p>You have not submitted any CV yet.</p>
+                                        <button type="button" className={styles.subTabButton} onClick={() => setActiveSubTab("jobs")}>
+                                            Browse jobs
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className={styles.appliedList}>
+                                        {submittedJobs.map((item) => {
+                                            const matchedJob = jobs.find((job) => job.id === item.job_id) || null;
+                                            const fulfilledCriteria = getFulfilledCriteria(item.matching_detail);
+                                            const missingSkills = getMissingSkills(item.matching_detail);
+                                            const missingRequirements = getMissingRequirements(item.matching_detail);
+                                            const scoreStatus = getScoreStatus(item.ai_matching_score);
+                                            const applicationImageUrl = getImageUrl(item.image_url || matchedJob?.image_url);
+                                            const applicationDescription = item.description || matchedJob?.description;
+
+                                            return (
+                                                <article className={styles.applicationCard} key={item.application_id}>
+                                                    <div className={styles.applicationHero}>
+                                                        {applicationImageUrl ? (
+                                                            <img src={applicationImageUrl} alt={item.job_title} className={styles.applicationImage} />
+                                                        ) : (
+                                                            <div className={styles.applicationImageFallback}>{item.company_name.charAt(0).toUpperCase()}</div>
+                                                        )}
+                                                        <div className={styles.applicationIntro}>
+                                                            <div className={styles.applicationTitleRow}>
+                                                                <div>
+                                                                    <h3>{item.job_title}</h3>
+                                                                    <p>{item.company_name} | {item.level} | {item.location}</p>
+                                                                </div>
+                                                                <div className={styles.scoreBox}>
+                                                                    <span className={`${styles.scorePill} ${styles[`score${scoreStatus[0].toUpperCase()}${scoreStatus.slice(1)}`]}`}>
+                                                                        {getScoreStatusLabel(item.ai_matching_score)}
+                                                                    </span>
+                                                                    <strong>{formatScore(item.ai_matching_score)}</strong>
+                                                                    <small>matching score</small>
+                                                                </div>
+                                                            </div>
+                                                            <div className={styles.applicationMetaGrid}>
+                                                                <span>Status: {item.status}</span>
+                                                                <span>Submitted: {formatSubmittedTime(item.submitted_at)}</span>
+                                                                <span>Deadline: {item.deadline || matchedJob?.deadline || "-"}</span>
+                                                                <span>Salary: {item.salary || matchedJob?.salary || "-"}</span>
+                                                                <span>Contact: {item.direct_contact || matchedJob?.direct_contact || "-"}</span>
+                                                            </div>
+                                                            {applicationDescription && <p className={styles.applicationDescription}>{applicationDescription}</p>}
+                                                        </div>
+                                                    </div>
+
+                                                    <div className={styles.criteriaGrid}>
+                                                        <section className={styles.criteriaBlock}>
+                                                            <h4>Matched in CV</h4>
+                                                            {renderCriteriaList(fulfilledCriteria, "good", "No matched criteria returned yet.")}
+                                                        </section>
+                                                        <section className={styles.criteriaBlock}>
+                                                            <h4>Missing skills</h4>
+                                                            {renderCriteriaList(missingSkills, "skill", "No missing skills recorded.")}
+                                                        </section>
+                                                        <section className={styles.criteriaBlock}>
+                                                            <h4>Missing requirements</h4>
+                                                            {renderCriteriaList(missingRequirements, "requirement", "No required condition missing.")}
+                                                        </section>
+                                                    </div>
+                                                </article>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <div className={styles.right}>
                     {selectedJob ? (
                         <div className={styles.jobDetails}>
+                            <button type="button" className={styles.applyButton} onClick={handleBackFromJobDetail}>
+                                {"<"} Back
+                            </button>
                             {selectedJob.image_url && (
                                 <img src={selectedJob.image_url} alt={selectedJob.title} className={styles.detailsImage} />
                             )}
                             
                             <h2 className={styles.detailsTitle}>{selectedJob.title}</h2>
                             <p className={styles.detailsMeta}>
-                                {selectedJob.level} | {selectedJob.location} | Quantity: {selectedJob.quantity ?? "-"}
+                                {selectedJob.level} | {selectedJob.location} | Quantity: {selectedJob.quantity ?? "-"} | Salary: {selectedJob.salary || "-"}
                             </p>
                             
                             <div className={styles.detailsSection}>
@@ -572,6 +814,7 @@ function CandidatePageContent() {
                             <div className={styles.detailsSection}>
                                 <h4>Requirements / Deadline:</h4>
                                 <p>Deadline: <strong>{selectedJob.deadline}</strong></p>
+                                <p>Salary: <strong>{selectedJob.salary || "-"}</strong></p>
                                 <p>Direct contact: <strong>{selectedJob.direct_contact || "N/A"}</strong></p>
                             </div>
 

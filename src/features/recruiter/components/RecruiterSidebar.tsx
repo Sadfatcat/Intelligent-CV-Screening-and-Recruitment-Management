@@ -1,5 +1,5 @@
 import styles from "../../../app/recruiter_UI/page.module.css";
-import BrandLogo from "../../../components/brand/BrandLogo";
+import BrandLogoIcon from "../../../components/brand/BrandLogoIcon";
 
 type RecruiterSidebarProps = {
     companyLabel: string;
@@ -24,7 +24,7 @@ export function RecruiterSidebar({
     return (
         <aside className={styles.sidebar}>
             <div className={styles.logoBox}>
-                <BrandLogo title="IntelliCV" subtitle="Recruiter Workspace" inverted />
+                <BrandLogoIcon size={82} color="#ffffff" accentColor="#ffffff" title="intelliCV recruiter" style={{ margin: "0 auto 12px" }} />
                 <div className={styles.accountBox}>
                     <div className={styles.avatar}>{companyLabel.charAt(0).toUpperCase()}</div>
                     <div>

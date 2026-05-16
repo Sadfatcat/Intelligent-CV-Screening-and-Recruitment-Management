@@ -26,7 +26,7 @@ def save_cover_image(cover_image: UploadFile | None) -> str | None:
 
     filename = cover_image.filename.lower()
     if not filename.endswith((".jpg", ".jpeg", ".png", ".webp")):
-        raise HTTPException(status_code=400, detail="Ảnh bìa chỉ nhận jpg, jpeg, png hoặc webp")
+        raise HTTPException(status_code=400, detail="Cover image must be a jpg, jpeg, png, or webp file")
 
     safe_name = f"{uuid.uuid4()}_{cover_image.filename}"
     file_path = os.path.join(JOB_COVER_UPLOAD_DIR, safe_name)
@@ -47,6 +47,7 @@ async def upload_jd(
     level: str = Form(...),
     deadline: str = Form(...),
     quantity: int = Form(...),
+    salary: str | None = Form(default=None),
     direct_contact: str = Form(...),
     description: str = Form(...),
     matching_config: str | None = Form(default=None),
@@ -56,22 +57,22 @@ async def upload_jd(
 ):
     recruiter = session.get(User, recruiter_id)
     if not recruiter or recruiter.role != "recruiter":
-        raise HTTPException(status_code=403, detail="Chỉ recruiter được phép đăng JD")
+        raise HTTPException(status_code=403, detail="Only recruiters can post a JD")
 
     resolved_company_name = (recruiter.company_name or company_name or "").strip()
     if not resolved_company_name:
         raise HTTPException(
             status_code=400,
-            detail="Tài khoản recruiter chưa có company_name. Vui lòng nhờ admin cập nhật trước khi đăng JD.",
+            detail="This recruiter account does not have a company name. Please ask an admin to update it before posting a JD.",
         )
 
     if not jd_file.filename.lower().endswith(".pdf"):
-        raise HTTPException(status_code=400, detail="JD chỉ nhận file PDF")
+        raise HTTPException(status_code=400, detail="JD upload only accepts PDF files")
 
     try:
         matching_config_json = serialize_matching_config(matching_config)
     except ValueError as exc:
-        raise HTTPException(status_code=400, detail=f"matching_config không hợp lệ: {str(exc)}")
+        raise HTTPException(status_code=400, detail=f"Invalid matching_config: {str(exc)}")
 
     file_bytes = await jd_file.read()
 
@@ -88,7 +89,7 @@ async def upload_jd(
         from app.services.extractor import extract_text
         parsed_text = extract_text(file_bytes, jd_file.filename)
     except Exception as e:
-        raise HTTPException(status_code=422, detail=f"Không đọc được file JD: {str(e)}")
+        raise HTTPException(status_code=422, detail=f"Could not read JD file: {str(e)}")
 
     # Vector embedding khá nặng; mặc định tắt trong request upload để tránh timeout FE/proxy.
     jd_vector_json = None
@@ -107,6 +108,7 @@ async def upload_jd(
         level=level,
         deadline=deadline,
         quantity=quantity,
+        salary=salary.strip() if salary else None,
         direct_contact=direct_contact,
         image_url=image_url,
         description=description,
@@ -132,7 +134,7 @@ async def upload_jd(
     session.commit()
 
     return {
-        "message": "Đăng JD thành công",
+        "message": "JD posted successfully",
         "job_id": new_job.id,
         "vector_saved": jd_vector_json is not None,
         "matching_config_saved": matching_config_json is not None,
@@ -151,6 +153,7 @@ def list_jobs(session: Session = Depends(get_session)):
             "level": j.level,
             "deadline": j.deadline,
             "quantity": j.quantity,
+            "salary": j.salary,
             "direct_contact": j.direct_contact,
             "description": j.description,
             "image_url": j.image_url,
@@ -164,7 +167,7 @@ def list_jobs(session: Session = Depends(get_session)):
 def get_job(job_id: int, session: Session = Depends(get_session)):
     job = session.get(Job, job_id)
     if not job:
-        raise HTTPException(status_code=404, detail="Không tìm thấy job")
+        raise HTTPException(status_code=404, detail="Job not found")
 
     return {
         "id": job.id,
@@ -174,6 +177,7 @@ def get_job(job_id: int, session: Session = Depends(get_session)):
         "level": job.level,
         "deadline": job.deadline,
         "quantity": job.quantity,
+        "salary": job.salary,
         "direct_contact": job.direct_contact,
         "description": job.description,
         "image_url": job.image_url,
@@ -187,10 +191,10 @@ def get_job(job_id: int, session: Session = Depends(get_session)):
 def download_job_jd_file(job_id: int, inline: bool = Query(False), session: Session = Depends(get_session)):
     job = session.get(Job, job_id)
     if not job:
-        raise HTTPException(status_code=404, detail="Không tìm thấy job")
+        raise HTTPException(status_code=404, detail="Job not found")
     
     if not job.jd_file_path or not os.path.exists(job.jd_file_path):
-        raise HTTPException(status_code=404, detail="JD file không tồn tại")
+        raise HTTPException(status_code=404, detail="JD file does not exist")
     
     filename = f"JD_{job.id}_{job.title}.pdf".replace(" ", "_")
     

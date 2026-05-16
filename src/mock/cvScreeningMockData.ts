@@ -810,7 +810,7 @@ const MOCK_CANDIDATES_SOURCE: MockCandidateProfile[] = [
         projects: ["Personal portfolio and todo app"],
         certifications: [],
         workExperience: ["University web club member"],
-        summary: "Sinh viên năm ba, có nền tảng HTML/CSS/JavaScript và muốn học quy trình làm việc thực tế.",
+        summary: "Third-year student with an HTML/CSS/JavaScript foundation who wants to learn a real-world workflow.",
         uploadedAt: "2026-04-25T10:10:00Z",
         status: "New",
     },

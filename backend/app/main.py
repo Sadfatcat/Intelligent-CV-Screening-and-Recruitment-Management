@@ -63,7 +63,7 @@ except Exception as exc:  # pragma: no cover
 
 @app.get("/")
 def root():
-    return {"message": "backend dang chay"}
+    return {"message": "Backend is running"}
 
 
 @app.get("/health")

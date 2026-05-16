@@ -11,6 +11,7 @@ export const MOCK_RECRUITER_JOBS: RecruiterJob[] = MOCK_JOB_DESCRIPTIONS.map((jo
     level: job.level,
     deadline: job.createdAt.slice(0, 10),
     quantity: 3,
+    salary: "Negotiable",
     direct_contact: "mock-hr@fpt.com",
     image_url: null,
     isMock: true,
