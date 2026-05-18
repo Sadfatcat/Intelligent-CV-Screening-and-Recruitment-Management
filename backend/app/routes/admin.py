@@ -7,7 +7,7 @@ from sqlmodel import Session, select
 
 from app.database import get_session
 from app.models import ActivityLog, CV, Job, JobApplication, User
-from app.security import get_password_hash
+from app.security import get_password_hash, verify_password
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
@@ -159,6 +159,7 @@ def admin_list_jobs(admin_id: int = Query(...), session: Session = Depends(get_s
                 "location": job.location,
                 "level": job.level,
                 "deadline": job.deadline,
+                "status": job.status,
                 "recruiter_id": job.recruiter_id,
                 "recruiter_email": recruiter.email if recruiter else None,
                 "applications_count": applications_count,
@@ -313,7 +314,7 @@ def admin_delete_recruiter(
 @router.get("/activities")
 def list_activities(
     admin_id: int = Query(...),
-    limit: int = Query(50, ge=1, le=200),
+    limit: int = Query(50, ge=1, le=1000),
     session: Session = Depends(get_session),
 ):
     require_admin(admin_id, session)
@@ -337,14 +338,24 @@ def list_activities(
 @router.get("/overview")
 def admin_overview(admin_id: int = Query(...), session: Session = Depends(get_session)):
     require_admin(admin_id, session)
+    admins = session.exec(select(User).where(User.role == "admin")).all()
+    recruiters = session.exec(select(User).where(User.role == "recruiter")).all()
+    default_password_recruiters = [
+        recruiter for recruiter in recruiters if verify_password("1", recruiter.password_hash)
+    ]
     total_candidates = len(session.exec(select(User).where(User.role == "candidate")).all())
-    total_recruiters = len(session.exec(select(User).where(User.role == "recruiter")).all())
     total_jobs = len(session.exec(select(Job)).all())
     total_applications = len(session.exec(select(JobApplication)).all())
 
     return {
+        "total_admins": len(admins),
         "total_candidates": total_candidates,
-        "total_recruiters": total_recruiters,
+        "total_recruiters": len(recruiters),
+        "active_admins": len([user for user in admins if user.is_active]),
+        "inactive_admins": len([user for user in admins if not user.is_active]),
+        "active_recruiters": len([user for user in recruiters if user.is_active]),
+        "inactive_recruiters": len([user for user in recruiters if not user.is_active]),
+        "recruiters_with_default_password": len(default_password_recruiters),
         "total_jobs": total_jobs,
         "total_applications": total_applications,
     }

@@ -18,6 +18,7 @@ export type RecruiterJob = {
     salary?: string | null;
     direct_contact?: string | null;
     image_url?: string | null;
+    status?: JobManagementStatus;
     isMock?: boolean;
 };
 
@@ -96,7 +97,7 @@ export type ScoreStatus = "passed" | "borderline" | "failed" | "not_scored";
 export type ScoringSubTab = "jobs" | "cvs" | "detail";
 export type CvSortMode = "score" | "experience";
 export type ExperienceFilter = "all" | "intern" | "gt1" | "gt3" | "gt5" | "gt7";
-export type JobManagementStatus = "active" | "turned_off" | "deleted";
+export type JobManagementStatus = "draft" | "active" | "turned_off" | "closed" | "deleted";
 
 export type StoredFptMockApplication = {
     id: number;

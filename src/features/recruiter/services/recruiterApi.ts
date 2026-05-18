@@ -1,6 +1,6 @@
 // Recruiter API: gom các API call của recruiter để UI không gọi fetch trực tiếp.
 import { apiUrl } from "@/utils/api";
-import type { CVLogItem, JobApplication, RecruiterJob, RecruiterSession, UploadJobDescriptionPayload } from "../types/recruiterTypes";
+import type { CVLogItem, JobApplication, JobManagementStatus, RecruiterJob, RecruiterSession, UploadJobDescriptionPayload } from "../types/recruiterTypes";
 
 async function parseJsonResponse<T>(response: Response, fallbackMessage: string): Promise<T> {
     const contentType = response.headers.get("content-type") || "";
@@ -87,6 +87,15 @@ export async function uploadJobDescription(payload: UploadJobDescriptionPayload)
         body: formData,
     });
     return parseJsonResponse<unknown>(response, "Upload JD failed");
+}
+
+export async function updateRecruiterJobStatus(recruiterId: number, jobId: number, status: JobManagementStatus) {
+    const response = await fetch(apiUrl(`/api/recruiter/${recruiterId}/jobs/${jobId}`), {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+    });
+    return parseJsonResponse<{ message: string; job_id: number; status: JobManagementStatus }>(response, "Update job status failed");
 }
 
 export async function deleteApplication(recruiterId: number, applicationId: number) {

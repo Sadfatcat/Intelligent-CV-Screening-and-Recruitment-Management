@@ -4,9 +4,10 @@ import BrandLogoIcon from "../../../components/brand/BrandLogoIcon";
 type RecruiterSidebarProps = {
     companyLabel: string;
     email?: string;
-    activeWorkspace: "overview" | "scoring";
+    activeWorkspace: "overview" | "jobs" | "applications";
     onOpenDashboard: () => void;
-    onOpenScoring: () => void;
+    onOpenJobs: () => void;
+    onOpenApplications: () => void;
     onOpenUpload: () => void;
     onLogout: () => void;
 };
@@ -17,7 +18,8 @@ export function RecruiterSidebar({
     email,
     activeWorkspace,
     onOpenDashboard,
-    onOpenScoring,
+    onOpenJobs,
+    onOpenApplications,
     onOpenUpload,
     onLogout,
 }: RecruiterSidebarProps) {
@@ -45,10 +47,16 @@ export function RecruiterSidebar({
                     Dashboard
                 </button>
                 <button
-                    className={`${styles.navButton} ${activeWorkspace === "scoring" ? styles.navButtonActive : ""}`}
-                    onClick={onOpenScoring}
+                    className={`${styles.navButton} ${activeWorkspace === "jobs" ? styles.navButtonActive : ""}`}
+                    onClick={onOpenJobs}
                 >
-                    CV Scoring
+                    Job Management
+                </button>
+                <button
+                    className={`${styles.navButton} ${activeWorkspace === "applications" ? styles.navButtonActive : ""}`}
+                    onClick={onOpenApplications}
+                >
+                    Submitted CVs
                 </button>
                 <button className={`${styles.navButton} ${styles.navButtonPrimary}`} onClick={onOpenUpload}>
                     Create JD

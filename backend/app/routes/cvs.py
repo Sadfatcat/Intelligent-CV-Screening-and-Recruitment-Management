@@ -2,13 +2,13 @@ import json
 import logging
 import os
 import uuid
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, UploadFile, File, Form
 from sqlalchemy import func, or_
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session, select
 from typing import Optional
 
-from app.database import get_session
+from app.database import engine, get_session
 from app.models import ActivityLog, CV, Job, JobApplication, User
 
 logger = logging.getLogger(__name__)
@@ -25,8 +25,81 @@ ALLOWED_EXTENSIONS = {".pdf", ".docx", ".jpg", ".jpeg", ".png"}
 ENABLE_UPLOAD_VECTORS = os.getenv("ENABLE_UPLOAD_VECTORS", "0") == "1"
 
 
+def score_application_background(application_id: int, cv_id: int, job_id: int, file_path: str, filename: str):
+    parsed_text = None
+    cv_vector_json = None
+    matching_score = None
+    matching_detail_json = None
+
+    try:
+        with open(file_path, "rb") as stored_file:
+            file_bytes = stored_file.read()
+
+        from app.services.extractor import extract_text
+        parsed_text = extract_text(file_bytes, filename)
+
+        if ENABLE_UPLOAD_VECTORS:
+            try:
+                from app.services.vectorizer import text_to_vector_json
+                cv_vector_json = text_to_vector_json(parsed_text) if parsed_text else None
+            except Exception:
+                cv_vector_json = None
+
+        with Session(engine) as session:
+            job = session.get(Job, job_id)
+            if parsed_text and job and job.jd_parsed_text:
+                try:
+                    import json
+                    from app.services.matching_config import parse_matching_config
+                    from app.services.matcher import score_cv_vs_jd
+
+                    config = parse_matching_config(job.matching_config, strict=False)
+                    matching_detail = score_cv_vs_jd(
+                        parsed_text,
+                        job.jd_parsed_text,
+                        weights=config.get("weights"),
+                        must_have=config.get("must_have"),
+                    )
+                    matching_score = matching_detail.get("final_score")
+                    matching_detail["overall_score"] = matching_score
+                    matching_detail["final_score"] = matching_score
+                    matching_detail_json = json.dumps(matching_detail, ensure_ascii=False)
+                except Exception as exc:
+                    logger.exception("Detailed CV/JD matcher failed for job_id=%s: %s", job_id, exc)
+
+            if matching_score is None and job and job.jd_vector and cv_vector_json:
+                try:
+                    from app.services.ai_service import calculate_match_score_from_vectors
+
+                    matching_score = calculate_match_score_from_vectors(cv_vector_json, job.jd_vector)
+                except Exception:
+                    matching_score = None
+
+            cv = session.get(CV, cv_id)
+            application = session.get(JobApplication, application_id)
+            if cv:
+                cv.parsed_text = parsed_text
+                cv.cv_vector = cv_vector_json
+                session.add(cv)
+            if application:
+                application.ai_matching_score = matching_score
+                application.matching_detail = matching_detail_json
+                application.status = "pending"
+                session.add(application)
+            session.commit()
+    except Exception as exc:
+        logger.exception("CV scoring background task failed for application_id=%s: %s", application_id, exc)
+        with Session(engine) as session:
+            application = session.get(JobApplication, application_id)
+            if application:
+                application.status = "pending"
+                session.add(application)
+                session.commit()
+
+
 @router.post("/upload-cv")
 async def upload_cv(
+    background_tasks: BackgroundTasks,
     job_id: int = Form(...),
     candidate_name: str = Form(...),
     candidate_email: str = Form(...),
@@ -45,6 +118,8 @@ async def upload_cv(
     job = session.get(Job, job_id)
     if not job:
         raise HTTPException(status_code=404, detail=f"Job id={job_id} not found")
+    if job.status != "active":
+        raise HTTPException(status_code=400, detail="This job is not accepting CV submissions")
 
     # kiểm tra định dạng file
     ext = os.path.splitext(cv_file.filename)[1].lower()
@@ -59,59 +134,14 @@ async def upload_cv(
     with open(file_path, "wb") as f:
         f.write(file_bytes)
 
-    # đọc text từ cv (pdf/docx/ảnh) - lazy import để tránh sập app do thiếu dependency
-    try:
-        from app.services.extractor import extract_text
-        parsed_text = extract_text(file_bytes, cv_file.filename)
-    except Exception as e:
-        raise HTTPException(status_code=422, detail=f"Could not read CV: {str(e)}")
-
-    # Vector embedding khá nặng; mặc định tắt trong request upload để tránh timeout FE/proxy.
-    cv_vector_json = None
-    if ENABLE_UPLOAD_VECTORS:
-        try:
-            from app.services.vectorizer import text_to_vector_json
-            cv_vector_json = text_to_vector_json(parsed_text) if parsed_text else None
-        except Exception:
-            cv_vector_json = None
-
-    matching_score = None
-    matching_detail_json = None
-    if parsed_text and job.jd_parsed_text:
-        try:
-            from app.services.matching_config import parse_matching_config
-            from app.services.matcher import score_cv_vs_jd
-
-            config = parse_matching_config(job.matching_config, strict=False)
-            matching_detail = score_cv_vs_jd(
-                parsed_text,
-                job.jd_parsed_text,
-                weights=config.get("weights"),
-                must_have=config.get("must_have"),
-            )
-            matching_score = matching_detail.get("final_score")
-            matching_detail["overall_score"] = matching_score
-            matching_detail["final_score"] = matching_score
-            matching_detail_json = json.dumps(matching_detail, ensure_ascii=False)
-        except Exception as exc:
-            logger.exception("Detailed CV/JD matcher failed for job_id=%s: %s", job_id, exc)
-
-    if matching_score is None and job.jd_vector and cv_vector_json:
-        try:
-            from app.services.ai_service import calculate_match_score_from_vectors
-
-            matching_score = calculate_match_score_from_vectors(cv_vector_json, job.jd_vector)
-        except Exception:
-            matching_score = None
-
     new_cv = CV(
         candidate_id=candidate_id,
         candidate_name=candidate_name,
         candidate_email=candidate_email,
         candidate_phone=candidate_phone,
         file_path=file_path,
-        parsed_text=parsed_text,
-        cv_vector=cv_vector_json,
+        parsed_text=None,
+        cv_vector=None,
     )
     session.add(new_cv)
     try:
@@ -125,9 +155,9 @@ async def upload_cv(
     application = JobApplication(
         job_id=job_id,
         cv_id=new_cv.id,
-        status="pending",
-        ai_matching_score=matching_score,
-        matching_detail=matching_detail_json,
+        status="scoring",
+        ai_matching_score=None,
+        matching_detail=None,
     )
     session.add(application)
     try:
@@ -152,14 +182,24 @@ async def upload_cv(
     except IntegrityError:
         session.rollback()
 
+    background_tasks.add_task(
+        score_application_background,
+        application.id,
+        new_cv.id,
+        job_id,
+        file_path,
+        cv_file.filename,
+    )
+
     return {
-        "message": "Application submitted successfully",
+        "message": "Application submitted successfully. Scoring is in progress.",
         "cv_id": new_cv.id,
         "application_id": application.id,
         "job_title": job.title,
-        "vector_saved": cv_vector_json is not None,
-        "matching_score": matching_score,
-        "matching_detail": json.loads(matching_detail_json) if matching_detail_json else None,
+        "status": application.status,
+        "vector_saved": False,
+        "matching_score": None,
+        "matching_detail": None,
     }
 
 

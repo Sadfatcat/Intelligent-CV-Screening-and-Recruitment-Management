@@ -38,6 +38,7 @@ class Job(SQLModel, table=True):
     jd_parsed_text: str | None = None
     jd_vector: str | None = None  # json string của vector 384 chiều
     matching_config: str | None = None  # optional JSON string: weights + must_have
+    status: str = Field(default="active")  # draft | active | turned_off | closed | deleted
 
     recruiter: Optional[User] = Relationship(back_populates="jobs")
     applications: List["JobApplication"] = Relationship(back_populates="job")

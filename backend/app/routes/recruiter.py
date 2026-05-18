@@ -1,4 +1,5 @@
 import json
+import re
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import FileResponse
 import os
@@ -13,6 +14,13 @@ router = APIRouter(prefix="/api/recruiter", tags=["recruiter"])
 
 class UpdateApplicationStatusRequest(BaseModel):
     status: str
+
+
+class UpdateJobStatusRequest(BaseModel):
+    status: str
+
+
+VALID_JOB_STATUSES = {"draft", "active", "turned_off", "closed", "deleted"}
 
 
 def require_recruiter(recruiter_id: int, session: Session) -> User:
@@ -61,6 +69,99 @@ def extract_cv_experience_years(cv: CV | None, matching_detail: dict | None) -> 
     return None
 
 
+def _detail_lines(text: str | None, limit: int = 12) -> list[str]:
+    if not text:
+        return []
+    lines: list[str] = []
+    seen = set()
+    for raw_line in text.splitlines():
+        line = re.sub(r"^[\s\-*•·]+", "", raw_line).strip()
+        line = re.sub(r"\s+", " ", line)
+        if not line or len(line) < 3:
+            continue
+        normalized = line.lower()
+        if normalized in seen:
+            continue
+        seen.add(normalized)
+        lines.append(line)
+        if len(lines) >= limit:
+            break
+    return lines
+
+
+def _merge_items(*groups: list[str], limit: int = 24) -> list[str]:
+    merged: list[str] = []
+    seen = set()
+    for group in groups:
+        for item in group:
+            value = str(item).strip()
+            normalized = value.lower()
+            if not value or normalized in seen:
+                continue
+            seen.add(normalized)
+            merged.append(value)
+            if len(merged) >= limit:
+                return merged
+    return merged
+
+
+def extract_cv_detail_fields(cv: CV | None, matching_detail: dict | None) -> dict:
+    if not cv or not cv.parsed_text:
+        return {
+            "summary": None,
+            "skills": [],
+            "extra_skills": [],
+            "languages": [],
+            "projects": [],
+            "certifications": [],
+            "work_experience": [],
+            "education": None,
+        }
+
+    try:
+        from app.services.matcher import (
+            _extract_evidence_from_cv,
+            _load_alias_index,
+            load_aliases,
+            parse_sections_cv,
+        )
+
+        parsed_cv = parse_sections_cv(cv.parsed_text)
+        alias_index = _load_alias_index(load_aliases())
+        evidence = _extract_evidence_from_cv(cv.parsed_text, alias_index)
+    except Exception:
+        parsed_cv = {}
+        evidence = {}
+
+    summary_lines = _detail_lines(parsed_cv.get("summary"), limit=3)
+    if not summary_lines:
+        summary_lines = _detail_lines(cv.parsed_text, limit=2)
+
+    project_lines = _detail_lines(parsed_cv.get("projects"), limit=12)
+    if not project_lines:
+        project_lines = evidence.get("projects", [])[:12]
+
+    experience_lines = _detail_lines(parsed_cv.get("experience"), limit=12)
+    if not experience_lines:
+        experience_lines = evidence.get("experience", [])[:12]
+
+    education_lines = _detail_lines(parsed_cv.get("education"), limit=4)
+
+    return {
+        "summary": " ".join(summary_lines) if summary_lines else None,
+        "skills": _merge_items(
+            evidence.get("technical_skills", []),
+            evidence.get("programming_languages", []),
+        ),
+        "extra_skills": _merge_items(evidence.get("soft_skills", [])),
+        "languages": _merge_items(evidence.get("natural_languages", [])),
+        "projects": project_lines,
+        "certifications": _merge_items(evidence.get("certificates", [])),
+        "work_experience": experience_lines,
+        "education": " ".join(education_lines) if education_lines else None,
+    }
+
+
 @router.get("/{recruiter_id}/profile")
 def get_recruiter_profile(recruiter_id: int, session: Session = Depends(get_session)):
     recruiter = require_recruiter(recruiter_id, session)
@@ -89,9 +190,52 @@ def list_recruiter_jobs(recruiter_id: int, session: Session = Depends(get_sessio
             "salary": j.salary,
             "direct_contact": j.direct_contact,
             "image_url": j.image_url,
+            "status": j.status,
         }
         for j in jobs
     ]
+
+
+@router.patch("/{recruiter_id}/jobs/{job_id}")
+def update_recruiter_job_status(
+    recruiter_id: int,
+    job_id: int,
+    payload: UpdateJobStatusRequest,
+    session: Session = Depends(get_session),
+):
+    recruiter = require_recruiter(recruiter_id, session)
+    if payload.status not in VALID_JOB_STATUSES:
+        raise HTTPException(status_code=400, detail="Invalid job status")
+
+    job = session.get(Job, job_id)
+    if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    if job.recruiter_id != recruiter_id:
+        raise HTTPException(status_code=403, detail="You do not have permission to update this JD")
+
+    previous_status = job.status
+    job.status = payload.status
+    session.add(job)
+    session.commit()
+    session.refresh(job)
+
+    session.add(
+        ActivityLog(
+            actor_user_id=recruiter.id,
+            actor_role="recruiter",
+            action="recruiter.job.status.update",
+            target_type="job",
+            target_id=job.id,
+            detail=f"Changed JD status from {previous_status} to {job.status}: {job.title}",
+        )
+    )
+    session.commit()
+
+    return {
+        "message": "Job status updated successfully",
+        "job_id": job.id,
+        "status": job.status,
+    }
 
 
 @router.delete("/{recruiter_id}/jobs/{job_id}")
@@ -174,16 +318,21 @@ def list_job_applications_for_recruiter(
     result = []
     for app in applications:
         cv = session.get(CV, app.cv_id)
+        if not cv:
+            continue
+        matching_detail = parse_matching_detail(app.matching_detail)
+        cv_detail = extract_cv_detail_fields(cv, matching_detail)
         result.append(
             {
                 "application_id": app.id,
                 "status": app.status,
                 "ai_matching_score": app.ai_matching_score,
                 "cv_id": app.cv_id,
-                "candidate_name": cv.candidate_name if cv else None,
-                "candidate_email": cv.candidate_email if cv else None,
-                "candidate_phone": cv.candidate_phone if cv else None,
-                "matching_detail": parse_matching_detail(app.matching_detail),
+                "candidate_name": cv.candidate_name,
+                "candidate_email": cv.candidate_email,
+                "candidate_phone": cv.candidate_phone,
+                "matching_detail": matching_detail,
+                **cv_detail,
             }
         )
 
@@ -365,7 +514,10 @@ def list_recruiter_cv_logs(recruiter_id: int, session: Session = Depends(get_ses
             continue
 
         cv = session.get(CV, application.cv_id) if application.cv_id else None
+        if not cv:
+            continue
         matching_detail = parse_matching_detail(application.matching_detail)
+        cv_detail = extract_cv_detail_fields(cv, matching_detail)
         result.append(
             {
                 "log_id": log.id,
@@ -373,15 +525,16 @@ def list_recruiter_cv_logs(recruiter_id: int, session: Session = Depends(get_ses
                 "job_id": job.id,
                 "job_title": job.title,
                 "application_id": application.id,
-                "cv_id": cv.id if cv else None,
-                "candidate_name": cv.candidate_name if cv else None,
-                "candidate_email": cv.candidate_email if cv else None,
-                "candidate_phone": cv.candidate_phone if cv else None,
+                "cv_id": cv.id,
+                "candidate_name": cv.candidate_name,
+                "candidate_email": cv.candidate_email,
+                "candidate_phone": cv.candidate_phone,
                 "status": application.status,
                 "ai_matching_score": application.ai_matching_score,
                 "matching_detail": matching_detail,
-                "cv_file_name": os.path.basename(cv.file_path) if cv and cv.file_path else None,
+                "cv_file_name": os.path.basename(cv.file_path) if cv.file_path else None,
                 "experience_years": extract_cv_experience_years(cv, matching_detail),
+                **cv_detail,
             }
         )
 

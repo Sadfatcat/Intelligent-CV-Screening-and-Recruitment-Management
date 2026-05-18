@@ -143,7 +143,7 @@ async def upload_jd(
 
 @router.get("/")
 def list_jobs(session: Session = Depends(get_session)):
-    jobs = session.exec(select(Job)).all()
+    jobs = session.exec(select(Job).where(Job.status == "active")).all()
     return [
         {
             "id": j.id,
@@ -158,6 +158,7 @@ def list_jobs(session: Session = Depends(get_session)):
             "description": j.description,
             "image_url": j.image_url,
             "jd_file_path": j.jd_file_path,
+            "status": j.status,
         }
         for j in jobs
     ]
@@ -167,6 +168,8 @@ def list_jobs(session: Session = Depends(get_session)):
 def get_job(job_id: int, session: Session = Depends(get_session)):
     job = session.get(Job, job_id)
     if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    if job.status != "active":
         raise HTTPException(status_code=404, detail="Job not found")
 
     return {
@@ -184,6 +187,7 @@ def get_job(job_id: int, session: Session = Depends(get_session)):
         "jd_parsed_text": job.jd_parsed_text,
         "vector_saved": job.jd_vector is not None,
         "jd_file_path": job.jd_file_path,
+        "status": job.status,
     }
 
 
@@ -191,6 +195,8 @@ def get_job(job_id: int, session: Session = Depends(get_session)):
 def download_job_jd_file(job_id: int, inline: bool = Query(False), session: Session = Depends(get_session)):
     job = session.get(Job, job_id)
     if not job:
+        raise HTTPException(status_code=404, detail="Job not found")
+    if job.status != "active":
         raise HTTPException(status_code=404, detail="Job not found")
     
     if not job.jd_file_path or not os.path.exists(job.jd_file_path):

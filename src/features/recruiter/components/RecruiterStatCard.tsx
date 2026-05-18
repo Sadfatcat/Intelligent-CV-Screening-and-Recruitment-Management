@@ -2,7 +2,7 @@ import styles from "../../../app/recruiter_UI/page.module.css";
 
 type RecruiterStatCardProps = {
     label: string;
-    value: number;
+    value: number | string;
     tone?: "neutral" | "scored" | "passed" | "borderline" | "failed";
 };
 

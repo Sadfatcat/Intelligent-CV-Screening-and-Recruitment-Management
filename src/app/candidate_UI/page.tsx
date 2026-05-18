@@ -1,6 +1,6 @@
 "use client"
 
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import brightStyles from "./page.bright.module.css";
@@ -12,7 +12,6 @@ import Jobcard from "@/components/Jobcard";
 import { MOCK_JOB_DESCRIPTIONS } from "@/mock/cvScreeningMockData";
 import { apiUrl } from "@/utils/api";
 
-const JOB_MANAGEMENT_STORAGE_KEY = "recruiterJobManagementState";
 const FPT_MOCK_APPLICATIONS_STORAGE_KEY = "fptMockSubmittedCvLogs";
 
 type JobItem = {
@@ -119,20 +118,6 @@ function saveFptMockApplication(application: StoredFptMockApplication) {
     }
 }
 
-function filterPublicJobsByManagementState(items: JobItem[]) {
-    try {
-        const raw = localStorage.getItem(JOB_MANAGEMENT_STORAGE_KEY);
-        if (!raw) return items;
-        const state = JSON.parse(raw) as Record<string, string>;
-        return items.filter((job) => {
-            const status = state[String(job.id)];
-            return status !== "turned_off" && status !== "deleted_active";
-        });
-    } catch {
-        return items;
-    }
-}
-
 function CandidatePageContent() {
     const [selectedJob, setSelectedJob] = useState<JobItem | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<string>("All Jobs"); // Trạng thái filter
@@ -149,13 +134,16 @@ function CandidatePageContent() {
     const [additionalInfo, setAdditionalInfo] = useState("");
     const [applyStatus, setApplyStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isCvScoring, setIsCvScoring] = useState(false);
     const [theme, setTheme] = useState<"bright" | "dark">("dark");
     const [showAllCategories, setShowAllCategories] = useState(false);
     const [activeSubTab, setActiveSubTab] = useState<"jobs" | "applications">("jobs");
     const candidateJobDetailHistoryRef = useRef(false);
     const searchParams = useSearchParams();
+    const hasScoringApplication = submittedJobs.some((item) => item.status === "scoring");
+    const shouldBlockCvApply = isSubmitting || isCvScoring || hasScoringApplication;
 
-    async function parseApiResponse(response: Response): Promise<{ data: unknown; message: string }> {
+    const parseApiResponse = useCallback(async function parseApiResponse(response: Response): Promise<{ data: unknown; message: string }> {
         const contentType = response.headers.get("content-type") || "";
 
         if (contentType.includes("application/json")) {
@@ -169,7 +157,7 @@ function CandidatePageContent() {
 
         const text = await response.text();
         return { data: null, message: text || "Unexpected server response" };
-    }
+    }, []);
 
     const styles = theme === "dark" ? darkStyles : brightStyles;
 
@@ -332,7 +320,7 @@ function CandidatePageContent() {
         );
     }
 
-    async function loadSubmittedJobs(candidateIdValue: number) {
+    const loadSubmittedJobs = useCallback(async function loadSubmittedJobs(candidateIdValue: number) {
         const response = await fetch(apiUrl(`/api/cvs/candidate/${candidateIdValue}/applications`));
         const { data, message } = await parseApiResponse(response);
         if (!response.ok) {
@@ -348,7 +336,8 @@ function CandidatePageContent() {
                 : [];
 
         setSubmittedJobs(applications);
-    }
+        setIsCvScoring(applications.some((item) => item.status === "scoring"));
+    }, [parseApiResponse]);
 
     useEffect(() => {
         const qsTheme = searchParams.get("theme");
@@ -372,18 +361,32 @@ function CandidatePageContent() {
         } catch {
             setDisplayName("Candidate");
         }
-    }, []);
+    }, [parseApiResponse]);
 
     useEffect(() => {
         if (candidateId === null) {
             setSubmittedJobs([]);
+            setIsCvScoring(false);
             return;
         }
 
         loadSubmittedJobs(candidateId).catch(() => {
             setSubmittedJobs([]);
+            setIsCvScoring(false);
         });
-    }, [candidateId]);
+    }, [candidateId, loadSubmittedJobs]);
+
+    useEffect(() => {
+        if (candidateId === null || (!isCvScoring && !hasScoringApplication)) return;
+
+        const timer = window.setInterval(() => {
+            loadSubmittedJobs(candidateId).catch(() => {
+                // keep the current waiting UI while a refresh fails
+            });
+        }, 2500);
+
+        return () => window.clearInterval(timer);
+    }, [candidateId, hasScoringApplication, isCvScoring, loadSubmittedJobs]);
 
     useEffect(() => {
         fetch(apiUrl("/api/jobs/"))
@@ -398,12 +401,12 @@ function CandidatePageContent() {
                         image_url: job.image_url ?? undefined,
                     }))
                     : [];
-                setJobs(filterPublicJobsByManagementState([...normalizedJobs, ...MOCK_CANDIDATE_JOBS]));
+                setJobs([...normalizedJobs, ...MOCK_CANDIDATE_JOBS]);
             })
             .catch(() => {
-                setJobs(filterPublicJobsByManagementState(MOCK_CANDIDATE_JOBS));
+                setJobs(MOCK_CANDIDATE_JOBS);
             });
-    }, []);
+    }, [parseApiResponse]);
 
     // onClick cho job cards
     const handleClickjob = (jobData: JobItem) => {
@@ -413,6 +416,11 @@ function CandidatePageContent() {
         }
         setSelectedJob(jobData);
         if (jobData.isMock) {
+            if (shouldBlockCvApply) {
+                setApplyStatus({ type: "error", message: "Your CV is being scored, please wait." });
+                setActiveSubTab("applications");
+                return;
+            }
             setIsModalOpen(true);
         }
     }
@@ -463,6 +471,11 @@ function CandidatePageContent() {
     async function handleApply(e: React.FormEvent) {
         e.preventDefault();
         setApplyStatus(null);
+
+        if (shouldBlockCvApply) {
+            setApplyStatus({ type: "error", message: "Please wait until the current CV scoring is finished." });
+            return;
+        }
 
         if (!file || !selectedJob) {
             setApplyStatus({ type: "error", message: "Please attach your CV before applying." });
@@ -545,13 +558,15 @@ function CandidatePageContent() {
                     ? (data as { application_id?: number }).application_id
                     : undefined;
 
+            setIsCvScoring(candidateId !== null);
             setApplyStatus({
                 type: "success",
-                message: `CV submitted successfully for ${selectedJob.title}.${applicationId ? ` Application ID: ${applicationId}` : ""}`,
+                message: `Your CV is being scored, please wait.${applicationId ? ` Application ID: ${applicationId}` : ""}`,
             });
             setFile(null);
             setAdditionalInfo("");
             setIsModalOpen(false);
+            setActiveSubTab("applications");
             if (candidateId !== null) {
                 loadSubmittedJobs(candidateId).catch(() => {
                     // keep existing list when refresh fails
@@ -568,11 +583,12 @@ function CandidatePageContent() {
             if (/internal server error/i.test(errorMessage)) {
                 setApplyStatus({
                     type: "success",
-                    message: `CV submitted for ${selectedJob.title}. The recruiter dashboard will show it after scoring is saved.`,
+                    message: `Your CV is being scored, please wait. The recruiter dashboard will show it after scoring is saved.`,
                 });
                 setFile(null);
                 setAdditionalInfo("");
                 setIsModalOpen(false);
+                setActiveSubTab("applications");
                 return;
             }
 
@@ -786,6 +802,16 @@ function CandidatePageContent() {
                                         })}
                                     </div>
                                 )}
+                                {(isCvScoring || hasScoringApplication) && (
+                                    <div className={styles.scoringOverlay} aria-live="polite" aria-busy="true">
+                                        <div className={styles.scoringSpinner}>
+                                            <span />
+                                            <span />
+                                            <span />
+                                        </div>
+                                        <p>Please wait...</p>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
@@ -846,8 +872,20 @@ function CandidatePageContent() {
                             </div>
 
                             {/* Đổi thẻ Link thành button mở Modal */}
-                            <button onClick={() => setIsModalOpen(true)} className={`${styles.applyButton} ${styles.applyPrimaryButton}`}>
-                                Apply For This Job
+                            <button
+                                onClick={() => {
+                                    if (shouldBlockCvApply) {
+                                        setApplyStatus({ type: "error", message: "Your CV is being scored, please wait." });
+                                        setActiveSubTab("applications");
+                                        return;
+                                    }
+                                    setIsModalOpen(true);
+                                }}
+                                className={`${styles.applyButton} ${styles.applyPrimaryButton}`}
+                                disabled={shouldBlockCvApply}
+                                type="button"
+                            >
+                                {shouldBlockCvApply ? "Scoring in progress..." : "Apply For This Job"}
                             </button>
                         </div>
                     ) : (
@@ -944,8 +982,8 @@ function CandidatePageContent() {
 
                             <div className={styles.modalFooter}>
                                 <div className={styles.submitActionBox}>
-                                    <button type="submit" className={styles.submitModalBtn} disabled={isSubmitting}>
-                                        {isSubmitting ? "Submitting..." : "Submit CV"}
+                                    <button type="submit" className={styles.submitModalBtn} disabled={shouldBlockCvApply}>
+                                        {isSubmitting ? "Submitting..." : shouldBlockCvApply ? "Scoring in progress..." : "Submit CV"}
                                     </button>
                                 </div>
                             </div>

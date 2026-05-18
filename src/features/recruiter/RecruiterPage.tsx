@@ -1,22 +1,22 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "../../app/recruiter_UI/page.module.css";
 import { RecruiterSidebar } from "./components/RecruiterSidebar";
 import { RecruiterStatCard } from "./components/RecruiterStatCard";
 import { RecruiterToast } from "./components/RecruiterToast";
-import { JOB_MANAGEMENT_STORAGE_KEY, RECRUITER_SESSION_STORAGE_KEY } from "./constants/recruiterConstants";
+import { RECRUITER_SESSION_STORAGE_KEY } from "./constants/recruiterConstants";
 import {
     deleteApplication,
-    fetchJobApplications,
     fetchRecruiterCvLogs,
     fetchRecruiterJobs,
     fetchRecruiterProfile,
     getRecruiterCvFileUrl,
+    updateRecruiterJobStatus,
     uploadJobDescription,
 } from "./services/recruiterApi";
-import type { CVLogItem, CvSortMode, ExperienceFilter, JobApplication, JobManagementStatus, RecruiterJob, RecruiterSession, ScoreStatus, ScoringSubTab } from "./types/recruiterTypes";
+import type { CVLogItem, CvSortMode, ExperienceFilter, JobManagementStatus, RecruiterJob, RecruiterSession, ScoreStatus, ScoringSubTab } from "./types/recruiterTypes";
 import {
     calculateSummary,
     filterCvsByExperience,
@@ -34,6 +34,15 @@ import {
 import { formatLogTime, formatScore } from "./utils/recruiterFormatters";
 import { isFptSession, MOCK_FPT_CV_LOGS, MOCK_RECRUITER_JOBS, readStoredFptMockCvLogs } from "./utils/recruiterMockMappers";
 
+type RecruiterWorkspace = "overview" | "jobs" | "applications";
+type DashboardRange = "today" | "7d" | "30d" | "all";
+type DonutChartItem = {
+    label: string;
+    value: number;
+    color: string;
+    range?: string;
+};
+
 function getScoreStatusClass(status: ScoreStatus) {
     const classes: Record<ScoreStatus, string> = {
         passed: styles.statusPassed,
@@ -46,14 +55,119 @@ function getScoreStatusClass(status: ScoreStatus) {
 
 function getJobManagementClass(status: JobManagementStatus) {
     const classes: Record<JobManagementStatus, string> = {
+        draft: styles.jobStatusTurnedOff,
         active: styles.jobStatusActive,
         turned_off: styles.jobStatusTurnedOff,
+        closed: styles.jobStatusDeleted,
         deleted: styles.jobStatusDeleted,
     };
     return classes[status];
 }
 
-export default function RecruiterUIPage() {
+type RecruiterPageProps = {
+    defaultWorkspace?: RecruiterWorkspace;
+};
+
+function isWithinDashboardRange(value: string | null | undefined, range: DashboardRange) {
+    if (!value) return range === "all";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return range === "all";
+    if (range === "all") return true;
+
+    const now = new Date();
+    if (range === "today") {
+        return date.toDateString() === now.toDateString();
+    }
+
+    const days = range === "7d" ? 7 : 30;
+    const start = new Date(now);
+    start.setHours(0, 0, 0, 0);
+    start.setDate(start.getDate() - (days - 1));
+    return date >= start;
+}
+
+function formatDashboardDate(value: string) {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return value;
+    return date.toLocaleDateString("en-US", { month: "short", day: "2-digit" });
+}
+
+function RoundedDonutChart({
+    data,
+    size = 240,
+    innerRadius = 64,
+    outerRadius = 104,
+    gapAngle = 8,
+    startAngle = -82,
+}: {
+    data: DonutChartItem[];
+    size?: number;
+    innerRadius?: number;
+    outerRadius?: number;
+    gapAngle?: number;
+    startAngle?: number;
+}) {
+    const visibleItems = data.filter((item) => item.value > 0);
+    const total = visibleItems.reduce((sum, item) => sum + item.value, 0);
+    const center = size / 2;
+    const radius = (innerRadius + outerRadius) / 2;
+    const strokeWidth = outerRadius - innerRadius;
+    const effectiveGap = visibleItems.length > 1 ? gapAngle : 0;
+    let currentAngle = startAngle;
+
+    function pointOnRing(angle: number) {
+        const radians = (Math.PI / 180) * angle;
+        return {
+            x: center + radius * Math.cos(radians),
+            y: center + radius * Math.sin(radians),
+        };
+    }
+
+    return (
+        <div className={styles.pieWrap} style={{ width: size, maxWidth: "100%" }}>
+            <svg className={styles.pieChart} viewBox={`0 0 ${size} ${size}`} role="img" aria-label="Distribution chart">
+                {total > 0 ? visibleItems.map((item) => {
+                    const rawAngle = (item.value / total) * 360;
+                    const segmentAngle = Math.max(2, rawAngle - effectiveGap);
+                    const segmentStart = currentAngle + effectiveGap / 2;
+                    const segmentEnd = segmentStart + segmentAngle;
+                    const start = pointOnRing(segmentStart);
+                    const end = pointOnRing(segmentEnd);
+                    const largeArcFlag = segmentAngle > 180 ? 1 : 0;
+                    const path =
+                        visibleItems.length === 1
+                            ? `M ${center} ${center - radius} A ${radius} ${radius} 0 1 1 ${center - 0.01} ${center - radius}`
+                            : `M ${start.x} ${start.y} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${end.x} ${end.y}`;
+                    currentAngle += rawAngle;
+
+                    return (
+                        <path
+                            key={item.label}
+                            className={styles.pieSlice}
+                            d={path}
+                            style={{ stroke: item.color, strokeWidth }}
+                        />
+                    );
+                }) : (
+                    <circle className={styles.sliceEmpty} cx={center} cy={center} r={radius} style={{ strokeWidth }} />
+                )}
+            </svg>
+            <div
+                className={styles.pieCenter}
+                style={{
+                    width: innerRadius * 1.42,
+                    height: innerRadius * 1.42,
+                    borderWidth: Math.max(8, strokeWidth * 0.26),
+                }}
+            >
+                <strong>{total}</strong>
+                <span>Total</span>
+            </div>
+        </div>
+    );
+}
+
+export default function RecruiterUIPage({ defaultWorkspace = "overview" }: RecruiterPageProps) {
     const router = useRouter();
     const [session, setSession] = useState<RecruiterSession | null>(null);
     const [isSessionChecked, setIsSessionChecked] = useState(false);
@@ -72,9 +186,7 @@ export default function RecruiterUIPage() {
 
     const [jobs, setJobs] = useState<RecruiterJob[]>([]);
     const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
-    const [applications, setApplications] = useState<JobApplication[]>([]);
     const [cvLogs, setCvLogs] = useState<CVLogItem[]>([]);
-    const [deleteConfirmApplicationId, setDeleteConfirmApplicationId] = useState<number | null>(null);
     const [selectedLog, setSelectedLog] = useState<CVLogItem | null>(null);
     const [isUploadPopupOpen, setIsUploadPopupOpen] = useState(false);
     const [scoreStatusFilter, setScoreStatusFilter] = useState<ScoreStatus | "all">("all");
@@ -83,16 +195,16 @@ export default function RecruiterUIPage() {
     const [screeningSearch, setScreeningSearch] = useState("");
     const [isScreeningLoading, setIsScreeningLoading] = useState(false);
     const [screeningError, setScreeningError] = useState("");
-    const [activeWorkspace, setActiveWorkspace] = useState<"overview" | "scoring">("overview");
-    const [scoringSubTab, setScoringSubTab] = useState<ScoringSubTab>("jobs");
+    const [activeWorkspace, setActiveWorkspace] = useState<RecruiterWorkspace>(defaultWorkspace);
+    const [scoringSubTab, setScoringSubTab] = useState<ScoringSubTab>(defaultWorkspace === "applications" ? "cvs" : "jobs");
     const [jdSearchInput, setJdSearchInput] = useState("");
     const [jdSearchTerm, setJdSearchTerm] = useState("");
     const [jobPage, setJobPage] = useState(1);
     const [selectedScreeningLog, setSelectedScreeningLog] = useState<CVLogItem | null>(null);
     const [cvSortMode, setCvSortMode] = useState<CvSortMode>("score");
-    const [jobManagementState, setJobManagementState] = useState<Record<number, JobManagementStatus>>({});
     const [storedFptCvLogs, setStoredFptCvLogs] = useState<CVLogItem[]>([]);
     const [isScoringSummaryOpen, setIsScoringSummaryOpen] = useState(false);
+    const [dashboardRange, setDashboardRange] = useState<DashboardRange>("7d");
     const recruiterCvDetailHistoryRef = useRef(false);
 
     const [message, setMessage] = useState("");
@@ -101,6 +213,10 @@ export default function RecruiterUIPage() {
     const recruiterJobs = useMemo(
         () => (isFptRecruiter ? [...jobs, ...MOCK_RECRUITER_JOBS] : jobs),
         [isFptRecruiter, jobs]
+    );
+    const getManagedJobStatus = useCallback(
+        (jobId: number): JobManagementStatus => recruiterJobs.find((job) => job.id === jobId)?.status || "active",
+        [recruiterJobs]
     );
     const recruiterCvLogs = useMemo(
         () => (isFptRecruiter ? [...cvLogs, ...storedFptCvLogs, ...MOCK_FPT_CV_LOGS] : cvLogs),
@@ -114,36 +230,22 @@ export default function RecruiterUIPage() {
                 const bInactive = getManagedJobStatus(b.id) === "turned_off" ? 1 : 0;
                 return aInactive - bInactive;
             }),
-        [jobManagementState, recruiterJobs]
+        [getManagedJobStatus, recruiterJobs]
     );
 
     useEffect(() => {
         const saved = localStorage.getItem(RECRUITER_SESSION_STORAGE_KEY);
-        const savedJobState = localStorage.getItem(JOB_MANAGEMENT_STORAGE_KEY);
-        if (savedJobState) {
-            try {
-                const parsed = JSON.parse(savedJobState) as Record<string, string>;
-                const normalized = Object.fromEntries(
-                    Object.entries(parsed)
-                        .filter(([, value]) => value === "active" || value === "turned_off" || value === "deleted" || value === "deleted_active")
-                        .map(([key, value]) => [Number(key), value === "deleted_active" ? "deleted" : value])
-                ) as Record<number, JobManagementStatus>;
-                setJobManagementState(normalized);
-            } catch {
-                localStorage.removeItem(JOB_MANAGEMENT_STORAGE_KEY);
-            }
-        }
         if (saved) {
             try {
                 const parsed = JSON.parse(saved) as RecruiterSession;
                 if (parsed.role === "recruiter" && !parsed.must_change_password) {
-                    setSession(parsed);
+                    window.setTimeout(() => setSession(parsed), 0);
                 }
             } catch {
                 localStorage.removeItem(RECRUITER_SESSION_STORAGE_KEY);
             }
         }
-        setIsSessionChecked(true);
+        window.setTimeout(() => setIsSessionChecked(true), 0);
     }, []);
 
     useEffect(() => {
@@ -174,26 +276,6 @@ export default function RecruiterUIPage() {
         setJobs(await fetchRecruiterJobs(recruiterId));
     }
 
-    async function reloadRecruiterData(recruiterId: number, keepCurrentSelection = true) {
-        await loadRecruiterJobs(recruiterId);
-
-        setIsScreeningLoading(true);
-        setScreeningError("");
-        try {
-            setCvLogs(await fetchRecruiterCvLogs(recruiterId));
-        } catch (err) {
-            setIsScreeningLoading(false);
-            setScreeningError(err instanceof Error ? err.message : "Failed to load CV logs");
-            throw err;
-        } finally {
-            setIsScreeningLoading(false);
-        }
-
-        if (keepCurrentSelection && selectedJobId) {
-            setApplications(await fetchJobApplications(recruiterId, selectedJobId));
-        }
-    }
-
     useEffect(() => {
         if (!session) return;
 
@@ -220,53 +302,40 @@ export default function RecruiterUIPage() {
                 setCompanyName(session.company_name || "");
             });
 
-        loadRecruiterJobs(session.user_id).catch((err) => {
-            setMessage(err instanceof Error ? err.message : "Failed to load jobs");
-            setMessageType("error");
-        });
+        const loadTimer = window.setTimeout(() => {
+            fetchRecruiterJobs(session.user_id)
+                .then(setJobs)
+                .catch((err) => {
+                    setMessage(err instanceof Error ? err.message : "Failed to load jobs");
+                    setMessageType("error");
+                });
 
-        setIsScreeningLoading(true);
-        setScreeningError("");
-        fetchRecruiterCvLogs(session.user_id)
-            .then((data) => {
-                setCvLogs(data);
-                setScreeningError("");
-            })
-            .catch((err) => {
-                setCvLogs([]);
-                setScreeningError(err instanceof Error ? err.message : "Failed to load CV logs");
-                setMessage(err instanceof Error ? err.message : "Failed to load CV logs");
-                setMessageType("error");
-            })
-            .finally(() => {
-                setIsScreeningLoading(false);
-            });
+            setIsScreeningLoading(true);
+            setScreeningError("");
+            fetchRecruiterCvLogs(session.user_id)
+                .then((data) => {
+                    setCvLogs(data);
+                    setScreeningError("");
+                })
+                .catch((err) => {
+                    setCvLogs([]);
+                    setScreeningError(err instanceof Error ? err.message : "Failed to load CV logs");
+                    setMessage(err instanceof Error ? err.message : "Failed to load CV logs");
+                    setMessageType("error");
+                })
+                .finally(() => {
+                    setIsScreeningLoading(false);
+                });
+        }, 0);
+
+        return () => window.clearTimeout(loadTimer);
     }, [session]);
-
-    useEffect(() => {
-        if (!session || !selectedJobId) {
-            setApplications([]);
-            return;
-        }
-        if (isFptRecruiter && MOCK_RECRUITER_JOBS.some((job) => job.id === selectedJobId)) {
-            setApplications([]);
-            return;
-        }
-
-        fetchJobApplications(session.user_id, selectedJobId)
-            .then(setApplications)
-            .catch((err) => {
-                setMessage(err instanceof Error ? err.message : "Failed to load applications");
-                setMessageType("error");
-            });
-    }, [isFptRecruiter, session, selectedJobId]);
 
     function handleLogout() {
         localStorage.removeItem(RECRUITER_SESSION_STORAGE_KEY);
         localStorage.removeItem("currentUser");
         setSession(null);
         setSelectedJobId(null);
-        setApplications([]);
         setCvLogs([]);
         setIsUploadPopupOpen(false);
         setMessage("Logged out");
@@ -274,31 +343,66 @@ export default function RecruiterUIPage() {
         router.push("/login");
     }
 
-    function getManagedJobStatus(jobId: number): JobManagementStatus {
-        return jobManagementState[jobId] || "active";
+    async function setManagedJobStatus(jobId: number, status: JobManagementStatus) {
+        if (!session) return;
+        const job = recruiterJobs.find((item) => item.id === jobId);
+        if (job?.isMock) {
+            setMessage("Mock job status changes are not saved to backend.");
+            setMessageType("error");
+            return;
+        }
+
+        try {
+            await updateRecruiterJobStatus(session.user_id, jobId, status);
+            await loadRecruiterJobs(session.user_id);
+            setCvLogs(await fetchRecruiterCvLogs(session.user_id));
+            setMessage(
+                status === "turned_off"
+                    ? "Job turned off. It is hidden from the public recruitment page, but submitted CVs remain accessible."
+                    : status === "active"
+                        ? "Job restored to the active list."
+                        : status === "deleted"
+                            ? "Job deleted from public and recruiter active management. Submitted CV history is preserved."
+                            : "Job status updated."
+            );
+            setMessageType("success");
+        } catch (err) {
+            setMessage(err instanceof Error ? err.message : "Update job status failed");
+            setMessageType("error");
+        }
     }
 
-    function setManagedJobStatus(jobId: number, status: JobManagementStatus) {
-        setJobManagementState((current) => {
-            const next = { ...current, [jobId]: status };
-            if (status === "active") {
-                delete next[jobId];
-            }
-            localStorage.setItem(JOB_MANAGEMENT_STORAGE_KEY, JSON.stringify(next));
-            return next;
-        });
+    async function handleDeleteSelectedCv(log: CVLogItem) {
+        if (!session) return;
+        if (log.isMock) {
+            setMessage("Mock CV records cannot be deleted from backend.");
+            setMessageType("error");
+            return;
+        }
+        const candidateLabel = log.candidate_name?.trim() || `application #${log.application_id}`;
+        if (!window.confirm(`Delete CV for ${candidateLabel}? This removes the submitted CV record from recruiter views.`)) return;
+
+        try {
+            await deleteApplication(session.user_id, log.application_id);
+            const refreshedLogs = await fetchRecruiterCvLogs(session.user_id);
+            setCvLogs(refreshedLogs);
+            setSelectedScreeningLog(null);
+            setSelectedLog(null);
+            setScoringSubTab("cvs");
+            setMessage("Submitted CV deleted successfully.");
+            setMessageType("success");
+        } catch (err) {
+            setMessage(err instanceof Error ? err.message : "Delete CV failed");
+            setMessageType("error");
+        }
     }
 
     function handleTurnOffJob(jobId: number) {
-        setManagedJobStatus(jobId, "turned_off");
-        setMessage("Job turned off. It is hidden from the public recruitment page, but submitted CVs remain accessible.");
-        setMessageType("success");
+        void setManagedJobStatus(jobId, "turned_off");
     }
 
     function handleRestoreJob(jobId: number) {
-        setManagedJobStatus(jobId, "active");
-        setMessage("Job restored to the active list.");
-        setMessageType("success");
+        void setManagedJobStatus(jobId, "active");
     }
 
     async function handleUploadJD(e: React.FormEvent<HTMLFormElement>) {
@@ -351,32 +455,9 @@ export default function RecruiterUIPage() {
     function handleDeleteJob(jobId: number, jobTitle?: string) {
         const label = jobTitle?.trim() || "this job";
         if (!window.confirm(`Delete "${label}" from job management? Submitted CV history will be preserved.`)) return;
-        setManagedJobStatus(jobId, "deleted");
+        void setManagedJobStatus(jobId, "deleted");
         if (selectedJobId === jobId) {
             setSelectedJobId(null);
-            setApplications([]);
-        }
-        setMessage("Job deleted from management. Submitted CV history is still kept in CV results.");
-        setMessageType("success");
-    }
-
-    async function handleDeleteApplication(applicationId: number) {
-        if (!session) return;
-        try {
-            await deleteApplication(session.user_id, applicationId);
-
-            setDeleteConfirmApplicationId(null);
-            setMessage("CV deleted successfully");
-            setMessageType("success");
-
-            if (selectedLog?.application_id === applicationId) {
-                setSelectedLog(null);
-            }
-
-            await reloadRecruiterData(session.user_id);
-        } catch (err) {
-            setMessage(err instanceof Error ? err.message : "Delete CV failed");
-            setMessageType("error");
         }
     }
 
@@ -396,6 +477,100 @@ export default function RecruiterUIPage() {
         () => calculateSummary(jobScopedLogs),
         [jobScopedLogs]
     );
+
+    const allScreeningSummary = useMemo(
+        () => calculateSummary(recruiterCvLogs),
+        [recruiterCvLogs]
+    );
+
+    const dashboardLogs = useMemo(
+        () => recruiterCvLogs.filter((log) => isWithinDashboardRange(log.created_at, dashboardRange)),
+        [dashboardRange, recruiterCvLogs]
+    );
+
+    const dashboardSummary = useMemo(() => {
+        const scores = recruiterCvLogs
+            .map((log) => normalizeScore(log.ai_matching_score))
+            .filter((score): score is number => score !== null);
+        const newApplications = recruiterCvLogs.filter((log) => isWithinDashboardRange(log.created_at, "today")).length;
+        const pendingReviews = recruiterCvLogs.filter((log) => log.status === "pending").length;
+        const shortlistedCandidates = recruiterCvLogs.filter((log) => {
+            const score = normalizeScore(log.ai_matching_score);
+            return log.status === "accepted" || (score !== null && score >= 85);
+        }).length;
+
+        return {
+            activeJobs: managedRecruiterJobs.filter((job) => getManagedJobStatus(job.id) === "active").length,
+            totalApplications: recruiterCvLogs.length,
+            newApplications,
+            pendingReviews,
+            averageScore: scores.length ? scores.reduce((sum, score) => sum + score, 0) / scores.length : null,
+            shortlistedCandidates,
+        };
+    }, [getManagedJobStatus, managedRecruiterJobs, recruiterCvLogs]);
+
+    const screeningDistribution = useMemo(() => {
+        return [
+            { label: "Failed", value: allScreeningSummary.failed, color: "#f4a6a6" },
+            { label: "Passed", value: allScreeningSummary.passed, color: "#9bd8b2" },
+            { label: "Borderline", value: allScreeningSummary.borderline, color: "#f4c48d" },
+        ];
+    }, [allScreeningSummary]);
+
+    const scoreDistribution = useMemo(() => {
+        const buckets = [
+            { label: "Strong Match", range: "90-100%", value: 0, color: "#166534" },
+            { label: "Good Match", range: "76-89%", value: 0, color: "#60a5fa" },
+            { label: "Consider Match", range: "50-75%", value: 0, color: "#f4a261" },
+            { label: "Weak Match", range: "Below 50%", value: 0, color: "#ef9a9a" },
+        ];
+
+        recruiterCvLogs.forEach((log) => {
+            const score = normalizeScore(log.ai_matching_score);
+            if (score === null) return;
+            if (score >= 90) buckets[0].value += 1;
+            else if (score >= 76) buckets[1].value += 1;
+            else if (score >= 50) buckets[2].value += 1;
+            else buckets[3].value += 1;
+        });
+
+        return buckets;
+    }, [recruiterCvLogs]);
+
+    const applicationsOverTime = useMemo(() => {
+        const grouped = new Map<string, { date: string; newApplications: number; reviewedApplications: number }>();
+        dashboardLogs.forEach((log) => {
+            const date = new Date(log.created_at);
+            if (Number.isNaN(date.getTime())) return;
+            const key = date.toISOString().slice(0, 10);
+            const current = grouped.get(key) || { date: key, newApplications: 0, reviewedApplications: 0 };
+            current.newApplications += 1;
+            if (log.status !== "pending") {
+                current.reviewedApplications += 1;
+            }
+            grouped.set(key, current);
+        });
+        return Array.from(grouped.values()).sort((a, b) => a.date.localeCompare(b.date));
+    }, [dashboardLogs]);
+
+    const jobPerformanceRows = useMemo(() => {
+        return managedRecruiterJobs.map((job) => {
+            const logs = recruiterCvLogs.filter((log) => log.job_id === job.id);
+            const scores = logs
+                .map((log) => normalizeScore(log.ai_matching_score))
+                .filter((score): score is number => score !== null);
+            const averageScore = scores.length ? scores.reduce((sum, score) => sum + score, 0) / scores.length : null;
+            return {
+                job,
+                status: getManagedJobStatus(job.id),
+                totalApplications: logs.length,
+                newCvs: logs.filter((log) => isWithinDashboardRange(log.created_at, "today")).length,
+                averageScore,
+                highMatchCount: scores.filter((score) => score >= 90).length,
+                pendingReviews: logs.filter((log) => log.status === "pending").length,
+            };
+        });
+    }, [getManagedJobStatus, managedRecruiterJobs, recruiterCvLogs]);
 
     const filteredLogs = useMemo(() => {
         const q = screeningSearch.trim().toLowerCase();
@@ -458,22 +633,6 @@ export default function RecruiterUIPage() {
         return "Recruiter";
     }, [recruiterJobs, selectedJob, session]);
 
-    const displayedApplications = useMemo(() => {
-        if (selectedJob?.isMock) {
-            return jobScopedLogs.map((log) => ({
-                application_id: log.application_id,
-                cv_id: log.cv_id,
-                candidate_name: log.candidate_name,
-                candidate_email: log.candidate_email,
-                candidate_phone: log.candidate_phone,
-                status: log.status,
-                ai_matching_score: log.ai_matching_score,
-                matching_detail: log.matching_detail,
-            }));
-        }
-        return applications;
-    }, [applications, jobScopedLogs, selectedJob]);
-
     const activeDetailLog = selectedScreeningLog || selectedLog;
     const selectedMatchingDetail = activeDetailLog?.matching_detail || null;
     const renderableMatchingSections = getRenderableMatchingSections(selectedMatchingDetail);
@@ -490,6 +649,8 @@ export default function RecruiterUIPage() {
         ["technical_skills", "programming_languages"],
         "missing"
     );
+    const selectedCvProjects = activeDetailLog?.projects || [];
+    const selectedCvExperience = activeDetailLog?.work_experience || [];
     const selectedRelevantProjects = getSectionPoints(selectedMatchingDetail, ["projects"], "good");
     const selectedExperienceGood = getSectionPoints(selectedMatchingDetail, ["experience"], "good");
     const selectedMissingRequirements = [
@@ -566,9 +727,100 @@ export default function RecruiterUIPage() {
         setJobPage(1);
     }
 
-    useEffect(() => {
-        setJobPage(1);
-    }, [jdSearchTerm, recruiterJobs]);
+    function openApplicationsForJob(jobId: number) {
+        setSelectedJobId(jobId);
+        setSelectedScreeningLog(null);
+        setSelectedLog(null);
+        setScoringSubTab("cvs");
+        setActiveWorkspace("applications");
+        router.push("/recruiter/applications");
+    }
+
+    function renderPieChart(items: DonutChartItem[]) {
+        return (
+            <div className={styles.chartPanel}>
+                <RoundedDonutChart
+                    data={items}
+                    size={240}
+                    innerRadius={64}
+                    outerRadius={106}
+                    gapAngle={9}
+                    startAngle={-82}
+                />
+                <div className={styles.chartLegend}>
+                    {items.map((item) => (
+                        <span key={item.label}>
+                            <i style={{ background: item.color }} />
+                            {item.label}{item.range ? `: ${item.range}` : ""} <strong>{item.value}</strong>
+                        </span>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    function renderApplicationsLineChart() {
+        if (!applicationsOverTime.length) {
+            return <p className={styles.tableState}>No applications in this period.</p>;
+        }
+
+        const width = 760;
+        const height = 240;
+        const paddingLeft = 48;
+        const paddingRight = 24;
+        const paddingTop = 24;
+        const paddingBottom = 46;
+        const chartWidth = width - paddingLeft - paddingRight;
+        const chartHeight = height - paddingTop - paddingBottom;
+        const maxValue = Math.max(1, ...applicationsOverTime.flatMap((point) => [point.newApplications, point.reviewedApplications]));
+        const denominator = Math.max(1, applicationsOverTime.length - 1);
+
+        const toPoint = (value: number, index: number) => {
+            const x = paddingLeft + (chartWidth * index) / denominator;
+            const y = paddingTop + chartHeight - (value / maxValue) * chartHeight;
+            return `${x},${y}`;
+        };
+
+        const newPoints = applicationsOverTime.map((item, index) => toPoint(item.newApplications, index)).join(" ");
+        const reviewedPoints = applicationsOverTime.map((item, index) => toPoint(item.reviewedApplications, index)).join(" ");
+        const yTicks = [maxValue, Math.ceil(maxValue / 2), 0];
+
+        return (
+            <div className={styles.lineChartSurface}>
+                <svg className={styles.lineChartSvg} viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Applications over time line chart">
+                    {yTicks.map((tick) => {
+                        const y = paddingTop + chartHeight - (tick / maxValue) * chartHeight;
+                        return (
+                            <g key={`tick-${tick}`}>
+                                <line className={styles.chartGridLine} x1={paddingLeft} x2={width - paddingRight} y1={y} y2={y} />
+                                <text className={styles.chartAxisLabel} x={12} y={y + 4}>{tick}</text>
+                            </g>
+                        );
+                    })}
+                    <line className={styles.chartAxisLine} x1={paddingLeft} x2={paddingLeft} y1={paddingTop} y2={height - paddingBottom} />
+                    <line className={styles.chartAxisLine} x1={paddingLeft} x2={width - paddingRight} y1={height - paddingBottom} y2={height - paddingBottom} />
+                    <polyline className={styles.newApplicationsLine} points={newPoints} />
+                    <polyline className={styles.reviewedApplicationsLine} points={reviewedPoints} />
+                    {applicationsOverTime.map((item, index) => {
+                        const [newX, newY] = toPoint(item.newApplications, index).split(",").map(Number);
+                        const [reviewedX, reviewedY] = toPoint(item.reviewedApplications, index).split(",").map(Number);
+                        const showLabel = applicationsOverTime.length <= 12 || index === 0 || index === applicationsOverTime.length - 1 || index % 3 === 0;
+                        return (
+                            <g key={item.date}>
+                                <circle className={styles.newApplicationsPoint} cx={newX} cy={newY} r="4" />
+                                <circle className={styles.reviewedApplicationsPoint} cx={reviewedX} cy={reviewedY} r="4" />
+                                {showLabel && (
+                                    <text className={styles.chartXAxisLabel} x={newX} y={height - 16} textAnchor="middle">
+                                        {formatDashboardDate(item.date)}
+                                    </text>
+                                )}
+                            </g>
+                        );
+                    })}
+                </svg>
+            </div>
+        );
+    }
 
     if (!session) {
         return <div className={styles.page} />;
@@ -584,13 +836,23 @@ export default function RecruiterUIPage() {
                     setActiveWorkspace("overview");
                     setSelectedScreeningLog(null);
                     setScoringSubTab("jobs");
+                    router.push("/recruiter_UI");
                 }}
-                onOpenScoring={() => {
-                    setActiveWorkspace("scoring");
+                onOpenJobs={() => {
+                    setActiveWorkspace("jobs");
                     setSelectedLog(null);
                     setSelectedScreeningLog(null);
                     setScoringSubTab("jobs");
                     setIsScoringSummaryOpen(false);
+                    router.push("/recruiter/jobs");
+                }}
+                onOpenApplications={() => {
+                    setActiveWorkspace("applications");
+                    setSelectedLog(null);
+                    setSelectedScreeningLog(null);
+                    setScoringSubTab("cvs");
+                    setIsScoringSummaryOpen(false);
+                    router.push("/recruiter/applications");
                 }}
                 onOpenUpload={() => setIsUploadPopupOpen(true)}
                 onLogout={handleLogout}
@@ -598,28 +860,38 @@ export default function RecruiterUIPage() {
 
             <div className={styles.mainContent}>
                 <header className={styles.header}>
-                    <h1>{activeWorkspace === "scoring" ? "CV Scoring Workspace" : "Recruiter Dashboard"}</h1>
+                    <h1>
+                        {activeWorkspace === "jobs"
+                            ? "Job Management"
+                            : activeWorkspace === "applications"
+                                ? "Submitted CV Management"
+                                : "Recruiter Dashboard"}
+                    </h1>
                     <p>
-                        {activeWorkspace === "scoring"
-                            ? "Choose one JD first, then review submitted CV scores in smaller focused steps."
-                            : "Manage JD posts and track CV submissions in real time."}
+                        {activeWorkspace === "jobs"
+                            ? "Create, search, and manage uploaded job descriptions."
+                            : activeWorkspace === "applications"
+                                ? "Review submitted CVs, matching scores, and candidate details."
+                                : "Overview analytics for jobs, applications, screening results, and recent activity."}
                     </p>
                 </header>
 
                 <main className={styles.contentArea}>
                     <RecruiterToast message={message} type={messageType} />
-                    {activeWorkspace === "scoring" ? (
+                    {activeWorkspace !== "overview" ? (
                         <>
-                            <nav className={styles.subTabs} aria-label="CV scoring steps">
+                            {activeWorkspace === "applications" && (
+                            <nav className={styles.subTabs} aria-label="Submitted CV views">
                                 <button
                                     className={`${styles.subTabButton} ${scoringSubTab === "jobs" ? styles.subTabButtonActive : ""}`}
                                     type="button"
                                     onClick={() => {
-                                        setScoringSubTab("jobs");
+                                        setActiveWorkspace("jobs");
+                                        router.push("/recruiter/jobs");
                                         setSelectedScreeningLog(null);
                                     }}
                                 >
-                                    Job List
+                                    Job Management
                                 </button>
                                 <button
                                     className={`${styles.subTabButton} ${scoringSubTab === "cvs" ? styles.subTabButtonActive : ""}`}
@@ -639,9 +911,10 @@ export default function RecruiterUIPage() {
                                     CV Detail
                                 </button>
                             </nav>
+                            )}
 
                             {/* Job List: chọn JD trước khi xem CV. */}
-                            {scoringSubTab === "jobs" && (
+                            {activeWorkspace === "jobs" && (
                             <section className={`${styles.card} ${styles.panelCard}`} style={{ gridColumn: "1 / -1" }}>
                                 <div className={styles.panelTitleRow}>
                                     <div>
@@ -782,7 +1055,7 @@ export default function RecruiterUIPage() {
                             )}
 
                             {/* Submitted CVs: bảng ranking CV của JD đã chọn. */}
-                            {scoringSubTab === "cvs" && (
+                            {activeWorkspace === "applications" && scoringSubTab === "cvs" && (
                                 <section className={`${styles.card} ${styles.panelCard}`} style={{ gridColumn: "1 / -1" }}>
                                     <div className={styles.panelTitleRow}>
                                         <div>
@@ -792,8 +1065,12 @@ export default function RecruiterUIPage() {
                                             </p>
                                         </div>
                                         <div className={styles.actionConfirmBox}>
-                                            <button className={styles.clearFilterBtn} type="button" onClick={() => setScoringSubTab("jobs")}>
-                                                Back to Job List
+	                                            <button className={styles.clearFilterBtn} type="button" onClick={() => {
+	                                                setActiveWorkspace("jobs");
+	                                                setScoringSubTab("jobs");
+	                                                router.push("/recruiter/jobs");
+	                                            }}>
+	                                                Back to Job Management
                                             </button>
                                             <button className={styles.clearFilterBtn} type="button" onClick={clearScreeningFilters}>
                                                 Clear CV filters
@@ -911,7 +1188,7 @@ export default function RecruiterUIPage() {
                             )}
 
                             {/* CV Detail: chi tiết điểm và thông tin CV. */}
-                            {scoringSubTab === "detail" && (
+                            {activeWorkspace === "applications" && scoringSubTab === "detail" && (
                                 <section className={`${styles.card} ${styles.panelCard}`} style={{ gridColumn: "1 / -1" }}>
                                     {!selectedScreeningLog ? (
                                         <p className={styles.tableState}>Please select a CV to view details.</p>
@@ -925,9 +1202,14 @@ export default function RecruiterUIPage() {
                                                 {getJobManagementLabel(getManagedJobStatus(selectedScreeningLog.job_id))}
                                             </span>
                                         </div>
-                                        <button className={styles.clearFilterBtn} type="button" onClick={handleBackFromScreeningDetail}>
-                                            Back to Submitted CVs
-                                        </button>
+                                        <div className={styles.actionConfirmBox}>
+                                            <button className={styles.deleteCvBtn} type="button" onClick={() => void handleDeleteSelectedCv(selectedScreeningLog)}>
+                                                Delete CV
+                                            </button>
+                                            <button className={styles.clearFilterBtn} type="button" onClick={handleBackFromScreeningDetail}>
+                                                Back to Submitted CVs
+                                            </button>
+                                        </div>
                                     </div>
 
                                     <div className={styles.kanbanGrid}>
@@ -963,11 +1245,11 @@ export default function RecruiterUIPage() {
                                             <p>{selectedScreeningLog.certifications?.length ? selectedScreeningLog.certifications.join(", ") : "Certifications are not available."}</p>
                                         </article>
                                         <article className={styles.kanbanBlock}>
-                                            <p className={styles.contactLabel}>Work Experience</p>
+                                            <p className={styles.contactLabel}>Experience</p>
                                             <ul className={styles.matchingList}>
-                                                {selectedScreeningLog.work_experience?.length ? selectedScreeningLog.work_experience.map((item) => (
+                                                {selectedCvExperience.length ? selectedCvExperience.map((item) => (
                                                     <li key={`work-${item}`}>{item}</li>
-                                                )) : <li className={styles.emptyDetailMessage}>Work experience is not available from backend yet.</li>}
+                                                )) : <li className={styles.emptyDetailMessage}>Experience is not available from the CV text.</li>}
                                             </ul>
                                         </article>
                                         <article className={styles.kanbanBlock}>
@@ -995,7 +1277,7 @@ export default function RecruiterUIPage() {
                                             </ul>
                                         </article>
                                         <article className={styles.kanbanBlock}>
-                                            <p className={styles.contactLabel}>Experience</p>
+                                            <p className={styles.contactLabel}>Matching Experience Evidence</p>
                                             <ul className={styles.matchingList}>
                                                 {selectedExperienceGood.length ? selectedExperienceGood.map((item) => (
                                                     <li className={styles.goodPoint} key={`detail-exp-${item}`}><span>✓</span>{item}</li>
@@ -1005,9 +1287,11 @@ export default function RecruiterUIPage() {
                                         <article className={styles.kanbanBlock}>
                                             <p className={styles.contactLabel}>Projects</p>
                                             <ul className={styles.matchingList}>
-                                                {selectedRelevantProjects.length ? selectedRelevantProjects.map((item) => (
+                                                {selectedCvProjects.length ? selectedCvProjects.map((item) => (
+                                                    <li key={`detail-project-${item}`}>{item}</li>
+                                                )) : selectedRelevantProjects.length ? selectedRelevantProjects.map((item) => (
                                                     <li className={styles.goodPoint} key={`detail-project-${item}`}><span>✓</span>{item}</li>
-                                                )) : <li className={styles.emptyDetailMessage}>No relevant projects recorded.</li>}
+                                                )) : <li className={styles.emptyDetailMessage}>Projects are not available from the CV text.</li>}
                                             </ul>
                                         </article>
                                         <article className={styles.kanbanBlock}>
@@ -1041,245 +1325,139 @@ export default function RecruiterUIPage() {
                         </>
                     ) : (
                         <>
-                    {/* Dashboard: hiển thị thống kê tổng quan. */}
-                    <RecruiterStatCard label="Total Jobs" value={managedRecruiterJobs.length} tone="neutral" />
-                    <RecruiterStatCard label="Total CVs" value={screeningSummary.total} tone="neutral" />
-                    <RecruiterStatCard label="Scored CVs" value={screeningSummary.scored} tone="scored" />
-                    <RecruiterStatCard label="Passed" value={screeningSummary.passed} tone="passed" />
-                    <RecruiterStatCard label="Borderline" value={screeningSummary.borderline} tone="borderline" />
-                    <RecruiterStatCard label="Failed" value={screeningSummary.failed} tone="failed" />
+	                    <RecruiterStatCard label="Active Jobs" value={dashboardSummary.activeJobs} tone="neutral" />
+	                    <RecruiterStatCard label="Total Applications" value={dashboardSummary.totalApplications} tone="neutral" />
+	                    <RecruiterStatCard label="New Applications" value={dashboardSummary.newApplications} tone="scored" />
+	                    <RecruiterStatCard label="Pending Reviews" value={dashboardSummary.pendingReviews} tone="borderline" />
+	                    <RecruiterStatCard label="Average Matching Score" value={formatScore(dashboardSummary.averageScore)} tone="passed" />
+	                    <RecruiterStatCard label="Shortlisted Candidates" value={dashboardSummary.shortlistedCandidates} tone="passed" />
 
-                    {/* Job Management: quản lý danh sách JD. */}
-                    <section className={`${styles.card} ${styles.panelCard}`} style={{ gridColumn: "1 / -1" }}>
-                        <h3>Manage Uploaded Jobs</h3>
-                        <p className={styles.subtleText}>Turn Off keeps the job here for restore. Delete removes it from job management while CV history stays in results.</p>
-                        <div className={styles.jobManagementList}>
-                            {managedRecruiterJobs.map((job) => {
-                                const jobStatus = getManagedJobStatus(job.id);
-                                const jobLogs = recruiterCvLogs.filter((log) => log.job_id === job.id);
-                                return (
-                                    <div
-                                        key={job.id}
-                                        className={`${styles.jobItemWrap} ${jobStatus === "turned_off" ? styles.jobItemInactive : ""}`}
-                                    >
-                                        <button
-                                            className={`${styles.jobBtn} ${selectedJobId === job.id ? styles.jobBtnActive : ""}`}
-                                            onClick={() => {
-                                                if (selectedJobId === job.id) {
-                                                    setSelectedJobId(null);
-                                                    setApplications([]);
-                                                } else {
-                                                    setSelectedJobId(job.id);
-                                                }
-                                            }}
-                                        >
-                                            <span className={styles.jobItemTitle}>{job.title}</span>
-                                            <span className={styles.jobItemMeta}>
-                                                {job.company_name || "Unknown company"} · {job.level || "No level"} · {jobLogs.length} CVs
-                                                {job.salary ? ` · ${job.salary}` : ""}
-                                            </span>
-                                        </button>
-                                        <div className={styles.jobItemRight}>
-                                            <span className={`${styles.jobStatusPill} ${getJobManagementClass(jobStatus)}`}>
-                                                {getJobManagementLabel(jobStatus)}
-                                            </span>
-                                            {job.isMock && <span className={styles.mockBadge}>Mock</span>}
-                                            <div className={styles.jobActionGroup}>
-                                                {jobStatus === "active" ? (
-                                                    <button
-                                                        className={styles.turnOffJobBtn}
-                                                        type="button"
-                                                        onClick={() => handleTurnOffJob(job.id)}
-                                                    >
-                                                        Turn Off
-                                                    </button>
-                                                ) : (
-                                                    <button
-                                                        className={styles.restoreJobBtn}
-                                                        type="button"
-                                                        onClick={() => handleRestoreJob(job.id)}
-                                                    >
-                                                        Restore
-                                                    </button>
-                                                )}
-                                                <button
-                                                    className={styles.jobDeleteXBtn}
-                                                    onClick={() => handleDeleteJob(job.id, job.title)}
-                                                    title="Delete this job"
-                                                    aria-label={`Delete job ${job.title}`}
-                                                >
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                            {managedRecruiterJobs.length === 0 && <p>No JD uploaded yet.</p>}
-                        </div>
-                    </section>
+	                    <section className={`${styles.card} ${styles.panelCard} ${styles.chartCard}`}>
+	                        <div className={styles.panelTitleRow}>
+	                            <div>
+	                                <h3>Screening Result Distribution</h3>
+	                            </div>
+	                        </div>
+	                        {renderPieChart(screeningDistribution)}
+	                    </section>
 
-                    {/* CV Ranking: bảng xếp hạng và filter CV. */}
-                    <section className={`${styles.card} ${styles.panelCard}`} style={{ gridColumn: "1 / -1" }}>
-                        <div className={styles.panelTitleRow}>
-                            <div>
-                                <h3>CV Screening Results</h3>
-                                <p className={styles.subtleText}>Ranked by matching score from high to low.</p>
-                            </div>
-                            <button className={styles.clearFilterBtn} type="button" onClick={clearScreeningFilters}>
-                                Clear filters
-                            </button>
-                        </div>
+	                    <section className={`${styles.card} ${styles.panelCard} ${styles.chartCard}`}>
+	                        <div className={styles.panelTitleRow}>
+	                            <div>
+	                                <h3>Matching Score Distribution</h3>
+	                            </div>
+	                        </div>
+	                        {renderPieChart(scoreDistribution)}
+	                    </section>
 
-                        <div className={styles.screeningFilters}>
-                            <input
-                                className={styles.filterInput}
-                                type="search"
-                                placeholder="Search candidate, email, job, skill..."
-                                value={screeningSearch}
-                                onChange={(e) => setScreeningSearch(e.target.value)}
-                            />
-                            <select
-                                className={styles.filterSelect}
-                                value={scoreStatusFilter}
-                                onChange={(e) => setScoreStatusFilter(e.target.value as ScoreStatus | "all")}
-                            >
-                                <option value="all">All statuses</option>
-                                <option value="passed">Passed</option>
-                                <option value="borderline">Borderline</option>
-                                <option value="failed">Failed</option>
-                                <option value="not_scored">Not scored / Pending</option>
-                            </select>
-                            <select
-                                className={styles.filterSelect}
-                                value={scoreRangeFilter}
-                                onChange={(e) => setScoreRangeFilter(e.target.value as "all" | "85-100" | "50-84" | "0-49")}
-                            >
-                                <option value="all">All score ranges</option>
-                                <option value="85-100">85-100</option>
-                                <option value="50-84">50-84</option>
-                                <option value="0-49">0-49</option>
-                            </select>
-                        </div>
+	                    <section className={`${styles.card} ${styles.panelCard} ${styles.lineChartCard}`} style={{ gridColumn: "1 / -1" }}>
+	                        <div className={styles.panelTitleRow}>
+	                            <div>
+	                                <h3>Applications Over Time</h3>
+	                            </div>
+	                            <div className={styles.rangeControl}>
+	                                {(["today", "7d", "30d", "all"] as DashboardRange[]).map((range) => (
+	                                    <button
+	                                        key={range}
+	                                        className={`${styles.rangeButton} ${dashboardRange === range ? styles.rangeButtonActive : ""}`}
+	                                        type="button"
+	                                        onClick={() => setDashboardRange(range)}
+	                                    >
+	                                        {range === "today" ? "Today" : range === "7d" ? "Last 7 Days" : range === "30d" ? "Last 30 Days" : "All Time"}
+	                                    </button>
+	                                ))}
+	                            </div>
+	                        </div>
+	                        <div className={styles.lineChart}>
+	                            {renderApplicationsLineChart()}
+	                        </div>
+	                        <div className={styles.chartLegendInline}>
+	                            <span><i className={styles.newApplicationBarLegend} />New applications</span>
+	                            <span><i className={styles.reviewedApplicationBarLegend} />Reviewed applications</span>
+	                        </div>
+	                    </section>
 
-                        {isScreeningLoading && (
-                            <p className={styles.tableState}>Loading CV screening results...</p>
-                        )}
-                        {screeningError && (
-                            <p className={`${styles.tableState} ${styles.error}`}>{screeningError}</p>
-                        )}
-                        <div className={styles.tableWrap}>
-                            <table className={styles.table}>
-                                <thead>
-                                    <tr>
-                                        <th>Rank</th>
-                                        <th>Time</th>
-                                        <th>Job</th>
-                                        <th>Candidate</th>
-                                        <th>Email</th>
-                                        <th>Status</th>
-                                        <th>Score</th>
-                                        <th>Recommendation</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {sortedFilteredLogs.map((log, index) => {
-                                        const status = getScoreStatus(log.ai_matching_score);
-                                        return (
-                                            <tr key={log.log_id}>
-                                                <td className={styles.tableSoftText}>#{index + 1}</td>
-                                                <td className={styles.tableSoftText}>{formatLogTime(log.created_at)}</td>
-                                                <td>{log.job_title}</td>
-                                                <td>{log.candidate_name || "-"}</td>
-                                                <td className={styles.tableSoftText}>{log.candidate_email || "-"}</td>
-                                                <td>
-                                                    <span className={`${styles.statusBadge} ${getScoreStatusClass(status)}`}>
-                                                        {getScoreStatusLabel(status)}
-                                                    </span>
-                                                </td>
-                                                <td>{formatScore(log.ai_matching_score)}/100</td>
-                                                <td className={styles.tableSoftText}>{getRecommendationLabel(log.ai_matching_score)}</td>
-                                            </tr>
-                                        );
-                                    })}
-                                    {!isScreeningLoading && sortedFilteredLogs.length === 0 && (
-                                        <tr>
-                                            <td colSpan={8}>
-                                                {jobScopedLogs.length === 0
-                                                    ? "No CV uploads logged yet."
-                                                    : "No CV matches the current filters."}
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
+	                    <section className={`${styles.card} ${styles.panelCard}`} style={{ gridColumn: "1 / -1" }}>
+	                        <div className={styles.panelTitleRow}>
+	                            <div>
+	                                <h3>Job Performance</h3>
+	                            </div>
+	                            <button className={styles.clearFilterBtn} type="button" onClick={() => {
+	                                setActiveWorkspace("jobs");
+	                                router.push("/recruiter/jobs");
+	                            }}>
+	                                Open Job Management
+	                            </button>
+	                        </div>
+	                        <div className={styles.tableWrap}>
+	                            <table className={styles.table}>
+	                                <thead>
+	                                    <tr>
+	                                        <th>Job Title</th>
+	                                        <th>Status</th>
+	                                        <th>Total Applications</th>
+	                                        <th>New CVs</th>
+	                                        <th>Average Score</th>
+	                                        <th>High Match Count</th>
+	                                        <th>Pending Reviews</th>
+	                                        <th>Action</th>
+	                                    </tr>
+	                                </thead>
+	                                <tbody>
+	                                    {jobPerformanceRows.map((row) => (
+	                                        <tr key={row.job.id}>
+	                                            <td>{row.job.title}</td>
+	                                            <td>
+	                                                <span className={`${styles.jobStatusPill} ${getJobManagementClass(row.status)}`}>
+	                                                    {getJobManagementLabel(row.status)}
+	                                                </span>
+	                                            </td>
+	                                            <td>{row.totalApplications}</td>
+	                                            <td>{row.newCvs}</td>
+	                                            <td>{formatScore(row.averageScore)}</td>
+	                                            <td>{row.highMatchCount}</td>
+	                                            <td>{row.pendingReviews}</td>
+	                                            <td>
+	                                                <button className={styles.clearFilterBtn} type="button" onClick={() => openApplicationsForJob(row.job.id)}>
+	                                                    View CVs
+	                                                </button>
+	                                            </td>
+	                                        </tr>
+	                                    ))}
+	                                    {jobPerformanceRows.length === 0 && (
+	                                        <tr>
+	                                            <td colSpan={8}>No jobs available.</td>
+	                                        </tr>
+	                                    )}
+	                                </tbody>
+	                            </table>
+	                        </div>
+	                    </section>
 
-                    {/* Application Status: quản lý CV đã nộp theo JD đang chọn. */}
-                    <section className={`${styles.card} ${styles.panelCard}`} style={{ gridColumn: "1 / -1" }}>
-                        <h3>Application Status (Selected Job)</h3>
-                        <div className={styles.tableWrap}>
-                            <table className={styles.table}>
-                                <thead>
-                                    <tr>
-                                        <th>Candidate</th>
-                                        <th>Email</th>
-                                        <th>Phone</th>
-                                        <th>Status</th>
-                                        <th>Score</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {displayedApplications.map((app) => (
-                                        <tr key={app.application_id}>
-                                            <td>{app.candidate_name || "-"}</td>
-                                            <td>{app.candidate_email || "-"}</td>
-                                            <td>{app.candidate_phone || "-"}</td>
-                                            <td>{app.status}</td>
-                                            <td>{formatScore(app.ai_matching_score)}</td>
-                                            <td>
-                                                {selectedJob?.isMock ? (
-                                                    <span className={styles.mockBadge}>Mock data</span>
-                                                ) : deleteConfirmApplicationId === app.application_id ? (
-                                                    <div className={styles.actionConfirmBox}>
-                                                        <button
-                                                            className={styles.confirmDeleteBtn}
-                                                            onClick={() => handleDeleteApplication(app.application_id)}
-                                                            type="button"
-                                                        >
-                                                            Confirm
-                                                        </button>
-                                                        <button
-                                                            className={styles.cancelDeleteBtn}
-                                                            onClick={() => setDeleteConfirmApplicationId(null)}
-                                                            type="button"
-                                                        >
-                                                            Cancel
-                                                        </button>
-                                                    </div>
-                                                ) : (
-                                                    <button
-                                                        className={styles.deleteCvBtn}
-                                                        onClick={() => setDeleteConfirmApplicationId(app.application_id)}
-                                                        type="button"
-                                                    >
-                                                        Delete CV
-                                                    </button>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    {displayedApplications.length === 0 && (
-                                        <tr>
-                                            <td colSpan={6}>No applications for selected job yet.</td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
+	                    <section className={`${styles.card} ${styles.panelCard}`} style={{ gridColumn: "1 / -1" }}>
+	                        <div className={styles.panelTitleRow}>
+	                            <div>
+	                                <h3>Activity Logs</h3>
+	                            </div>
+	                            <button className={styles.clearFilterBtn} type="button" onClick={() => {
+	                                setActiveWorkspace("applications");
+	                                setScoringSubTab("cvs");
+	                                router.push("/recruiter/applications");
+	                            }}>
+	                                Open Submitted CVs
+	                            </button>
+	                        </div>
+	                        <ul className={styles.dashboardActivityList}>
+	                            {recruiterCvLogs.slice(0, 8).map((log) => (
+	                                <li key={log.log_id}>
+	                                    <span>{formatLogTime(log.created_at)}</span>
+	                                    <strong>{log.candidate_name || "Candidate"}</strong>
+	                                    <em>submitted a CV for {log.job_title}</em>
+	                                </li>
+	                            ))}
+	                            {recruiterCvLogs.length === 0 && <li>No activity yet.</li>}
+	                        </ul>
+	                    </section>
 
                         </>
                     )}
@@ -1288,7 +1466,7 @@ export default function RecruiterUIPage() {
             </div>
 
             {/* CV Scoring Summary Popup: xem nhanh tình trạng CV theo từng JD. */}
-            {isScoringSummaryOpen && activeWorkspace === "scoring" && selectedJob && (
+            {isScoringSummaryOpen && activeWorkspace === "jobs" && selectedJob && (
                 <div className={styles.popupOverlay}>
                     <div className={`${styles.popupCard} ${styles.summaryPopupCard}`}>
                         <button className={styles.popupClose} onClick={() => setIsScoringSummaryOpen(false)}>×</button>
@@ -1404,7 +1582,7 @@ export default function RecruiterUIPage() {
             )}
 
             {/* CV Contact Modal: xem chi tiết CV từ dashboard. */}
-            {selectedLog && session && activeWorkspace === "overview" && (
+            {selectedLog && session && activeWorkspace === "applications" && (
                 <div className={styles.popupOverlay}>
                     <div className={styles.popupCard}>
                         <button className={styles.popupClose} onClick={() => setSelectedLog(null)}>×</button>

@@ -317,6 +317,7 @@
   gap: 14px;
   min-height: 0;
   overflow: hidden;
+  position: relative;
 }
 
 .appliedHeader {
@@ -709,6 +710,14 @@
   transform: translateY(-1px);
 }
 
+.applyButton:disabled,
+.submitModalBtn:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+  transform: none;
+  box-shadow: none;
+}
+
 .applyPrimaryButton {
   font-size: 16px;
   font-weight: 800;
@@ -1009,6 +1018,71 @@
   border-color: rgba(239, 68, 68, 0.42);
   background: #fef2f2;
   color: #7f1d1d;
+}
+
+.scoringOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  min-height: 260px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.78);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  pointer-events: all;
+}
+
+.scoringOverlay p {
+  margin: 0;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.scoringSpinner {
+  position: relative;
+  width: 56px;
+  height: 52px;
+}
+
+.scoringSpinner span {
+  position: absolute;
+  bottom: 0;
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: #ffffff;
+  animation: scoringClimb 0.9s ease-in-out infinite;
+}
+
+.scoringSpinner span:nth-child(1) {
+  left: 8px;
+  animation-delay: 0s;
+}
+
+.scoringSpinner span:nth-child(2) {
+  left: 22px;
+  animation-delay: 0.15s;
+}
+
+.scoringSpinner span:nth-child(3) {
+  left: 36px;
+  animation-delay: 0.3s;
+}
+
+@keyframes scoringClimb {
+  0%, 100% {
+    transform: translateY(0) scale(0.9);
+    opacity: 0.65;
+  }
+  50% {
+    transform: translateY(-28px) scale(1);
+    opacity: 1;
+  }
 }
 
 @keyframes toastSlideIn {

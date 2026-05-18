@@ -30,6 +30,8 @@ def run_startup_migrations():
         "ALTER TABLE job ADD COLUMN IF NOT EXISTS direct_contact VARCHAR",
         "ALTER TABLE job ADD COLUMN IF NOT EXISTS image_url VARCHAR",
         "ALTER TABLE job ADD COLUMN IF NOT EXISTS matching_config TEXT",
+        "ALTER TABLE job ADD COLUMN IF NOT EXISTS status VARCHAR DEFAULT 'active'",
+        "UPDATE job SET status = 'active' WHERE status IS NULL",
         "ALTER TABLE cv ADD COLUMN IF NOT EXISTS candidate_name VARCHAR",
         "ALTER TABLE cv ADD COLUMN IF NOT EXISTS candidate_email VARCHAR",
         "ALTER TABLE cv ADD COLUMN IF NOT EXISTS candidate_phone VARCHAR",
