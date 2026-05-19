@@ -13,7 +13,7 @@ import BackButton from "../../../components/navigation/BackButton";
 export default function RecruiterChangePasswordPage() {
     const router = useRouter();
     const [pendingSession, setPendingSession] = useState<RecruiterSession | null>(null);
-    const [currentPassword, setCurrentPassword] = useState("1");
+    const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [message, setMessage] = useState("");

@@ -7,7 +7,7 @@ import BrandLogoFull from "@/components/brand/BrandLogoFull";
 
 const navItems = [
     { label: "About Us", href: "https://usth.edu.vn/gioi-thieu/gioi-thieu-chung-ve-usth/" },
-    { label: "Jobs", href:"/candidate_UI" },
+    { label: "Jobs", href: "/candidate" },
     { label: "Contact", href: "https://usth.edu.vn/" },
 ];
 

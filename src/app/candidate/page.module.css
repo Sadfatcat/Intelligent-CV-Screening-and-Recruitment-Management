@@ -1,28 +1,27 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Newsreader:wght@500;600&display=swap");
 
 .container {
-  --bg-1: #f6fffb;
-  --bg-2: #e9f8ff;
-  --surface: rgba(255, 255, 255, 0.84);
-  --surface-strong: rgba(255, 255, 255, 0.94);
-  --line: rgba(18, 76, 89, 0.14);
-  --title: #124c59;
-  --text: #355d67;
-  --muted: #5f7e86;
-  --accent: #0db190;
-  --accent-hover: #0a9578;
-  --chip: #dff6ef;
+  --bg-1: #07111d;
+  --bg-2: #0c1c2f;
+  --surface: rgba(13, 26, 42, 0.82);
+  --surface-strong: rgba(11, 23, 37, 0.9);
+  --line: rgba(129, 164, 194, 0.22);
+  --title: #e8f0f8;
+  --text: #b5c8d9;
+  --muted: #90a8bc;
+  --accent: #2f6fa5;
+  --accent-hover: #255b88;
   min-height: 100vh;
   display: flex;
   flex-direction: row;
   gap: 14px;
   padding: 90px 18px 18px;
   background:
-    radial-gradient(circle at 12% 18%, rgba(13, 177, 144, 0.2), transparent 40%),
-    radial-gradient(circle at 86% 78%, rgba(48, 170, 228, 0.2), transparent 38%),
-    linear-gradient(145deg, var(--bg-1), var(--bg-2));
+    radial-gradient(circle at 14% 18%, rgba(31, 90, 138, 0.34), transparent 42%),
+    radial-gradient(circle at 86% 78%, rgba(59, 86, 122, 0.3), transparent 42%),
+    linear-gradient(150deg, var(--bg-1), var(--bg-2));
   background-attachment: fixed;
-  font-family: "Manrope", sans-serif;
+  font-family: "Source Sans 3", sans-serif;
   align-items: flex-start;
 }
 
@@ -40,9 +39,8 @@
 .middle,
 .right {
   background: var(--surface);
-  backdrop-filter: blur(12px);
-  border-radius: 20px;
-  box-shadow: 0 18px 28px rgba(18, 76, 89, 0.12);
+  border-radius: 14px;
+  box-shadow: 0 18px 30px rgba(4, 10, 18, 0.42);
   border: 1px solid var(--line);
   display: flex;
   flex-direction: column;
@@ -88,24 +86,25 @@
 .searchInput {
   flex: 1;
   min-width: 220px;
-  border: 1px solid rgba(18, 76, 89, 0.2);
+  border: 1px solid rgba(129, 164, 194, 0.3);
   border-radius: 999px;
   padding: 11px 14px;
   background: var(--surface-strong);
   outline: none;
   font-size: 14px;
+  color: #e8f0f8;
 }
 
 .searchInput:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(13, 177, 144, 0.18);
+  box-shadow: 0 0 0 4px rgba(63, 111, 143, 0.18);
 }
 
 .searchHint {
-  color: #0a6a81;
+  color: #d6e5f2;
   font-weight: 700;
   font-size: 13px;
-  background: #e4f6fb;
+  background: rgba(47, 111, 165, 0.28);
   border-radius: 999px;
   padding: 6px 10px;
 }
@@ -132,14 +131,14 @@
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #0ea5e9 0%, #0db190 100%);
+  background: linear-gradient(135deg, #315f85 0%, #3f7aad 100%);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 20px;
-  font-weight: 800;
-  box-shadow: 0 10px 20px rgba(14, 165, 233, 0.28);
+  font-weight: 700;
+  box-shadow: 0 10px 20px rgba(8, 18, 30, 0.45);
   flex-shrink: 0;
 }
 
@@ -152,7 +151,7 @@
 
 .userName {
   margin: 0;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--title);
   font-size: 15px;
   text-transform: capitalize;
@@ -163,6 +162,17 @@
   text-decoration: none;
   font-size: 13px;
   font-weight: 600;
+}
+
+.settingLink {
+  color: var(--title);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.settingLink:hover {
+  color: var(--accent);
 }
 
 .logoutLink:hover {
@@ -192,10 +202,10 @@
 }
 
 .companySection {
-  border: 1px solid rgba(18, 76, 89, 0.14);
+  border: 1px solid rgba(129, 164, 194, 0.24);
   border-radius: 16px;
   padding: 14px;
-  background: rgba(255, 255, 255, 0.62);
+  background: rgba(13, 26, 42, 0.66);
 }
 
 .companyHeader {
@@ -213,13 +223,13 @@
 }
 
 .companyHeader span {
-  color: #0a6a81;
+  color: #d6e5f2;
   font-size: 12px;
   font-weight: 700;
-  border: 1px solid rgba(13, 177, 144, 0.3);
+  border: 1px solid rgba(129, 164, 194, 0.34);
   border-radius: 999px;
   padding: 4px 10px;
-  background: rgba(13, 177, 144, 0.1);
+  background: rgba(47, 111, 165, 0.24);
 }
 
 .companyJobList {
@@ -238,12 +248,12 @@
 }
 
 .companyJobList::-webkit-scrollbar-thumb {
-  background: rgba(13, 177, 144, 0.35);
+  background: rgba(129, 164, 194, 0.34);
   border-radius: 999px;
 }
 
 .companyJobList::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(16, 38, 58, 0.6);
   border-radius: 999px;
 }
 
@@ -264,12 +274,12 @@
 }
 
 .jobList::-webkit-scrollbar-thumb {
-  background: rgba(13, 177, 144, 0.35);
+  background: rgba(52, 69, 86, 0.35);
   border-radius: 999px;
 }
 
 .jobList::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(129, 164, 194, 0.18);
   border-radius: 999px;
 }
 
@@ -288,9 +298,9 @@
   max-width: 100%;
   gap: 6px;
   padding: 6px;
-  border: 1px solid rgba(18, 76, 89, 0.16);
+  border: 1px solid rgba(129, 164, 194, 0.24);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.72);
+  background: rgba(11, 23, 37, 0.72);
 }
 
 .subTabButton {
@@ -307,7 +317,7 @@
 
 .subTabButtonActive,
 .subTabButton:hover {
-  background: rgba(13, 177, 144, 0.12);
+  background: rgba(47, 111, 165, 0.32);
   color: var(--title);
 }
 
@@ -343,10 +353,10 @@
 
 .appliedHeader > span {
   color: var(--title);
-  border: 1px solid rgba(18, 76, 89, 0.16);
+  border: 1px solid rgba(129, 164, 194, 0.28);
   border-radius: 999px;
   padding: 7px 11px;
-  background: rgba(13, 177, 144, 0.1);
+  background: rgba(47, 111, 165, 0.2);
   font-size: 12px;
   font-weight: 800;
   white-space: nowrap;
@@ -386,6 +396,38 @@
   background: #fee2e2;
   border-color: #fecaca;
   color: #991b1b;
+}
+
+/* Remove default focus/hover outlines and borders for interactive elements inside this container */
+.container a,
+.container button,
+.container input,
+.container textarea {
+  outline: none;
+  border: none;
+  box-shadow: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.container a:hover,
+.container button:hover {
+  outline: none;
+  box-shadow: none;
+  border: none;
+}
+
+.container a:focus,
+.container button:focus,
+.container input:focus,
+.container textarea:focus {
+  outline: none;
+  box-shadow: none;
+  border-color: transparent;
+}
+
+.container :focus-visible {
+  outline: none;
+  box-shadow: none;
 }
 
 .legendChipScore {
@@ -465,7 +507,7 @@
 
 .appliedEmpty {
   min-height: 260px;
-  border: 1px dashed rgba(18, 76, 89, 0.22);
+  border: 1px dashed rgba(129, 164, 194, 0.3);
   border-radius: 16px;
   display: flex;
   flex-direction: column;
@@ -484,9 +526,9 @@
 }
 
 .applicationCard {
-  border: 1px solid rgba(18, 76, 89, 0.14);
+  border: 1px solid rgba(129, 164, 194, 0.24);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.76);
+  background: rgba(13, 26, 42, 0.72);
   padding: 14px;
   display: flex;
   flex-direction: column;
@@ -515,7 +557,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(13, 177, 144, 0.12);
+  background: rgba(47, 111, 165, 0.28);
   color: var(--title);
   font-size: 42px;
   font-weight: 900;
@@ -550,10 +592,10 @@
 }
 
 .scoreBox {
-  border: 1px solid rgba(18, 76, 89, 0.14);
+  border: 1px solid rgba(18, 22, 29, 0.12);
   border-radius: 14px;
   padding: 10px;
-  background: rgba(255, 255, 255, 0.88);
+  background: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -580,11 +622,11 @@
 }
 
 .applicationMetaGrid span {
-  border: 1px solid rgba(18, 76, 89, 0.12);
+  border: 1px solid rgba(18, 22, 29, 0.1);
   border-radius: 10px;
   padding: 8px 10px;
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.8);
+  color: rgba(18, 22, 29, 0.72);
+  background: #f7f7f5;
   font-size: 12px;
   font-weight: 800;
   min-width: 0;
@@ -598,10 +640,10 @@
 }
 
 .criteriaBlock {
-  border: 1px solid rgba(18, 76, 89, 0.12);
+  border: 1px solid rgba(18, 22, 29, 0.1);
   border-radius: 14px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.82);
+  background: #ffffff;
   min-width: 0;
 }
 
@@ -660,28 +702,27 @@
   width: 100%;
   height: 180px;
   object-fit: cover;
-  border-radius: 14px;
+  border-radius: 12px;
 }
 
 .detailsTitle {
   color: var(--title);
   margin: 0;
   font-size: 24px;
-  font-weight: 800;
-  letter-spacing: -0.01em;
+  font-weight: 700;
 }
 
 .detailsMeta {
   color: var(--text);
-  font-weight: 700;
+  font-weight: 600;
   margin: 0;
-  border-bottom: 1px solid rgba(18, 76, 89, 0.15);
+  border-bottom: 1px solid rgba(30, 48, 63, 0.14);
   padding-bottom: 11px;
 }
 
 .detailsSection h4 {
   margin: 0 0 6px 0;
-  color: #254f58;
+  color: #d7e6f4;
 }
 
 .detailsSection p {
@@ -696,13 +737,12 @@
   color: #fff;
   text-decoration: none;
   padding: 13px 18px;
-  border-radius: 12px;
+  border-radius: 10px;
   text-align: center;
   font-weight: 700;
   font-size: 15px;
   transition: 0.25s ease;
   border: none;
-  box-shadow: 0 10px 18px rgba(13, 177, 144, 0.24);
 }
 
 .applyButton:hover {
@@ -723,11 +763,11 @@
   font-weight: 800;
   letter-spacing: 0.01em;
   padding: 15px 18px;
-  box-shadow: 0 14px 24px rgba(13, 177, 144, 0.32);
+  box-shadow: 0 14px 24px rgba(7, 18, 30, 0.55);
 }
 
 .applyPrimaryButton:hover {
-  box-shadow: 0 16px 26px rgba(13, 177, 144, 0.4);
+  box-shadow: 0 16px 26px rgba(7, 18, 30, 0.65);
 }
 
 .emptyState {
@@ -747,30 +787,30 @@
 .modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(9, 23, 29, 0.45);
+  background: rgba(17, 24, 32, 0.46);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(3px);
   padding: 16px;
 }
 
 .modalContent {
-  background: #fff;
+  background: #0d1f33;
   width: 900px;
   max-width: 96vw;
-  border-radius: 14px;
-  padding: 34px;
+  border-radius: 10px;
+  padding: 32px;
   position: relative;
-  box-shadow: 0 24px 44px rgba(9, 23, 29, 0.2);
+  box-shadow: 0 24px 40px rgba(17, 24, 32, 0.2);
 }
 
 .closeBtn {
   position: absolute;
   top: 16px;
   right: 16px;
-  background: #eef4f6;
+  background: #17304a;
   border: none;
   width: 34px;
   height: 34px;
@@ -780,12 +820,12 @@
   justify-content: center;
   align-items: center;
   font-size: 16px;
-  color: #4d6870;
+  color: #c8dcec;
   transition: 0.2s;
 }
 
 .closeBtn:hover {
-  background: #dde8ec;
+  background: #1d3a58;
 }
 
 .modalHeader {
@@ -794,13 +834,13 @@
 
 .modalHeader h2 {
   margin: 0 0 8px 0;
-  color: #153e47;
+  color: #e7f0f8;
   font-size: 24px;
 }
 
 .modalHeader p {
   margin: 0;
-  color: #5a7781;
+  color: #9cb4c8;
   font-size: 14px;
 }
 
@@ -818,28 +858,30 @@
 
 .modalInput {
   padding: 13px 14px;
-  border: 1px solid rgba(18, 76, 89, 0.18);
+  border: 1px solid rgba(129, 164, 194, 0.3);
   border-radius: 10px;
   font-size: 14px;
   width: 100%;
   outline: none;
   transition: 0.2s;
+  background: rgba(8, 18, 30, 0.78);
+  color: #e8f0f8;
 }
 
 .modalInput::placeholder {
-  color: #6c7d83;
+  color: #91a9bd;
   opacity: 1;
 }
 
 .modalInput:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(13, 177, 144, 0.18);
+  box-shadow: 0 0 0 3px rgba(63, 111, 143, 0.18);
 }
 
 .jobTitleInput {
-  background: #f7fbfc;
-  color: #1f3840;
-  border-color: rgba(18, 76, 89, 0.2);
+  background: rgba(23, 48, 74, 0.86);
+  color: #f0f7ff;
+  border-color: rgba(139, 182, 218, 0.42);
   font-weight: 700;
   opacity: 1;
   cursor: default;
@@ -853,10 +895,10 @@
 .phonePrefix {
   width: 90px;
   padding: 13px;
-  border: 1px solid rgba(18, 76, 89, 0.18);
+  border: 1px solid rgba(129, 164, 194, 0.28);
   border-radius: 10px;
-  background: #f5fbfd;
-  color: #1f3840;
+  background: rgba(20, 44, 67, 0.72);
+  color: #e8f0f8;
   font-weight: 700;
   display: flex;
   justify-content: center;
@@ -865,7 +907,7 @@
 
 .modalUploadCol {
   flex: 1;
-  border: 2px dashed #0ea5e9;
+  border: 2px dashed #6f97ba;
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -874,13 +916,13 @@
   padding: 34px 18px;
   text-align: center;
   cursor: pointer;
-  background: #f1faff;
+  background: rgba(16, 38, 58, 0.7);
   position: relative;
   transition: 0.2s;
 }
 
 .modalUploadCol:hover {
-  background: #e7f6ff;
+  background: rgba(20, 47, 72, 0.8);
 }
 
 .fileInput {
@@ -893,29 +935,29 @@
 
 .uploadIcon {
   font-size: 44px;
-  color: #0f9ad7;
+  color: #8bb6da;
   margin-bottom: 12px;
 }
 
 .uploadText {
-  color: #0e7ca8;
+  color: #b8d4ea;
   font-weight: 600;
   margin-bottom: 8px;
   font-size: 15px;
 }
 
 .uploadText span {
-  color: #2e5560;
+  color: #e8f0f8;
 }
 
 .uploadTextSelected {
-  color: #047857;
+  color: #86efac;
   font-weight: 800;
   word-break: break-word;
 }
 
 .uploadSubText {
-  color: #6e8d96;
+  color: #92acc1;
   font-size: 12px;
 }
 
@@ -931,18 +973,18 @@
   display: inline-flex;
   padding: 6px;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  background: rgba(255, 255, 255, 0.36);
+  border: 1px solid rgba(181, 200, 217, 0.32);
+  background: rgba(13, 31, 51, 0.5);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 12px 20px rgba(18, 76, 89, 0.16);
+  box-shadow: 0 14px 24px rgba(3, 9, 16, 0.5);
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .submitActionBox:hover {
   transform: translateY(-1px);
-  background: rgba(255, 255, 255, 0.48);
-  box-shadow: 0 16px 28px rgba(18, 76, 89, 0.22);
+  background: rgba(17, 40, 63, 0.62);
+  box-shadow: 0 18px 28px rgba(3, 9, 16, 0.62);
 }
 
 .submitModalBtn {
@@ -974,11 +1016,11 @@
 }
 
 .submitStatusSuccess {
-  color: #127a46;
+  color: #73d29b;
 }
 
 .submitStatusError {
-  color: #b0333f;
+  color: #ff9292;
 }
 
 .toast {
@@ -993,7 +1035,7 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-  box-shadow: 0 18px 34px rgba(9, 23, 29, 0.22);
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.38);
   animation: toastSlideIn 0.18s ease-out;
 }
 
@@ -1009,15 +1051,15 @@
 }
 
 .toastSuccess {
-  border-color: rgba(34, 197, 94, 0.42);
-  background: #f0fdf4;
-  color: #14532d;
+  border-color: rgba(34, 197, 94, 0.44);
+  background: #052e18;
+  color: #bbf7d0;
 }
 
 .toastError {
-  border-color: rgba(239, 68, 68, 0.42);
-  background: #fef2f2;
-  color: #7f1d1d;
+  border-color: rgba(239, 68, 68, 0.44);
+  background: #3b0a0a;
+  color: #fecaca;
 }
 
 .scoringOverlay {
@@ -1275,4 +1317,414 @@
 .jobList::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 12px;
+}
+
+/* Recruiter visual alignment */
+.container {
+  --bg-1: #fbfaf7;
+  --bg-2: #fbfaf7;
+  --surface: #ffffff;
+  --surface-strong: #ffffff;
+  --line: rgba(18, 22, 29, 0.12);
+  --title: #12161d;
+  --text: #4a4a4a;
+  --muted: #666666;
+  --accent: #12161d;
+  --accent-hover: #2a2f38;
+  --sidebar: #11161f;
+  --sidebar-panel: #20242b;
+  --sidebar-line: #343942;
+  --sidebar-text: #ecf4ff;
+  --brand: #b05a36;
+  background: #fbfaf7;
+  background-attachment: scroll;
+  gap: 24px;
+  padding: 102px 24px 24px;
+  font-family: "Inter", sans-serif;
+}
+
+.left {
+  flex: 0 0 280px;
+  top: 102px;
+  height: calc(100vh - 126px);
+  gap: 14px;
+  border: 1px solid #30343b;
+  border-radius: 24px;
+  background: var(--sidebar);
+  padding: 16px;
+  color: #fef9ef;
+}
+
+.leftTopBox,
+.leftMiddleBox,
+.leftBottomBox {
+  border-color: var(--sidebar-line);
+  border-radius: 18px;
+  background: var(--sidebar-panel);
+  color: var(--sidebar-text);
+}
+
+.leftTopBox,
+.leftBottomBox {
+  padding: 16px;
+}
+
+.leftMiddleBox {
+  padding: 16px;
+}
+
+.leftTopBox:hover,
+.leftMiddleBox:hover,
+.leftBottomBox:hover {
+  box-shadow: none;
+}
+
+.left .Linktext,
+.left .userName,
+.left .settingLink {
+  color: var(--sidebar-text);
+}
+
+.left .logoutLink {
+  color: #fecaca;
+}
+
+.left .settingLink:hover,
+.left .logoutLink:hover {
+  color: #ffffff;
+}
+
+.left .searchInput {
+  min-width: 0;
+  border-color: var(--sidebar-line);
+  background: #11161f;
+  color: var(--sidebar-text);
+}
+
+.left .searchInput::placeholder {
+  color: rgba(236, 244, 255, 0.58);
+}
+
+.left .searchInput:focus {
+  border-color: #6a6f78;
+  box-shadow: 0 0 0 3px rgba(254, 249, 239, 0.08);
+}
+
+.left .searchHint {
+  border-color: rgba(176, 90, 54, 0.38);
+  background: rgba(176, 90, 54, 0.16);
+  color: #fed7aa;
+}
+
+.avatarCircle {
+  background: var(--brand);
+  border: 2px solid rgba(254, 249, 239, 0.72);
+}
+
+.middle,
+.right,
+.companySection,
+.applicationCard,
+.criteriaBlock,
+.scoreBox {
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.middle {
+  padding: 24px;
+}
+
+.right {
+  top: 102px;
+  height: calc(100vh - 126px);
+  padding: 24px;
+}
+
+.companySection:hover,
+.middle:hover,
+.right:hover,
+.applicationCard:hover {
+  border-color: #006a4e;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+.companyHeader h3,
+.detailsTitle,
+.applicationTitleRow h3,
+.appliedHeader h2 {
+  font-family: "Newsreader", serif;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--title);
+}
+
+.companyHeader span,
+.appliedHeader > span,
+.searchHint {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #f4f3f0;
+  color: #12161d;
+}
+
+.subTabBar {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #f4f3f0;
+}
+
+.subTabButton {
+  border-radius: 12px;
+  color: var(--text);
+}
+
+.subTabButtonActive,
+.subTabButton:hover {
+  background: #006a4e;
+  color: #ffffff;
+}
+
+.applicationMetaGrid span,
+.criteriaBlock,
+.scoreBox {
+  background: #ffffff;
+}
+
+.applicationDescription,
+.applicationTitleRow p,
+.detailsSection p,
+.detailsMeta,
+.appliedHeader p {
+  color: var(--text);
+}
+
+.detailsSection h4,
+.criteriaBlock h4 {
+  color: var(--title);
+}
+
+.applyButton,
+.submitModalBtn {
+  background: #12161d;
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.applyButton:hover,
+.submitModalBtn:hover {
+  background: #2a2f38;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+.modalContent {
+  border-radius: 24px;
+  background: #ffffff;
+}
+
+.modalHeader h2 {
+  font-family: "Newsreader", serif;
+  font-weight: 500;
+  color: var(--title);
+}
+
+.modalHeader p,
+.modalInput,
+.phonePrefix,
+.uploadText,
+.uploadSubText {
+  color: var(--text);
+}
+
+.modalInput,
+.phonePrefix,
+.jobTitleInput,
+.modalUploadCol,
+.submitActionBox {
+  border-color: var(--line);
+  background: #ffffff;
+  color: var(--text);
+}
+
+.modalInput::placeholder {
+  color: var(--muted);
+}
+
+.modalUploadCol {
+  border-color: rgba(176, 90, 54, 0.42);
+  background: #fbfaf7;
+}
+
+.modalUploadCol:hover {
+  background: #f4f3f0;
+}
+
+.uploadIcon,
+.uploadText span {
+  color: var(--brand);
+}
+
+.closeBtn {
+  border-radius: 12px;
+  background: #12161d;
+  color: #ffffff;
+}
+
+@media (max-width: 1200px) {
+  .container {
+    padding: 92px 14px 14px;
+  }
+
+  .left {
+    flex: none;
+    height: auto;
+  }
+
+  .right {
+    height: auto;
+  }
+}
+
+/* Candidate visual standard: font and tone */
+.container {
+  --candidate-bg: #fbfaf7;
+  --candidate-surface: #ffffff;
+  --candidate-soft: #f4f3f0;
+  --candidate-text: #12161d;
+  --candidate-body: #4a4a4a;
+  --candidate-muted: #666666;
+  --candidate-line: rgba(18, 22, 29, 0.12);
+  --candidate-green: #006a4e;
+  --candidate-brand: #b05a36;
+  --candidate-sidebar: #11161f;
+  --candidate-sidebar-panel: #20242b;
+  --candidate-sidebar-line: #343942;
+  --candidate-sidebar-text: #ecf4ff;
+  background: var(--candidate-bg);
+  color: var(--candidate-body);
+  font-family: "Inter", sans-serif;
+}
+
+.container button,
+.container input,
+.container textarea {
+  font-family: "Inter", sans-serif;
+}
+
+.left {
+  background: var(--candidate-sidebar);
+  border-color: #30343b;
+}
+
+.leftTopBox,
+.leftMiddleBox,
+.leftBottomBox {
+  background: var(--candidate-sidebar-panel);
+  border-color: var(--candidate-sidebar-line);
+}
+
+.middle,
+.right,
+.companySection,
+.applicationCard,
+.scoreBox,
+.criteriaBlock,
+.modalContent {
+  background: var(--candidate-surface);
+  border-color: var(--candidate-line);
+  color: var(--candidate-body);
+}
+
+.companyHeader h3,
+.appliedHeader h2,
+.applicationTitleRow h3,
+.detailsTitle,
+.modalHeader h2,
+.criteriaBlock h4 {
+  color: var(--candidate-text);
+  font-family: "Newsreader", serif;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+.Linktext,
+.detailsSection h4,
+.scoreBox strong,
+.scoreBox small,
+.applicationMetaGrid span,
+.criteriaItem,
+.criteriaMore,
+.criteriaEmpty {
+  color: var(--candidate-text);
+}
+
+.appliedHeader p,
+.applicationTitleRow p,
+.applicationDescription,
+.detailsMeta,
+.detailsSection p,
+.modalHeader p,
+.modalInput,
+.phonePrefix,
+.uploadText,
+.uploadSubText {
+  color: var(--candidate-body);
+}
+
+.searchHint,
+.companyHeader span,
+.appliedHeader > span,
+.subTabBar,
+.applicationMetaGrid span {
+  background: var(--candidate-soft);
+  border-color: var(--candidate-line);
+  color: var(--candidate-text);
+}
+
+.subTabButtonActive,
+.subTabButton:hover {
+  background: var(--candidate-green);
+  color: #ffffff;
+}
+
+.avatarCircle {
+  background: var(--candidate-brand);
+}
+
+.applyButton,
+.submitModalBtn,
+.closeBtn {
+  background: var(--candidate-text);
+  color: #ffffff;
+}
+
+.applyButton:hover,
+.submitModalBtn:hover,
+.closeBtn:hover {
+  background: #2a2f38;
+}
+
+.modalInput,
+.jobTitleInput,
+.phonePrefix,
+.submitActionBox {
+  background: var(--candidate-surface);
+  border-color: var(--candidate-line);
+}
+
+.modalUploadCol {
+  background: var(--candidate-bg);
+  border-color: rgba(176, 90, 54, 0.42);
+}
+
+.modalUploadCol:hover {
+  background: var(--candidate-soft);
+}
+
+.uploadIcon,
+.uploadText span,
+.uploadTextSelected {
+  color: var(--candidate-brand);
 }

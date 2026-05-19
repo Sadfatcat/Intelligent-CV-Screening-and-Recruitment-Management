@@ -23,7 +23,7 @@ export default function ApplyCVPage({ params }: { params: { id: string } }) {
     return (
         <div style={{ padding: "40px", maxWidth: "600px", margin: "auto" }}>
             <BackButton
-                fallbackHref="/candidate_UI"
+                fallbackHref="/candidate"
                 style={{
                     border: "1px solid #d1d5db",
                     borderRadius: 10,

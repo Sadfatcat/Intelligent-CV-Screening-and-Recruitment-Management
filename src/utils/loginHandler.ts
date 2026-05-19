@@ -110,7 +110,7 @@ export async function handleLoginSubmit(
 
     localStorage.setItem("currentUser", JSON.stringify(data));
 
-    return { success: true, redirectPath: "/candidate_UI" };
+    return { success: true, redirectPath: "/candidate" };
   } catch (error) {
     setters.setResultMessage("Error: Cannot connect to Backend.");
     setters.setResultType("error");

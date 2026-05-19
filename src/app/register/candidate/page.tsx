@@ -45,7 +45,7 @@ function RegisterCandidatePageContent() {
       <div className={styles.register}>
         <form className={styles.registerForm} onSubmit={handleSubmit}>
           <div className={styles.registerHeader}>
-            <BackButton fallbackHref="/candidate_UI" className={styles.backButton} />
+            <BackButton fallbackHref="/candidate" className={styles.backButton} />
             <BrandLogoFull iconSize={56} />
             <p>Create a candidate account to submit CVs and track applied jobs.</p>
           </div>
