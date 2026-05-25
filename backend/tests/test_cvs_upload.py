@@ -6,13 +6,15 @@ import sys
 
 os.environ.setdefault("CV_UPLOAD_DIR", tempfile.gettempdir())
 
+from fastapi import BackgroundTasks
 from sqlmodel import SQLModel, Session, create_engine, select
 
 sys.path.insert(0, '..')
 
-from app.models import CV, Job, JobApplication, User
+from app.models import ActivityLog, CV, Job, JobApplication
 from app.routes import cvs
 from app.services import extractor, vectorizer, matcher
+from tests.factories import make_user
 
 
 CV_TEXT = """
@@ -31,7 +33,9 @@ Responsibilities: Build REST APIs
 
 
 def _make_session():
-    engine = create_engine("sqlite:///:memory:")
+    db_fd, db_path = tempfile.mkstemp(suffix=".db")
+    os.close(db_fd)
+    engine = create_engine(f"sqlite:///{db_path}")
     SQLModel.metadata.create_all(engine)
     return Session(engine)
 
@@ -50,8 +54,8 @@ def _make_upload_file(filename="candidate.pdf"):
 
 
 def _seed_job_and_candidate(session: Session):
-    recruiter = User(email="recruiter@example.com", password_hash="hash", role="recruiter")
-    candidate = User(email="candidate@example.com", password_hash="hash", role="candidate")
+    recruiter = make_user("recruiter@example.com", "recruiter")
+    candidate = make_user("candidate@example.com", "candidate")
     session.add(recruiter)
     session.add(candidate)
     session.commit()
@@ -74,9 +78,11 @@ def _seed_job_and_candidate(session: Session):
     return job, candidate
 
 
-def _run_upload(session: Session, job_id: int, candidate_id: int | None = None):
-    return asyncio.run(
+def _run_upload(session: Session, job_id: int, candidate_id: int | None = None, run_background: bool = True):
+    background_tasks = BackgroundTasks()
+    response = asyncio.run(
         cvs.upload_cv(
+            background_tasks=background_tasks,
             job_id=job_id,
             candidate_name="Alice",
             candidate_email="alice@example.com",
@@ -86,6 +92,15 @@ def _run_upload(session: Session, job_id: int, candidate_id: int | None = None):
             session=session,
         )
     )
+    if run_background:
+        original_engine = cvs.engine
+        cvs.engine = session.get_bind()
+        try:
+            for task in background_tasks.tasks:
+                task.func(*task.args, **task.kwargs)
+        finally:
+            cvs.engine = original_engine
+    return response
 
 
 def test_cv_upload_creates_cv_application_and_matching_detail():
@@ -106,6 +121,7 @@ def test_cv_upload_creates_cv_application_and_matching_detail():
 
             assert cv is not None
             assert application is not None
+            session.refresh(application)
             assert application.ai_matching_score is not None
             assert application.matching_detail is not None
             detail = json.loads(application.matching_detail)
@@ -113,11 +129,13 @@ def test_cv_upload_creates_cv_application_and_matching_detail():
             assert detail["overall_score"] == application.ai_matching_score
             assert response["cv_id"] == cv.id
             assert response["application_id"] == application.id
-            assert response["matching_score"] == application.ai_matching_score
-            assert response["matching_detail"]["final_score"] == application.ai_matching_score
-            assert response["message"] == "Nộp hồ sơ thành công"
+            assert response["matching_score"] is None
+            assert response["matching_detail"] is None
+            assert response["message"] == "Application submitted successfully. Scoring is in progress."
+            assert response["status"] == "scoring"
+            assert application.status == "pending"
             assert response["job_title"] == job.title
-            assert "vector_saved" in response
+            assert response["vector_saved"] is False
         finally:
             session.close()
             cvs.UPLOAD_DIR = original_upload_dir
@@ -149,12 +167,14 @@ def test_cv_upload_does_not_crash_when_detailed_matcher_fails():
 
             assert cv is not None
             assert application is not None
+            session.refresh(application)
             assert application.ai_matching_score is None
             assert application.matching_detail is None
             assert response["matching_score"] is None
             assert response["matching_detail"] is None
             assert response["application_id"] == application.id
             assert response["cv_id"] == cv.id
+            assert application.status == "pending"
         finally:
             session.close()
             cvs.UPLOAD_DIR = original_upload_dir
@@ -201,12 +221,112 @@ def test_cv_upload_uses_job_matching_config_for_custom_weights_and_must_have():
 
             assert captured["weights"] == {"technical_skills": 0.8, "experience": 0.2}
             assert captured["must_have"] == ["Python"]
+            session.refresh(application)
             assert application.ai_matching_score == 91.0
             assert json.loads(application.matching_detail)["final_score"] == 91.0
-            assert response["matching_detail"]["final_score"] == response["matching_score"]
+            assert response["matching_detail"] is None
+            assert response["matching_score"] is None
         finally:
             session.close()
             cvs.UPLOAD_DIR = original_upload_dir
             extractor.extract_text = original_extract_text
             vectorizer.text_to_vector_json = original_vectorizer
             matcher.score_cv_vs_jd = original_score_cv_vs_jd
+
+
+def test_candidate_applications_merge_candidate_id_email_and_activity_log_sources():
+    session = _make_session()
+    job, candidate = _seed_job_and_candidate(session)
+
+    linked_cv = CV(
+        candidate_id=candidate.id,
+        candidate_name="Linked Candidate",
+        candidate_email="linked@example.com",
+        candidate_phone="1",
+        file_path="/tmp/linked.pdf",
+    )
+    email_cv = CV(
+        candidate_id=None,
+        candidate_name="Email Candidate",
+        candidate_email="CANDIDATE@example.com",
+        candidate_phone="2",
+        file_path="/tmp/email.pdf",
+    )
+    logged_cv = CV(
+        candidate_id=None,
+        candidate_name="Logged Candidate",
+        candidate_email="guest@example.com",
+        candidate_phone="3",
+        file_path="/tmp/logged.pdf",
+    )
+    unrelated_cv = CV(
+        candidate_id=None,
+        candidate_name="Other Candidate",
+        candidate_email="other@example.com",
+        candidate_phone="4",
+        file_path="/tmp/other.pdf",
+    )
+    session.add(linked_cv)
+    session.add(email_cv)
+    session.add(logged_cv)
+    session.add(unrelated_cv)
+    session.commit()
+    session.refresh(linked_cv)
+    session.refresh(email_cv)
+    session.refresh(logged_cv)
+    session.refresh(unrelated_cv)
+
+    linked_application = JobApplication(job_id=job.id, cv_id=linked_cv.id, status="scoring")
+    email_application = JobApplication(job_id=job.id, cv_id=email_cv.id, status="pending", ai_matching_score=82.0)
+    logged_application = JobApplication(job_id=job.id, cv_id=logged_cv.id, status="pending", ai_matching_score=91.0)
+    unrelated_application = JobApplication(job_id=job.id, cv_id=unrelated_cv.id, status="pending", ai_matching_score=44.0)
+    session.add(linked_application)
+    session.add(email_application)
+    session.add(logged_application)
+    session.add(unrelated_application)
+    session.commit()
+    session.refresh(linked_application)
+    session.refresh(email_application)
+    session.refresh(logged_application)
+    session.refresh(unrelated_application)
+
+    session.add(
+        ActivityLog(
+            actor_user_id=candidate.id,
+            actor_role="candidate",
+            action="candidate.cv.submit",
+            target_type="application",
+            target_id=logged_application.id,
+            detail="Submitted as logged candidate",
+        )
+    )
+    session.add(
+        ActivityLog(
+            actor_user_id=candidate.id,
+            actor_role="candidate",
+            action="candidate.cv.submit",
+            target_type="application",
+            target_id=email_application.id,
+            detail="Duplicate source for email candidate",
+        )
+    )
+    session.commit()
+
+    try:
+        response = cvs.list_candidate_applications(candidate.id, session)
+        application_ids = [item["application_id"] for item in response["applications"]]
+
+        assert response["total"] == 3
+        assert application_ids == sorted(application_ids, reverse=True)
+        assert set(application_ids) == {
+            linked_application.id,
+            email_application.id,
+            logged_application.id,
+        }
+        assert unrelated_application.id not in application_ids
+
+        linked_item = next(item for item in response["applications"] if item["application_id"] == linked_application.id)
+        assert linked_item["status"] == "scoring"
+        assert linked_item["ai_matching_score"] is None
+    finally:
+        session.close()

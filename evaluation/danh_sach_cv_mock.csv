@@ -1,0 +1,287 @@
+cv_id,cv_name,candidate_email,cv_source,cv_text,profile_summary,skills_summary,experience_summary,role_category
+201,an_nguyen_frontend_cv.pdf,an.nguyen@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: an_nguyen_frontend_cv.pdf
+Target position: Frontend Developer
+Role category: frontend
+Summary: Frontend engineer with strong UI implementation and API integration experience.
+Skills: React, TypeScript, CSS, Next.js, REST API, Figma
+Experience years: 2
+Education: Bachelor of Software Engineering
+Languages: Vietnamese, English
+Projects: Built a responsive recruitment dashboard with React and TypeScript
+Certifications: Meta Front-End Developer
+Work experience: Frontend Developer at SunnyTech",Frontend engineer with strong UI implementation and API integration experience.,"React, TypeScript, CSS, Next.js, REST API, Figma",Frontend Developer at SunnyTech,frontend
+202,binh_tran_backend_cv.pdf,binh.tran@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: binh_tran_backend_cv.pdf
+Target position: Backend Developer
+Role category: backend
+Summary: Backend developer focused on API design, PostgreSQL, and containerized services.
+Skills: Python, FastAPI, PostgreSQL, Docker, Redis, AWS
+Experience years: 4
+Education: Bachelor of Computer Science
+Languages: Vietnamese, English
+Projects: Designed FastAPI services for an e-commerce order system
+Certifications: AWS Cloud Practitioner
+Work experience: Backend Developer at APIWorks","Backend developer focused on API design, PostgreSQL, and containerized services.","Python, FastAPI, PostgreSQL, Docker, Redis, AWS",Backend Developer at APIWorks,backend
+203,chi_le_data_engineer.pdf,chi.le@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: chi_le_data_engineer.pdf
+Target position: Data Engineer
+Role category: data_engineering
+Summary: Strong data platform candidate with batch and streaming experience.
+Skills: Python, SQL, Airflow, Spark, Kafka, dbt
+Experience years: 6
+Education: Master of Data Science
+Languages: Vietnamese, English
+Projects: Built Airflow pipelines processing 80M retail events daily
+Certifications: Databricks Lakehouse Fundamentals
+Work experience: Senior Data Engineer at RetailData",Strong data platform candidate with batch and streaming experience.,"Python, SQL, Airflow, Spark, Kafka, dbt",Senior Data Engineer at RetailData,data_engineering
+204,duc_pham_ml_engineer.pdf,duc.pham@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: duc_pham_ml_engineer.pdf
+Target position: Machine Learning Engineer
+Role category: ai_ml
+Summary: ML engineer with practical model deployment and validation experience.
+Skills: Python, PyTorch, scikit-learn, Docker, FastAPI, ML pipelines
+Experience years: 3
+Education: Bachelor of Artificial Intelligence
+Languages: Vietnamese, English
+Projects: Deployed churn prediction model as a FastAPI inference service
+Certifications: Machine Learning Specialization
+Work experience: ML Engineer at ModelOps",ML engineer with practical model deployment and validation experience.,"Python, PyTorch, scikit-learn, Docker, FastAPI, ML pipelines",ML Engineer at ModelOps,ai_ml
+205,emma_wilson_devops.pdf,emma.wilson@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: emma_wilson_devops.pdf
+Target position: DevOps Engineer
+Role category: cloud_devops
+Summary: Infrastructure engineer with Kubernetes operations and incident response background.
+Skills: Docker, Kubernetes, CI/CD, Linux, Terraform, Prometheus, AWS
+Experience years: 5
+Education: Bachelor of Information Technology
+Languages: English
+Projects: Migrated monolith deployment to Kubernetes with blue-green release
+Certifications: Certified Kubernetes Administrator
+Work experience: DevOps Engineer at CloudOps",Infrastructure engineer with Kubernetes operations and incident response background.,"Docker, Kubernetes, CI/CD, Linux, Terraform, Prometheus, AWS",DevOps Engineer at CloudOps,cloud_devops
+206,giang_ho_mobile.pdf,giang.ho@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: giang_ho_mobile.pdf
+Target position: Mobile Developer
+Role category: mobile
+Summary: Mobile developer experienced in Flutter apps and release workflows.
+Skills: Flutter, Dart, Firebase, REST API, Kotlin
+Experience years: 3
+Education: Bachelor of Software Engineering
+Languages: Vietnamese, English
+Projects: Published Flutter booking app with push notifications
+Certifications: Not available
+Work experience: Mobile Developer at AppSprint",Mobile developer experienced in Flutter apps and release workflows.,"Flutter, Dart, Firebase, REST API, Kotlin",Mobile Developer at AppSprint,mobile
+207,hoa_nguyen_qa.pdf,hoa.nguyen@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: hoa_nguyen_qa.pdf
+Target position: QA Engineer
+Role category: qa
+Summary: QA engineer with strong manual and API test case design.
+Skills: Manual testing, Test cases, API testing, SQL, Postman
+Experience years: 2
+Education: Bachelor of Information Systems
+Languages: Vietnamese, English
+Projects: Created regression checklist for banking web application
+Certifications: ISTQB Foundation
+Work experience: QA Engineer at TestLab",QA engineer with strong manual and API test case design.,"Manual testing, Test cases, API testing, SQL, Postman",QA Engineer at TestLab,qa
+208,ivy_chen_product_designer.pdf,ivy.chen@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: ivy_chen_product_designer.pdf
+Target position: UI/UX Designer
+Role category: design
+Summary: Designer with shipped SaaS experience and design system practice.
+Skills: Figma, User research, Wireframing, Design system, Prototyping
+Experience years: 4
+Education: Bachelor of Digital Design
+Languages: English, Mandarin
+Projects: Designed SaaS onboarding flow improving activation by 18%
+Certifications: Google UX Design
+Work experience: Product Designer at FlowUI",Designer with shipped SaaS experience and design system practice.,"Figma, User research, Wireframing, Design system, Prototyping",Product Designer at FlowUI,design
+209,khanh_vo_pm.pdf,khanh.vo@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: khanh_vo_pm.pdf
+Target position: Product Manager
+Role category: product
+Summary: Product manager combining technical background with growth analytics.
+Skills: Roadmap, Agile, Analytics, SQL, A/B testing
+Experience years: 6
+Education: MBA, Bachelor of Computer Science
+Languages: Vietnamese, English
+Projects: Led pricing experiment increasing paid conversion by 9%
+Certifications: Certified Scrum Product Owner
+Work experience: Product Manager at MarketApp",Product manager combining technical background with growth analytics.,"Roadmap, Agile, Analytics, SQL, A/B testing",Product Manager at MarketApp,product
+210,lan_pham_business_analyst.pdf,lan.pham@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: lan_pham_business_analyst.pdf
+Target position: Business Analyst
+Role category: business_analysis
+Summary: BA with strong process mapping and stakeholder interview experience.
+Skills: Requirement analysis, BPMN, Documentation, UAT, Jira
+Experience years: 4
+Education: Bachelor of Business Information Systems
+Languages: Vietnamese, English
+Projects: Documented loan approval workflow and coordinated UAT
+Certifications: CBAP Training
+Work experience: Business Analyst at FinProcess",BA with strong process mapping and stakeholder interview experience.,"Requirement analysis, BPMN, Documentation, UAT, Jira",Business Analyst at FinProcess,business_analysis
+211,minh_dao_security.pdf,minh.dao@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: minh_dao_security.pdf
+Target position: Cybersecurity Analyst
+Role category: security
+Summary: Security analyst experienced in alert triage and incident reports.
+Skills: SIEM, Incident response, Network security, Linux, Python
+Experience years: 3
+Education: Bachelor of Cybersecurity
+Languages: Vietnamese, English
+Projects: Built detection rule set for suspicious login patterns
+Certifications: CompTIA Security+
+Work experience: SOC Analyst at SecureOps",Security analyst experienced in alert triage and incident reports.,"SIEM, Incident response, Network security, Linux, Python",SOC Analyst at SecureOps,security
+212,nam_tran_cloud.pdf,nam.tran@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: nam_tran_cloud.pdf
+Target position: Cloud Engineer
+Role category: cloud_devops
+Summary: Cloud engineer with high-scale AWS and infrastructure automation experience.
+Skills: AWS, Terraform, Kubernetes, Networking, Prometheus
+Experience years: 7
+Education: Bachelor of Computer Networks
+Languages: Vietnamese, English
+Projects: Built AWS landing zone with Terraform and centralized logging
+Certifications: AWS Solutions Architect Professional
+Work experience: Cloud Engineer at SkyOps",Cloud engineer with high-scale AWS and infrastructure automation experience.,"AWS, Terraform, Kubernetes, Networking, Prometheus",Cloud Engineer at SkyOps,cloud_devops
+213,olivia_brown_fullstack.pdf,olivia.brown@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: olivia_brown_fullstack.pdf
+Target position: Full Stack Developer
+Role category: fullstack
+Summary: Good full-stack foundation but limited Docker and production deployment experience.
+Skills: React, Node.js, SQL, PostgreSQL, Next.js
+Experience years: 2
+Education: Bachelor of Computer Science
+Languages: English
+Projects: Built a subscription management app with React and Node.js
+Certifications: Not available
+Work experience: Full Stack Developer at SaaSly",Good full-stack foundation but limited Docker and production deployment experience.,"React, Node.js, SQL, PostgreSQL, Next.js",Full Stack Developer at SaaSly,fullstack
+214,phuc_le_frontend_intern.pdf,phuc.le@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: phuc_le_frontend_intern.pdf
+Target position: Frontend Intern
+Role category: frontend
+Summary: Third-year student with an HTML/CSS/JavaScript foundation who wants to learn a real-world workflow.
+Skills: HTML, CSS, JavaScript, React basics
+Experience years: 0
+Education: Third-year Computer Science student
+Languages: Vietnamese
+Projects: Personal portfolio and todo app
+Certifications: Not available
+Work experience: University web club member",Third-year student with an HTML/CSS/JavaScript foundation who wants to learn a real-world workflow.,"HTML, CSS, JavaScript, React basics",University web club member,frontend
+215,quang_bui_java_architect.pdf,quang.bui@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: quang_bui_java_architect.pdf
+Target position: Senior Backend Architect
+Role category: backend
+Summary: Senior backend architect with distributed systems and migration leadership.
+Skills: Java, Spring Boot, Microservices, PostgreSQL, Kafka, Kubernetes, DDD
+Experience years: 10
+Education: Master of Software Engineering
+Languages: Vietnamese, English
+Projects: Led migration of payment monolith to event-driven microservices
+Certifications: Oracle Certified Professional Java
+Work experience: Backend Architect at CoreBank",Senior backend architect with distributed systems and migration leadership.,"Java, Spring Boot, Microservices, PostgreSQL, Kafka, Kubernetes, DDD",Backend Architect at CoreBank,backend
+216,rina_sato_uiux.pdf,rina.sato@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: rina_sato_uiux.pdf
+Target position: Senior Product Designer
+Role category: design
+Summary: Senior designer with systems thinking, research practice, and accessibility knowledge.
+Skills: Figma, Design system, User research, Prototyping, Accessibility, Product analytics
+Experience years: 7
+Education: Bachelor of Interaction Design
+Languages: English, Japanese
+Projects: Created enterprise design system used by 12 product squads
+Certifications: NN/g UX Certification
+Work experience: Senior Product Designer at EnterpriseUX","Senior designer with systems thinking, research practice, and accessibility knowledge.","Figma, Design system, User research, Prototyping, Accessibility, Product analytics",Senior Product Designer at EnterpriseUX,design
+217,son_dang_sales_cv.pdf,son.dang@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: son_dang_sales_cv.pdf
+Target position: Sales Executive
+Role category: sales
+Summary: Strong sales profile but unrelated to engineering roles.
+Skills: CRM, Cold calling, Negotiation
+Experience years: 5
+Education: Bachelor of Marketing
+Languages: Vietnamese, English
+Projects: Managed regional sales pipeline
+Certifications: Not available
+Work experience: Sales Executive at TradeCo",Strong sales profile but unrelated to engineering roles.,"CRM, Cold calling, Negotiation",Sales Executive at TradeCo,sales
+218,thao_mai_data_analyst.pdf,Not available,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: thao_mai_data_analyst.pdf
+Target position: Data Analyst
+Role category: data_analytics
+Summary: Good analyst profile; email intentionally missing for edge-case UI.
+Skills: SQL, Excel, Power BI, Statistics, Python
+Experience years: 2
+Education: Bachelor of Economics
+Languages: Vietnamese, English
+Projects: Built sales dashboard for retail chain
+Certifications: Microsoft Power BI Data Analyst
+Work experience: Data Analyst at ShopPlus",Good analyst profile; email intentionally missing for edge-case UI.,"SQL, Excel, Power BI, Statistics, Python",Data Analyst at ShopPlus,data_analytics
+219,missing_name_cv.pdf,unknown.candidate@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: missing_name_cv.pdf
+Target position: QA Engineer
+Role category: qa
+Summary: Candidate name and phone are missing to test fallback labels.
+Skills: Manual testing, SQL
+Experience years: 1
+Education: College diploma in IT
+Languages: Vietnamese
+Projects: Tested small inventory application
+Certifications: Not available
+Work experience: QA Intern",Candidate name and phone are missing to test fallback labels.,"Manual testing, SQL",QA Intern,qa
+220,uyen_do_no_skills.pdf,uyen.do@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: uyen_do_no_skills.pdf
+Target position: Frontend Developer
+Role category: frontend
+Summary: CV has no explicit skills listed, useful for testing no-skills extraction UI.
+Skills: Not available
+Experience years: 1
+Education: Bachelor of Multimedia
+Languages: Vietnamese
+Projects: Created visual content for marketing campaigns
+Certifications: Not available
+Work experience: Graphic Designer","CV has no explicit skills listed, useful for testing no-skills extraction UI.",Not available,Graphic Designer,frontend
+221,vu_hoang_python_junior.pdf,vu.hoang@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: vu_hoang_python_junior.pdf
+Target position: Backend Developer
+Role category: backend
+Summary: Matches core backend skills but lacks required years for middle backend role.
+Skills: Python, FastAPI, PostgreSQL, Docker
+Experience years: 1
+Education: Bachelor of Computer Science
+Languages: Vietnamese, English
+Projects: Built a FastAPI learning management API
+Certifications: Not available
+Work experience: Junior Backend Developer",Matches core backend skills but lacks required years for middle backend role.,"Python, FastAPI, PostgreSQL, Docker",Junior Backend Developer,backend
+222,will_johnson_manager.pdf,will.johnson@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: will_johnson_manager.pdf
+Target position: Backend Developer
+Role category: backend
+Summary: Strong experience and leadership but weak technical backend skill match.
+Skills: Stakeholder management, Roadmap, Agile
+Experience years: 8
+Education: MBA
+Languages: English
+Projects: Managed engineering roadmap but did not code production APIs
+Certifications: PMP
+Work experience: Engineering Manager",Strong experience and leadership but weak technical backend skill match.,"Stakeholder management, Roadmap, Agile",Engineering Manager,backend
+223,xuan_kim_long_project.pdf,xuan.kim@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: xuan_kim_long_project.pdf
+Target position: Legacy System Modernization Engineer
+Role category: backend
+Summary: Long project description candidate for testing text wrapping and detail modal layout.
+Skills: Java, SQL, System design, Migration planning, Spring Boot, Docker
+Experience years: 8
+Education: Bachelor of Software Engineering
+Languages: Vietnamese, English
+Projects: Led a 24-month modernization initiative that extracted identity, billing, reporting, and notification modules from a legacy monolith; planned data reconciliation, rollback windows, staged releases, stakeholder sign-off, batch job replacement, and post-release monitoring dashboards across five business units.
+Certifications: Not available
+Work experience: Senior Software Engineer at LegacyWorks",Long project description candidate for testing text wrapping and detail modal layout.,"Java, SQL, System design, Migration planning, Spring Boot, Docker",Senior Software Engineer at LegacyWorks,backend
+224,yen_truong_nlp.pdf,yen.truong@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: yen_truong_nlp.pdf
+Target position: NLP Engineer
+Role category: ai_ml
+Summary: NLP engineer with multilingual background and evaluation mindset.
+Skills: Python, NLP, Transformers, Evaluation, Vector search, RAG
+Experience years: 4
+Education: Master of Computational Linguistics
+Languages: Vietnamese, English, French
+Projects: Built Vietnamese intent classifier and semantic search evaluator
+Certifications: Not available
+Work experience: NLP Engineer at SearchAI",NLP engineer with multilingual background and evaluation mindset.,"Python, NLP, Transformers, Evaluation, Vector search, RAG",NLP Engineer at SearchAI,ai_ml
+225,zara_ali_pending.pdf,zara.ali@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: zara_ali_pending.pdf
+Target position: AI Engineer
+Role category: ai_ml
+Summary: Pending scoring example for UI state testing.
+Skills: Python, LLM, RAG, FastAPI
+Experience years: 4
+Education: Bachelor of Computer Science
+Languages: English, Arabic
+Projects: Built internal Q&A bot prototype
+Certifications: Not available
+Work experience: AI Developer",Pending scoring example for UI state testing.,"Python, LLM, RAG, FastAPI",AI Developer,ai_ml
+226,bao_lam_security_intern.pdf,bao.lam@example.com,src/mock/cvScreeningMockData.ts:MOCK_CANDIDATES_SOURCE,"Candidate name: bao_lam_security_intern.pdf
+Target position: Security Intern
+Role category: security
+Summary: Intern candidate with good basics and no professional experience.
+Skills: Networking basics, Linux basics, Security fundamentals, Python, CTF
+Experience years: 0
+Education: Second-year Cybersecurity student
+Languages: Vietnamese, English
+Projects: Built home lab with pfSense and Linux VM monitoring
+Certifications: Not available
+Work experience: CTF club member",Intern candidate with good basics and no professional experience.,"Networking basics, Linux basics, Security fundamentals, Python, CTF",CTF club member,security

@@ -5,8 +5,8 @@ from sqlmodel import SQLModel, Session, create_engine, select
 
 sys.path.insert(0, '..')
 
-from app.models import User
 from app.routes import admin
+from tests.factories import make_user
 
 
 def _make_session():
@@ -16,7 +16,7 @@ def _make_session():
 
 
 def _seed_admin(session: Session):
-    admin_user = User(email="admin@example.com", password_hash="hash", role="admin")
+    admin_user = make_user("admin@example.com", "admin")
     session.add(admin_user)
     session.commit()
     session.refresh(admin_user)
@@ -72,7 +72,7 @@ def test_admin_create_recruiter_rejects_duplicate_email():
 def test_admin_routes_reject_non_admin_user():
     session = _make_session()
     try:
-        candidate = User(email="candidate@example.com", password_hash="hash", role="candidate")
+        candidate = make_user("candidate@example.com", "candidate")
         session.add(candidate)
         session.commit()
         session.refresh(candidate)
@@ -91,8 +91,8 @@ def test_admin_overview_counts_core_records():
     session = _make_session()
     try:
         admin_user = _seed_admin(session)
-        session.add(User(email="candidate@example.com", password_hash="hash", role="candidate"))
-        session.add(User(email="rec@example.com", password_hash="hash", role="recruiter"))
+        session.add(make_user("candidate@example.com", "candidate"))
+        session.add(make_user("rec@example.com", "recruiter"))
         session.commit()
 
         overview = admin.admin_overview(admin_user.id, session)

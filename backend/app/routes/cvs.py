@@ -239,23 +239,49 @@ def list_candidate_applications(candidate_id: int, session: Session = Depends(ge
         raise HTTPException(status_code=404, detail="Candidate not found")
 
     candidate_email = (candidate.email or "").strip().lower()
+    cv_filters = [CV.candidate_id == candidate_id]
+    if candidate_email:
+        cv_filters.append(func.lower(CV.candidate_email) == candidate_email)
+
     cvs = session.exec(
         select(CV).where(
-            or_(
-                CV.candidate_id == candidate_id,
-                func.lower(CV.candidate_email) == candidate_email,
-            )
+            or_(*cv_filters)
         )
     ).all()
-    cv_ids = [cv.id for cv in cvs if cv.id is not None]
-    if not cv_ids:
+    cv_ids = {cv.id for cv in cvs if cv.id is not None}
+
+    candidate_submit_logs = session.exec(
+        select(ActivityLog).where(
+            ActivityLog.action == "candidate.cv.submit",
+            ActivityLog.target_type == "application",
+            ActivityLog.actor_user_id == candidate_id,
+        )
+    ).all()
+    logged_application_ids = {
+        log.target_id for log in candidate_submit_logs if log.target_id is not None
+    }
+
+    applications_by_id: dict[int, JobApplication] = {}
+    if cv_ids:
+        applications = session.exec(
+            select(JobApplication).where(JobApplication.cv_id.in_(cv_ids))
+        ).all()
+        for application in applications:
+            if application.id is not None:
+                applications_by_id[application.id] = application
+
+    if logged_application_ids:
+        applications = session.exec(
+            select(JobApplication).where(JobApplication.id.in_(logged_application_ids))
+        ).all()
+        for application in applications:
+            if application.id is not None:
+                applications_by_id[application.id] = application
+
+    if not applications_by_id:
         return {"candidate_id": candidate_id, "total": 0, "applications": []}
 
-    applications = session.exec(
-        select(JobApplication)
-        .where(JobApplication.cv_id.in_(cv_ids))
-        .order_by(JobApplication.id.desc())
-    ).all()
+    applications = sorted(applications_by_id.values(), key=lambda item: item.id or 0, reverse=True)
 
     result = []
     for app in applications:

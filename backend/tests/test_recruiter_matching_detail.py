@@ -5,8 +5,9 @@ from sqlmodel import SQLModel, Session, create_engine
 
 sys.path.insert(0, '..')
 
-from app.models import ActivityLog, CV, Job, JobApplication, User
+from app.models import ActivityLog, CV, Job, JobApplication
 from app.routes import recruiter
+from tests.factories import make_user
 
 
 def _make_session():
@@ -16,7 +17,7 @@ def _make_session():
 
 
 def _seed_application(session: Session, matching_detail=None):
-    rec = User(email="rec@example.com", password_hash="hash", role="recruiter")
+    rec = make_user("rec@example.com", "recruiter")
     session.add(rec)
     session.commit()
     session.refresh(rec)

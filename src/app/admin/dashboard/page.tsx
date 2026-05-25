@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import styles from "./dashboard.module.css";
 import { apiUrl } from "@/utils/api";
 import BrandLogoIcon from "@/components/brand/BrandLogoIcon";
+import { DashboardLineChart } from "@/components/charts/DashboardCharts";
 
 type AdminOverview = {
     total_admins?: number;
@@ -258,58 +259,19 @@ export default function AdminDashboard() {
         points: TrendPoint[];
         series: Array<{ key: keyof Omit<TrendPoint, "date">; label: string; color: string }>;
     }) {
-        const chartWidth = 760;
-        const chartHeight = 220;
-        const padding = 34;
-        const maxValue = Math.max(1, ...points.flatMap((point) => series.map((item) => Number(point[item.key] || 0))));
-        const denominator = Math.max(1, points.length - 1);
-
-        function toPoint(value: number, index: number) {
-            const x = padding + ((chartWidth - padding * 2) * index) / denominator;
-            const y = chartHeight - padding - ((chartHeight - padding * 2) * value) / maxValue;
-            return `${x},${y}`;
-        }
-
         if (!points.length) {
             return <p className={styles.emptyState}>{loading ? "Loading..." : "No activity data yet"}</p>;
         }
 
         return (
             <div className={styles.lineChartWrap}>
-                <svg className={styles.lineChartSvg} viewBox={`0 0 ${chartWidth} ${chartHeight}`} role="img" aria-label="Trend line chart">
-                    <line x1={padding} y1={chartHeight - padding} x2={chartWidth - padding} y2={chartHeight - padding} className={styles.chartAxis} />
-                    <line x1={padding} y1={padding} x2={padding} y2={chartHeight - padding} className={styles.chartAxis} />
-                    {[0, 0.5, 1].map((ratio) => {
-                        const y = chartHeight - padding - (chartHeight - padding * 2) * ratio;
-                        return <line key={ratio} x1={padding} y1={y} x2={chartWidth - padding} y2={y} className={styles.chartGridLine} />;
-                    })}
-                    {series.map((item) => (
-                        <polyline
-                            key={item.key}
-                            points={points.map((point, index) => toPoint(Number(point[item.key] || 0), index)).join(" ")}
-                            fill="none"
-                            stroke={item.color}
-                            strokeWidth="4"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        />
-                    ))}
-                    {series.flatMap((item) => points.map((point, index) => {
-                        const [x, y] = toPoint(Number(point[item.key] || 0), index).split(",").map(Number);
-                        return <circle key={`${item.key}-${point.date}`} cx={x} cy={y} r="4" fill={item.color} />;
-                    }))}
-                </svg>
-                <div className={styles.chartLabels}>
-                    {points.map((point, index) => {
-                        const showLabel = points.length <= 12 || index === 0 || index === points.length - 1 || index % 5 === 0;
-                        return <span key={point.date}>{showLabel ? formatTrendDate(point.date) : ""}</span>;
-                    })}
-                </div>
-                <div className={styles.chartLegend}>
-                    {series.map((item) => (
-                        <span key={item.key}><i style={{ background: item.color }} />{item.label}</span>
-                    ))}
-                </div>
+                <DashboardLineChart
+                    points={points}
+                    series={series}
+                    getLabel={(point) => formatTrendDate(point.date)}
+                    emptyText={loading ? "Loading..." : "No activity data yet"}
+                    textColor="#200080"
+                />
             </div>
         );
     }

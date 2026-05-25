@@ -102,6 +102,9 @@ def login_user(user_data: UserLoginRequest, session: Session = Depends(get_sessi
         "user_id": user.id,
         "role": user.role,
         "email": user.email,
+        "full_name": user.full_name,
+        "phone": user.phone,
+        "address": user.address,
         "company_name": user.company_name,
         "must_change_password": user.role == "recruiter" and verify_password("1", user.password_hash),
     }
@@ -112,8 +115,8 @@ def change_password(payload: ChangePasswordRequest, session: Session = Depends(g
     user = session.get(User, payload.user_id)
     if not user:
         raise HTTPException(status_code=404, detail="Account not found")
-    if user.role != "recruiter":
-        raise HTTPException(status_code=403, detail="Only recruiters can change password in this flow")
+    if user.role not in {"candidate", "recruiter"}:
+        raise HTTPException(status_code=403, detail="Only candidates and recruiters can change password")
     if not verify_password(payload.current_password, user.password_hash):
         raise HTTPException(status_code=400, detail="Current password is incorrect")
 
@@ -131,10 +134,10 @@ def change_password(payload: ChangePasswordRequest, session: Session = Depends(g
         ActivityLog(
             actor_user_id=user.id,
             actor_role=user.role,
-            action="recruiter.password.change",
+            action=f"{user.role}.password.change",
             target_type="user",
             target_id=user.id,
-            detail=f"Recruiter changed password: {user.email}",
+            detail=f"{user.role.title()} changed password: {user.email}",
         )
     )
     session.commit()

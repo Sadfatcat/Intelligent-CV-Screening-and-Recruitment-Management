@@ -9,6 +9,7 @@
     --line: rgba(18, 22, 29, 0.12);
     --accent: #b05a36;
     --danger: #a63127;
+    --dashboard-purple: #200080;
     min-height: 100vh;
     display: flex;
     font-family: "Inter", sans-serif;
@@ -151,7 +152,7 @@
 .statCard h3,
 .panelCard h3 {
     margin: 0 0 10px;
-    color: var(--muted);
+    color: var(--dashboard-purple);
     font-size: 0.95rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -163,7 +164,7 @@
     font-family: "Newsreader", serif;
     font-size: 2.3rem;
     font-weight: 500;
-    color: var(--text);
+    color: var(--dashboard-purple);
 }
 
 .panelCard {
@@ -195,12 +196,12 @@
     padding: 14px;
     display: grid;
     gap: 8px;
-    color: var(--muted);
+    color: var(--dashboard-purple);
     font-weight: 800;
 }
 
 .accountStatusGrid strong {
-    color: var(--text);
+    color: var(--dashboard-purple);
     font-family: "Newsreader", serif;
     font-size: 1.8rem;
     font-weight: 500;
@@ -217,14 +218,14 @@
 }
 
 .passwordStatusBox strong {
-    color: var(--danger);
+    color: var(--dashboard-purple);
     font-family: "Newsreader", serif;
     font-size: 2.4rem;
     font-weight: 500;
 }
 
 .passwordStatusBox span {
-    color: var(--body-text);
+    color: var(--dashboard-purple);
     font-weight: 800;
 }
 
@@ -243,7 +244,7 @@
     border: 1px solid var(--line);
     border-radius: 999px;
     background: #fff;
-    color: var(--muted);
+    color: var(--dashboard-purple);
     padding: 8px 12px;
     font-size: 0.78rem;
     font-weight: 800;
@@ -252,9 +253,9 @@
 
 .rangeButton:hover,
 .rangeButtonActive {
-    background: var(--text);
+    background: var(--dashboard-purple);
     color: #fff;
-    border-color: var(--text);
+    border-color: var(--dashboard-purple);
 }
 
 .lineChartWrap {
@@ -284,7 +285,7 @@
     grid-auto-flow: column;
     grid-auto-columns: 1fr;
     gap: 4px;
-    color: var(--muted);
+    color: var(--dashboard-purple);
     font-size: 0.72rem;
     font-weight: 800;
 }
@@ -298,7 +299,7 @@
     display: flex;
     flex-wrap: wrap;
     gap: 14px;
-    color: var(--body-text);
+    color: var(--dashboard-purple);
     font-size: 0.82rem;
     font-weight: 800;
 }
@@ -539,7 +540,7 @@
     border-radius: 16px;
     background: #fff;
     border: 1px solid var(--line);
-    color: var(--body-text);
+    color: var(--dashboard-purple);
     line-height: 1.5;
 }
 
@@ -552,36 +553,37 @@
 }
 
 .activityTime {
-    color: var(--accent);
+    color: var(--dashboard-purple);
     font-weight: 700;
 }
 
 .activityRole {
-    color: var(--text);
+    color: var(--dashboard-purple);
     font-weight: 700;
 }
 
 .activityDetail {
-    color: var(--body-text);
+    color: var(--dashboard-purple);
 }
 
 .emptyState {
-    color: var(--muted);
+    color: var(--dashboard-purple);
     margin: 10px 0 0;
 }
 
 .messageBox {
+    color: var(--dashboard-purple);
     font-weight: 600;
 }
 
 .successBox {
-    color: #166534;
+    color: var(--dashboard-purple);
     background: rgba(34, 197, 94, 0.12);
     border: 1px solid rgba(34, 197, 94, 0.22);
 }
 
 .errorBox {
-    color: #991b1b;
+    color: var(--dashboard-purple);
     background: rgba(239, 68, 68, 0.12);
     border: 1px solid rgba(239, 68, 68, 0.22);
 }

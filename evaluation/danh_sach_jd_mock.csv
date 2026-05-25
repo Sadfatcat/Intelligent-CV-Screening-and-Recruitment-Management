@@ -1,0 +1,289 @@
+jd_id,jd_name,role_category,jd_source,jd_text,requirements_summary,core_skills,experience_requirement
+101,Frontend Developer,frontend,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: Frontend Developer
+Role category: frontend
+Level: Junior
+Required skills: React, TypeScript, CSS, REST API
+Preferred skills: Next.js, Figma, Playwright
+Required experience years: 1 years
+Education requirement: Bachelor in Computer Science or equivalent experience
+Language requirements: English
+Responsibilities: Build responsive UI; Integrate REST APIs; Improve accessibility
+Requirements: Strong JavaScript fundamentals; Can translate Figma designs into UI; Understands component state
+Nice to have: Design system experience, Basic testing experience
+Keywords: frontend, react, typescript, css",Strong JavaScript fundamentals; Can translate Figma designs into UI; Understands component state,"React, TypeScript, CSS, REST API",1 years
+102,Backend Developer,backend,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: Backend Developer
+Role category: backend
+Level: Middle
+Required skills: Python, FastAPI, PostgreSQL, Docker
+Preferred skills: Redis, Kubernetes, AWS
+Required experience years: 3 years
+Education requirement: Bachelor in Software Engineering or related field
+Language requirements: English
+Responsibilities: Design APIs; Optimize database queries; Maintain deployment pipelines
+Requirements: 3+ years backend experience; Production API ownership; Database schema design
+Nice to have: Cloud deployment, Message queues
+Keywords: backend, fastapi, postgresql, docker",3+ years backend experience; Production API ownership; Database schema design,"Python, FastAPI, PostgreSQL, Docker",3 years
+103,Full Stack Developer,fullstack,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: Full Stack Developer
+Role category: fullstack
+Level: Middle
+Required skills: React, Node.js, SQL, Docker
+Preferred skills: GraphQL, Next.js, PostgreSQL
+Required experience years: 3 years
+Education requirement: Bachelor or equivalent portfolio
+Language requirements: English
+Responsibilities: Build end-to-end features; Own API contracts; Review pull requests
+Requirements: Frontend and backend delivery experience; Database modeling; CI/CD basics
+Nice to have: Microservices, Server-side rendering
+Keywords: full stack, react, node, sql",Frontend and backend delivery experience; Database modeling; CI/CD basics,"React, Node.js, SQL, Docker",3 years
+104,Data Engineer,data_engineering,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: Data Engineer
+Role category: data_engineering
+Level: Senior
+Required skills: Python, SQL, Airflow, Spark
+Preferred skills: dbt, Kafka, AWS Glue
+Required experience years: 5 years
+Education requirement: Bachelor in Computer Science, Data Engineering, or related field
+Language requirements: English
+Responsibilities: Build data pipelines; Maintain data warehouse models; Monitor data quality
+Requirements: 5+ years data engineering; Batch and streaming pipeline experience; Strong SQL optimization
+Nice to have: Lakehouse architecture, Cost optimization
+Keywords: data engineer, etl, airflow, spark",5+ years data engineering; Batch and streaming pipeline experience; Strong SQL optimization,"Python, SQL, Airflow, Spark",5 years
+105,Data Analyst,data_analytics,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: Data Analyst
+Role category: data_analytics
+Level: Junior
+Required skills: SQL, Excel, Power BI, Statistics
+Preferred skills: Python, Tableau
+Required experience years: 1 years
+Education requirement: Bachelor in Business, Economics, Statistics, or related field
+Language requirements: Vietnamese, English
+Responsibilities: Create dashboards; Analyze sales funnels; Prepare weekly reports
+Requirements: Can write SQL joins; Understands descriptive statistics; Clear business communication
+Nice to have: Retail domain experience
+Keywords: data analyst, power bi, sql, dashboard",Can write SQL joins; Understands descriptive statistics; Clear business communication,"SQL, Excel, Power BI, Statistics",1 years
+106,Machine Learning Engineer,ai_ml,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: Machine Learning Engineer
+Role category: ai_ml
+Level: Middle
+Required skills: Python, PyTorch, scikit-learn, ML pipelines
+Preferred skills: MLOps, Docker, FastAPI
+Required experience years: 3 years
+Education requirement: Bachelor or Master in AI, CS, Mathematics, or related field
+Language requirements: English
+Responsibilities: Train models; Deploy inference services; Evaluate model quality
+Requirements: Machine learning project experience; Experiment tracking; Model validation
+Nice to have: NLP, Vector search
+Keywords: machine learning, pytorch, mlops, python",Machine learning project experience; Experiment tracking; Model validation,"Python, PyTorch, scikit-learn, ML pipelines",3 years
+107,AI Engineer,ai_ml,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: AI Engineer
+Role category: ai_ml
+Level: Senior
+Required skills: Python, LLM, RAG, Vector database
+Preferred skills: LangChain, OpenAI API, FastAPI
+Required experience years: 5 years
+Education requirement: Bachelor or Master in CS/AI or equivalent AI delivery experience
+Language requirements: English
+Responsibilities: Build AI assistants; Design retrieval pipelines; Evaluate hallucination risks
+Requirements: Production AI system experience; Prompt and retrieval evaluation; Strong Python
+Nice to have: Security review for AI apps
+Keywords: ai engineer, rag, llm, vector database",Production AI system experience; Prompt and retrieval evaluation; Strong Python,"Python, LLM, RAG, Vector database",5 years
+108,DevOps Engineer,cloud_devops,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: DevOps Engineer
+Role category: cloud_devops
+Level: Middle
+Required skills: Docker, Kubernetes, CI/CD, Linux
+Preferred skills: Terraform, Prometheus, AWS
+Required experience years: 3 years
+Education requirement: Bachelor or equivalent infrastructure experience
+Language requirements: English
+Responsibilities: Maintain clusters; Automate releases; Monitor services
+Requirements: Container orchestration experience; Incident response; Scripting
+Nice to have: GitOps, Cost monitoring
+Keywords: devops, kubernetes, docker, cicd",Container orchestration experience; Incident response; Scripting,"Docker, Kubernetes, CI/CD, Linux",3 years
+109,Mobile Developer,mobile,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: Mobile Developer
+Role category: mobile
+Level: Middle
+Required skills: Flutter, Dart, REST API, Firebase
+Preferred skills: Swift, Kotlin, CI/CD
+Required experience years: 2 years
+Education requirement: Bachelor or equivalent mobile portfolio
+Language requirements: English
+Responsibilities: Build mobile features; Fix production crashes; Publish app releases
+Requirements: Mobile app delivery experience; State management; API integration
+Nice to have: Native iOS/Android experience
+Keywords: mobile, flutter, dart, firebase",Mobile app delivery experience; State management; API integration,"Flutter, Dart, REST API, Firebase",2 years
+110,QA Engineer,qa,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: QA Engineer
+Role category: qa
+Level: Junior
+Required skills: Manual testing, Test cases, API testing, SQL
+Preferred skills: Playwright, Postman, Automation testing
+Required experience years: 1 years
+Education requirement: Bachelor in IT or related field
+Language requirements: Vietnamese, English
+Responsibilities: Write test cases; Validate releases; Report defects
+Requirements: Understands SDLC; Can test APIs; Clear bug reports
+Nice to have: Automation basics
+Keywords: qa, testing, api testing, sql",Understands SDLC; Can test APIs; Clear bug reports,"Manual testing, Test cases, API testing, SQL",1 years
+111,UI/UX Designer,design,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: UI/UX Designer
+Role category: design
+Level: Middle
+Required skills: Figma, User research, Wireframing, Design system
+Preferred skills: Prototyping, HTML, Accessibility
+Required experience years: 3 years
+Education requirement: Design degree or strong portfolio
+Language requirements: English
+Responsibilities: Design user flows; Run usability reviews; Maintain UI library
+Requirements: Portfolio with product screens; User-centered process; Component thinking
+Nice to have: SaaS product design
+Keywords: ui ux, figma, design system, research",Portfolio with product screens; User-centered process; Component thinking,"Figma, User research, Wireframing, Design system",3 years
+112,Product Manager,product,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: Product Manager
+Role category: product
+Level: Senior
+Required skills: Roadmap, Stakeholder management, Analytics, Agile
+Preferred skills: SQL, A/B testing, B2B SaaS
+Required experience years: 5 years
+Education requirement: Bachelor in Business, CS, or equivalent product experience
+Language requirements: English
+Responsibilities: Own roadmap; Prioritize backlog; Define success metrics
+Requirements: Product discovery; Cross-functional leadership; Data-informed decisions
+Nice to have: Recruitment domain experience
+Keywords: product manager, roadmap, agile, analytics",Product discovery; Cross-functional leadership; Data-informed decisions,"Roadmap, Stakeholder management, Analytics, Agile",5 years
+113,Business Analyst,business_analysis,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: Business Analyst
+Role category: business_analysis
+Level: Middle
+Required skills: Requirement analysis, BPMN, SQL, Documentation
+Preferred skills: UAT, Figma, Jira
+Required experience years: 3 years
+Education requirement: Bachelor in Business Information Systems or related field
+Language requirements: Vietnamese, English
+Responsibilities: Gather requirements; Write specs; Support UAT
+Requirements: Stakeholder interviews; Process mapping; Clear documentation
+Nice to have: Finance domain
+Keywords: business analyst, bpmn, uat, requirements",Stakeholder interviews; Process mapping; Clear documentation,"Requirement analysis, BPMN, SQL, Documentation",3 years
+114,Cybersecurity Analyst,security,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: Cybersecurity Analyst
+Role category: security
+Level: Middle
+Required skills: SIEM, Incident response, Network security, Linux
+Preferred skills: Python, Cloud security, ISO 27001
+Required experience years: 3 years
+Education requirement: Bachelor in Cybersecurity/IT or equivalent security experience
+Language requirements: English
+Responsibilities: Monitor alerts; Investigate incidents; Improve detection rules
+Requirements: SOC experience; Threat analysis; Security reporting
+Nice to have: Security certifications
+Keywords: cybersecurity, siem, incident response, soc",SOC experience; Threat analysis; Security reporting,"SIEM, Incident response, Network security, Linux",3 years
+115,Cloud Engineer,cloud_devops,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: Cloud Engineer
+Role category: cloud_devops
+Level: Senior
+Required skills: AWS, Terraform, Kubernetes, Networking
+Preferred skills: Go, Prometheus, Security hardening
+Required experience years: 6 years
+Education requirement: Bachelor or equivalent cloud engineering experience
+Language requirements: English
+Responsibilities: Design cloud landing zones; Automate infrastructure; Review reliability risks
+Requirements: 6+ years infrastructure experience; AWS production systems; IaC ownership
+Nice to have: Multi-account AWS governance
+Keywords: cloud engineer, aws, terraform, kubernetes",6+ years infrastructure experience; AWS production systems; IaC ownership,"AWS, Terraform, Kubernetes, Networking",6 years
+116,Frontend Intern,frontend,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: Frontend Intern
+Role category: frontend
+Level: Intern
+Required skills: HTML, CSS, JavaScript
+Preferred skills: Not available
+Required experience years: 0 years
+Education requirement: Current student or recent graduate
+Language requirements: Vietnamese
+Responsibilities: Fix UI bugs; Build small components; Learn code review process
+Requirements: Basic web knowledge; Can learn quickly; Available 3 months
+Nice to have: React basics
+Keywords: intern, frontend, html, css",Basic web knowledge; Can learn quickly; Available 3 months,"HTML, CSS, JavaScript",0 years
+117,Senior Backend Architect,backend,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: Senior Backend Architect
+Role category: backend
+Level: Senior
+Required skills: Java, Spring Boot, Microservices, PostgreSQL, Kafka
+Preferred skills: Kubernetes, Observability, DDD
+Required experience years: 8 years
+Education requirement: Bachelor or Master in Software Engineering
+Language requirements: English
+Responsibilities: Define backend architecture; Guide senior engineers; Review system scalability
+Requirements: 8+ years backend delivery; Distributed systems; Architecture decision records
+Nice to have: High traffic fintech systems
+Keywords: architect, microservices, spring boot, kafka",8+ years backend delivery; Distributed systems; Architecture decision records,"Java, Spring Boot, Microservices, PostgreSQL, Kafka",8 years
+118,Data Analyst Intern,data_analytics,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: Data Analyst Intern
+Role category: data_analytics
+Level: Intern
+Required skills: Excel, SQL basics, Statistics
+Preferred skills: Power BI
+Required experience years: 0 years
+Education requirement: Current student in Business, Statistics, or IT
+Language requirements: Vietnamese
+Responsibilities: Clean datasets; Prepare simple charts; Support reporting
+Requirements: Basic spreadsheet skills; Curiosity with data; Careful with numbers
+Nice to have: Portfolio dashboard
+Keywords: intern, data analyst, excel, sql",Basic spreadsheet skills; Curiosity with data; Careful with numbers,"Excel, SQL basics, Statistics",0 years
+119,QA Automation Engineer,qa,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: QA Automation Engineer
+Role category: qa
+Level: Middle
+Required skills: Playwright, TypeScript, API testing, CI/CD
+Preferred skills: Performance testing, Docker
+Required experience years: 3 years
+Education requirement: Bachelor in IT or equivalent QA automation experience
+Language requirements: English
+Responsibilities: Build automated tests; Stabilize regression suites; Review quality gates
+Requirements: Automation framework experience; API and UI testing; Pipeline integration
+Nice to have: Visual regression testing
+Keywords: qa automation, playwright, typescript, api testing",Automation framework experience; API and UI testing; Pipeline integration,"Playwright, TypeScript, API testing, CI/CD",3 years
+120,Security Intern,security,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: Security Intern
+Role category: security
+Level: Intern
+Required skills: Networking basics, Linux basics, Security fundamentals
+Preferred skills: Python, CTF
+Required experience years: 0 years
+Education requirement: Current student in Cybersecurity/IT
+Language requirements: Vietnamese, English
+Responsibilities: Review alerts; Document findings; Learn SOC workflow
+Requirements: Basic security knowledge; Willingness to learn; Careful documentation
+Nice to have: Home lab
+Keywords: security intern, linux, networking, soc",Basic security knowledge; Willingness to learn; Careful documentation,"Networking basics, Linux basics, Security fundamentals",0 years
+121,Senior Product Designer,design,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: Senior Product Designer
+Role category: design
+Level: Senior
+Required skills: Figma, Design system, User research, Prototyping
+Preferred skills: Product analytics, Accessibility, Workshop facilitation
+Required experience years: 6 years
+Education requirement: Design portfolio with shipped SaaS products
+Language requirements: English
+Responsibilities: Lead design strategy; Mentor designers; Define reusable patterns
+Requirements: 6+ years product design; Strong systems thinking; Research-to-delivery ownership
+Nice to have: Hiring platform design experience
+Keywords: product designer, figma, design system, research",6+ years product design; Strong systems thinking; Research-to-delivery ownership,"Figma, Design system, User research, Prototyping",6 years
+122,Enterprise Business Analyst,business_analysis,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: Enterprise Business Analyst
+Role category: business_analysis
+Level: Senior
+Required skills: Requirement analysis, Stakeholder management, BPMN, UAT
+Preferred skills: SQL, ERP, Change management
+Required experience years: 6 years
+Education requirement: Bachelor in Business, MIS, or related field
+Language requirements: Vietnamese, English
+Responsibilities: Lead discovery workshops; Manage requirement traceability; Coordinate UAT
+Requirements: Enterprise software delivery; Executive stakeholder communication; Process redesign
+Nice to have: SAP or ERP rollout
+Keywords: business analyst, enterprise, uat, stakeholder",Enterprise software delivery; Executive stakeholder communication; Process redesign,"Requirement analysis, Stakeholder management, BPMN, UAT",6 years
+123,NLP Engineer,ai_ml,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: NLP Engineer
+Role category: ai_ml
+Level: Middle
+Required skills: Python, NLP, Transformers, Evaluation
+Preferred skills: RAG, Vector search, MLOps
+Required experience years: 3 years
+Education requirement: Bachelor or Master in AI/CS/Linguistics
+Language requirements: English
+Responsibilities: Build text models; Evaluate extraction quality; Improve search relevance
+Requirements: NLP model experience; Dataset evaluation; Python production skills
+Nice to have: Vietnamese NLP
+Keywords: nlp, transformers, evaluation, python",NLP model experience; Dataset evaluation; Python production skills,"Python, NLP, Transformers, Evaluation",3 years
+124,Legacy System Modernization Engineer,backend,src/mock/cvScreeningMockData.ts:MOCK_JOB_DESCRIPTIONS_SOURCE,"Job title: Legacy System Modernization Engineer
+Role category: backend
+Level: Senior
+Required skills: Java, SQL, System design, Migration planning
+Preferred skills: Spring Boot, Docker, Cloud migration
+Required experience years: 7 years
+Education requirement: Bachelor in Software Engineering or equivalent
+Language requirements: English
+Responsibilities: Assess legacy systems; Plan staged migrations; Reduce downtime risk
+Requirements: Experience decomposing monoliths into maintainable services while preserving business continuity across billing, identity, reporting, and integration modules; Can document migration risks, rollback strategy, data reconciliation approach, and release sequencing for stakeholders; Comfortable reading old codebases, SQL procedures, batch jobs, and unclear legacy documentation
+Nice to have: COBOL exposure, Mainframe integration
+Keywords: legacy, migration, java, system design","Experience decomposing monoliths into maintainable services while preserving business continuity across billing, identity, reporting, and integration modules; Can document migration risks, rollback strategy, data reconciliation approach, and release sequencing for stakeholders; Comfortable reading old codebases, SQL procedures, batch jobs, and unclear legacy documentation","Java, SQL, System design, Migration planning",7 years

@@ -5,8 +5,9 @@ from sqlmodel import SQLModel, Session, create_engine
 
 sys.path.insert(0, '..')
 
-from app.models import CV, Job, JobApplication, User
+from app.models import CV, Job, JobApplication
 from app.routes import recruiter
+from tests.factories import make_user
 
 
 def _make_session():
@@ -16,9 +17,9 @@ def _make_session():
 
 
 def _seed_recruiter_job_application(session: Session):
-    rec = User(email="rec@example.com", password_hash="hash", role="recruiter")
-    other_rec = User(email="other@example.com", password_hash="hash", role="recruiter")
-    candidate = User(email="candidate@example.com", password_hash="hash", role="candidate")
+    rec = make_user("rec@example.com", "recruiter")
+    other_rec = make_user("other@example.com", "recruiter")
+    candidate = make_user("candidate@example.com", "candidate")
     session.add(rec)
     session.add(other_rec)
     session.add(candidate)
@@ -59,7 +60,7 @@ def _seed_recruiter_job_application(session: Session):
 def test_recruiter_job_list_rejects_candidate_user():
     session = _make_session()
     try:
-        candidate = User(email="candidate@example.com", password_hash="hash", role="candidate")
+        candidate = make_user("candidate@example.com", "candidate")
         session.add(candidate)
         session.commit()
         session.refresh(candidate)

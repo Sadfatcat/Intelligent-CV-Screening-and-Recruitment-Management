@@ -615,6 +615,54 @@
   text-transform: uppercase;
 }
 
+.scoreBoxSpinner {
+  position: relative;
+  width: 38px;
+  height: 30px;
+}
+
+.scoreBoxSpinner span {
+  position: absolute;
+  bottom: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #006a4e;
+  animation: scoringClimbSmall 0.9s ease-in-out infinite;
+}
+
+.scoreBoxSpinner span:nth-child(1) {
+  left: 6px;
+  animation-delay: 0s;
+}
+
+.scoreBoxSpinner span:nth-child(2) {
+  left: 15px;
+  animation-delay: 0.15s;
+}
+
+.scoreBoxSpinner span:nth-child(3) {
+  left: 24px;
+  animation-delay: 0.3s;
+}
+
+.scoreBox .scoreBoxWaiting {
+  color: #006a4e;
+  font-size: 18px;
+  line-height: 1.05;
+}
+
+@keyframes scoringClimbSmall {
+  0%, 100% {
+    transform: translateY(0) scale(0.9);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-16px) scale(1);
+    opacity: 1;
+  }
+}
+
 .applicationMetaGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -820,12 +868,12 @@
   justify-content: center;
   align-items: center;
   font-size: 16px;
-  color: #c8dcec;
+  color: white;
   transition: 0.2s;
 }
 
 .closeBtn:hover {
-  background: #1d3a58;
+  background: #66ccff;
 }
 
 .modalHeader {
@@ -1267,7 +1315,7 @@
 
 .applyButton,
 .submitModalBtn {
-  background: #12161d;
+  background: #1e232c;
   color: #ffffff;
   border-radius: 12px;
   box-shadow: none;
@@ -1487,6 +1535,17 @@
   color: #ffffff;
 }
 
+.subTabButton:disabled,
+.applyButton:disabled,
+.submitModalBtn:disabled,
+.searchInput:disabled,
+.modalInput:disabled,
+.fileInput:disabled,
+.applyButton[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
 .applicationMetaGrid span,
 .criteriaBlock,
 .scoreBox {
@@ -1703,7 +1762,7 @@
 .applyButton:hover,
 .submitModalBtn:hover,
 .closeBtn:hover {
-  background: #2a2f38;
+  background: #66ccff;
 }
 
 .modalInput,
@@ -1727,4 +1786,180 @@
 .uploadText span,
 .uploadTextSelected {
   color: var(--candidate-brand);
+}
+
+/* Apply CV modal: final scoped rules override older duplicated theme blocks. */
+.modalOverlay {
+  background: rgba(18, 22, 29, 0.62);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  padding: 24px;
+}
+
+.modalContent {
+  width: min(920px, calc(100vw - 48px));
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  border: 1px solid rgba(18, 22, 29, 0.12);
+  border-radius: 18px;
+  background: #ffffff;
+  padding: 30px;
+  box-shadow: 0 24px 60px rgba(18, 22, 29, 0.24);
+}
+
+.modalHeader {
+  margin-bottom: 22px;
+  padding-right: 48px;
+}
+
+.modalHeader h2 {
+  margin: 0 0 8px;
+  color: var(--candidate-text);
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.modalHeader p {
+  color: var(--candidate-body);
+  line-height: 1.45;
+}
+
+.closeBtn {
+  top: 18px;
+  right: 18px;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--candidate-text);
+  color: #200080;
+  box-shadow: 0 10px 24px rgba(18, 22, 29, 0.16);
+}
+
+.modalBody {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.92fr);
+  gap: 22px;
+  align-items: stretch;
+}
+
+.modalFormCol {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.modalInput,
+.phonePrefix,
+.jobTitleInput {
+  min-height: 48px;
+  border: 1px solid rgba(18, 22, 29, 0.16);
+  border-radius: 12px;
+  background: #ffffff;
+  color: var(--candidate-text);
+  box-shadow: inset 0 1px 0 rgba(18, 22, 29, 0.03);
+}
+
+.modalInput::placeholder {
+  color: rgba(74, 74, 74, 0.72);
+}
+
+.phoneGroup {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.phonePrefix {
+  width: auto;
+}
+
+.modalUploadCol {
+  min-height: 286px;
+  border: 2px dashed rgba(176, 90, 54, 0.52);
+  border-radius: 18px;
+  background: #fbfaf7;
+  color: var(--candidate-text);
+  padding: 28px;
+}
+
+.modalUploadCol:hover {
+  background: #f4f3f0;
+  border-color: var(--candidate-brand);
+}
+
+.fileInput {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.uploadIcon {
+  color: var(--candidate-brand);
+}
+
+.uploadText {
+  color: var(--candidate-text);
+  line-height: 1.35;
+}
+
+.uploadSubText {
+  color: var(--candidate-body);
+  line-height: 1.4;
+}
+
+.modalFooter {
+  margin-top: 22px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.submitActionBox {
+  display: flex;
+  width: min(240px, 100%);
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.submitActionBox:hover {
+  transform: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.submitModalBtn {
+  width: 100%;
+  min-height: 48px;
+  border-radius: 12px;
+  background: #99d9ff;
+  color: #12161d;
+}
+
+@media (max-width: 820px) {
+  .modalOverlay {
+    padding: 14px;
+    align-items: flex-start;
+  }
+
+  .modalContent {
+    width: 100%;
+    max-height: calc(100vh - 28px);
+    padding: 22px;
+  }
+
+  .modalBody {
+    grid-template-columns: 1fr;
+  }
+
+  .modalUploadCol {
+    min-height: 220px;
+  }
+
+  .submitActionBox {
+    width: 100%;
+  }
 }

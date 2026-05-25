@@ -306,6 +306,59 @@
     min-height: 320px;
 }
 
+.dashboardSummaryPanel {
+    grid-column: 1 / -1;
+}
+
+.dashboardSummaryGrid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.dashboardSummaryGrid span {
+    border: 1px solid rgba(32, 0, 128, 0.16);
+    border-radius: 14px;
+    background: #ffffff;
+    color: #200080;
+    padding: 14px;
+    display: grid;
+    gap: 6px;
+    min-width: 0;
+}
+
+.dashboardSummaryGrid small {
+    color: #200080;
+    font-size: 0.78rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.dashboardSummaryGrid strong {
+    color: #200080;
+    font-family: "Newsreader", serif;
+    font-size: 2rem;
+    font-weight: 500;
+    line-height: 1;
+}
+
+.dashboardSummaryGrid .dashboardSummaryCompact strong {
+    font-size: 1.45rem;
+}
+
+.dashboardChartsRow {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.dashboardChartsRow .chartCard {
+    grid-column: auto;
+    min-width: 0;
+}
+
 .chartPanel {
     display: grid;
     grid-template-columns: minmax(210px, 0.85fr) minmax(220px, 1fr);
@@ -426,7 +479,7 @@
 
 .lineChart {
     min-height: 280px;
-    overflow-x: auto;
+    min-width: 0;
     padding: 10px 0 0;
 }
 
@@ -1614,6 +1667,10 @@
     .contentArea {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+
+    .dashboardSummaryGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 @media (max-width: 900px) {
@@ -1634,6 +1691,11 @@
     .contentArea {
         grid-template-columns: 1fr;
         padding: 0 18px 18px;
+    }
+
+    .dashboardSummaryGrid,
+    .dashboardChartsRow {
+        grid-template-columns: 1fr;
     }
 
     .screeningFilters,

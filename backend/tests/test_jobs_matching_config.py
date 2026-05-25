@@ -12,9 +12,10 @@ from sqlmodel import SQLModel, Session, create_engine, select
 
 sys.path.insert(0, '..')
 
-from app.models import Job, User
+from app.models import Job
 from app.routes import jobs
 from app.services import extractor, vectorizer
+from tests.factories import make_user
 
 
 class FakeUploadFile:
@@ -37,10 +38,9 @@ def _make_session():
 
 
 def _seed_recruiter(session: Session):
-    recruiter = User(
-        email="recruiter@example.com",
-        password_hash="hash",
-        role="recruiter",
+    recruiter = make_user(
+        "recruiter@example.com",
+        "recruiter",
         company_name="Tech Co",
     )
     session.add(recruiter)
