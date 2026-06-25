@@ -1,12 +1,13 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import brightStyles from "./page.bright.module.css";
 import { handleRegisterSubmit } from "@/utils/registerHandler";
 import BrandLogoFull from "@/components/brand/BrandLogoFull";
 import BackButton from "@/components/navigation/BackButton";
+import { getStoredHomeHref } from "@/utils/homeRoute";
 
 function RegisterCandidatePageContent() {
   const router = useRouter();
@@ -17,7 +18,12 @@ function RegisterCandidatePageContent() {
   const [passwordError, setPasswordError] = useState("");
   const [resultMessage, setResultMessage] = useState("");
   const [resultType, setResultType] = useState<"success" | "error" | "">("");
+  const [homeHref, setHomeHref] = useState("/login");
   const styles = brightStyles;
+
+  useEffect(() => {
+    setHomeHref(getStoredHomeHref());
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     await handleRegisterSubmit(
@@ -46,7 +52,9 @@ function RegisterCandidatePageContent() {
         <form className={styles.registerForm} onSubmit={handleSubmit}>
           <div className={styles.registerHeader}>
             <BackButton fallbackHref="/candidate" className={styles.backButton} />
-            <BrandLogoFull iconSize={56} />
+            <Link href={homeHref} aria-label="Go to home">
+              <BrandLogoFull iconSize={56} />
+            </Link>
             <p>Create a candidate account to submit CVs and track applied jobs.</p>
           </div>
 

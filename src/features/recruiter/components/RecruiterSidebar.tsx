@@ -1,6 +1,12 @@
 import styles from "../../../app/recruiter_UI/page.module.css";
 import BrandLogoIcon from "../../../components/brand/BrandLogoIcon";
 
+const DEMO_ROUTES = [
+    { label: "Admin", href: "/admin/dashboard" },
+    { label: "Recruiter", href: "/recruiter_UI" },
+    { label: "Candidate", href: "/candidate" },
+];
+
 type RecruiterSidebarProps = {
     companyLabel: string;
     email?: string;
@@ -23,10 +29,21 @@ export function RecruiterSidebar({
     onOpenUpload,
     onLogout,
 }: RecruiterSidebarProps) {
+    function openDemoRoute(path: string) {
+        window.open(path, "_blank", "noopener,noreferrer");
+    }
+
     return (
         <aside className={styles.sidebar}>
             <div className={styles.logoBox}>
-                <BrandLogoIcon size={82} color="#ffffff" accentColor="#ffffff" title="intelliCV recruiter" style={{ margin: "0 auto 12px" }} />
+                <button
+                    type="button"
+                    onClick={onOpenDashboard}
+                    aria-label="Go to recruiter home"
+                    style={{ all: "unset", cursor: "pointer", display: "block", margin: "0 auto 12px" }}
+                >
+                    <BrandLogoIcon size={82} color="#ffffff" accentColor="#ffffff" title="intelliCV recruiter" />
+                </button>
                 <div className={styles.accountBox}>
                     <div className={styles.avatar}>{companyLabel.charAt(0).toUpperCase()}</div>
                     <div>
@@ -61,6 +78,13 @@ export function RecruiterSidebar({
                 <button className={`${styles.navButton} ${styles.navButtonPrimary}`} onClick={onOpenUpload}>
                     Create JD
                 </button>
+                <div className={styles.quickSwapGroup}>
+                    {DEMO_ROUTES.map((route) => (
+                        <button key={route.href} type="button" className={styles.quickSwapButton} onClick={() => openDemoRoute(route.href)}>
+                            {route.label}
+                        </button>
+                    ))}
+                </div>
             </div>
         </aside>
     );

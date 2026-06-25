@@ -15,11 +15,22 @@ router = APIRouter(prefix="/api/admin", tags=["admin"])
 class CreateRecruiterRequest(BaseModel):
     admin_id: int
     email: str
-    password: str
+    password: Optional[str] = None
     company_name: str
     full_name: Optional[str] = None
     phone: Optional[str] = None
     address: Optional[str] = None
+
+
+class UpdateRecruiterRequest(BaseModel):
+    admin_id: int
+    email: Optional[str] = None
+    password: Optional[str] = None
+    company_name: Optional[str] = None
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    is_active: Optional[bool] = None
 
 
 def require_admin(admin_id: int, session: Session) -> User:
@@ -83,19 +94,28 @@ def _delete_job_and_dependencies(session: Session, job: Job) -> dict:
 @router.post("/recruiters")
 def create_recruiter(payload: CreateRecruiterRequest, session: Session = Depends(get_session)):
     admin = require_admin(payload.admin_id, session)
+    email = payload.email.strip()
+    company_name = payload.company_name.strip()
 
-    existing = session.exec(select(User).where(User.email == payload.email)).first()
+    if not email:
+        raise HTTPException(status_code=400, detail="Recruiter email is required")
+    if not company_name:
+        raise HTTPException(status_code=400, detail="Company name is required")
+
+    existing = session.exec(select(User).where(User.email == email)).first()
     if existing:
         raise HTTPException(status_code=400, detail="This email already exists")
 
+    temporary_password = (payload.password or "").strip() or "1"
+
     recruiter = User(
-        email=payload.email,
-        password_hash=get_password_hash(payload.password),
+        email=email,
+        password_hash=get_password_hash(temporary_password),
         role="recruiter",
-        full_name=payload.full_name,
-        phone=payload.phone,
-        address=payload.address,
-        company_name=payload.company_name,
+        full_name=payload.full_name.strip() if payload.full_name else None,
+        phone=payload.phone.strip() if payload.phone else None,
+        address=payload.address.strip() if payload.address else None,
+        company_name=company_name,
         is_active=True,
     )
     session.add(recruiter)
@@ -119,6 +139,76 @@ def create_recruiter(payload: CreateRecruiterRequest, session: Session = Depends
         "recruiter_id": recruiter.id,
         "email": recruiter.email,
         "company_name": recruiter.company_name,
+        "temporary_password_used": temporary_password == "1",
+    }
+
+
+@router.put("/recruiters/{recruiter_id}")
+def update_recruiter(
+    recruiter_id: int,
+    payload: UpdateRecruiterRequest,
+    session: Session = Depends(get_session),
+):
+    admin = require_admin(payload.admin_id, session)
+    recruiter = session.get(User, recruiter_id)
+    if not recruiter:
+        raise HTTPException(status_code=404, detail="Recruiter not found")
+    if recruiter.role != "recruiter":
+        raise HTTPException(status_code=400, detail="This user is not a recruiter")
+
+    if payload.email is not None:
+        email = payload.email.strip()
+        if not email:
+            raise HTTPException(status_code=400, detail="Recruiter email is required")
+        existing = session.exec(select(User).where(User.email == email, User.id != recruiter_id)).first()
+        if existing:
+            raise HTTPException(status_code=400, detail="This email already exists")
+        recruiter.email = email
+
+    if payload.company_name is not None:
+        company_name = payload.company_name.strip()
+        if not company_name:
+            raise HTTPException(status_code=400, detail="Company name is required")
+        recruiter.company_name = company_name
+
+    if payload.full_name is not None:
+        recruiter.full_name = payload.full_name.strip() or None
+    if payload.phone is not None:
+        recruiter.phone = payload.phone.strip() or None
+    if payload.address is not None:
+        recruiter.address = payload.address.strip() or None
+    if payload.is_active is not None:
+        recruiter.is_active = payload.is_active
+
+    next_password = (payload.password or "").strip()
+    if next_password:
+        recruiter.password_hash = get_password_hash(next_password)
+
+    session.add(recruiter)
+    session.commit()
+    session.refresh(recruiter)
+
+    session.add(
+        ActivityLog(
+            actor_user_id=admin.id,
+            actor_role="admin",
+            action="admin.update.recruiter",
+            target_type="user",
+            target_id=recruiter.id,
+            detail=f"Updated recruiter account: {recruiter.email}",
+        )
+    )
+    session.commit()
+
+    return {
+        "message": "Recruiter account updated successfully",
+        "recruiter_id": recruiter.id,
+        "email": recruiter.email,
+        "company_name": recruiter.company_name,
+        "full_name": recruiter.full_name,
+        "phone": recruiter.phone,
+        "is_active": recruiter.is_active,
+        "password_changed": bool(next_password),
     }
 
 

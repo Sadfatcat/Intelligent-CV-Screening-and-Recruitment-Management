@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import uuid
+from pathlib import Path
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, UploadFile, File, Form
 from sqlalchemy import func, or_
 from sqlalchemy.exc import IntegrityError
@@ -17,7 +18,7 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/cvs", tags=["cvs"])
 
 # thư mục lưu file cv trên server
-UPLOAD_DIR = os.getenv("CV_UPLOAD_DIR", "/app/uploads/cv")
+UPLOAD_DIR = os.getenv("CV_UPLOAD_DIR", str(Path(__file__).resolve().parent.parent / "uploads" / "cv"))
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # các định dạng file được chấp nhận

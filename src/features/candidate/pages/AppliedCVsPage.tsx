@@ -1,7 +1,9 @@
 "use client";
 
 import type { CandidateSubmissionItem, JobItem, MatchingDetail } from "../hooks/useCandidateData";
+import { normalizeJobImageUrl } from "../utils/candidateJobAssets";
 import styles from "../../../app/candidate/page.module.css";
+import { useState } from "react";
 
 type Props = {
     submittedJobs: CandidateSubmissionItem[];
@@ -43,12 +45,6 @@ function getScoreStatusLabel(value: number | null | undefined) {
     if (status === "borderline") return "Borderline";
     if (status === "failed") return "Failed";
     return "Pending";
-}
-
-function getImageUrl(value: string | null | undefined) {
-    if (!value) return "";
-    if (/^https?:\/\//i.test(value)) return value;
-    return value;
 }
 
 function uniqueItems(items: Array<string | null | undefined>) {
@@ -104,6 +100,8 @@ function renderCriteriaList(items: string[], kind: "good" | "skill" | "requireme
 }
 
 export default function AppliedCVsPage({ submittedJobs, jobs, isCvScoring, hasScoringApplication, onBrowseJobs }: Props) {
+    const [failedImageIds, setFailedImageIds] = useState<Set<number>>(() => new Set());
+
     return (
         <div className={styles.appliedWorkspace}>
             <div className={styles.appliedHeader}>
@@ -139,14 +137,20 @@ export default function AppliedCVsPage({ submittedJobs, jobs, isCvScoring, hasSc
                         const missingSkills = getMissingSkills(item.matching_detail);
                         const missingRequirements = getMissingRequirements(item.matching_detail);
                         const scoreStatus = getScoreStatus(item.ai_matching_score);
-                        const imageUrl = getImageUrl(item.image_url || matchedJob?.image_url);
+                        const imageUrl = normalizeJobImageUrl(item.image_url || matchedJob?.image_url);
+                        const imageFailed = failedImageIds.has(item.application_id);
                         const description = item.description || matchedJob?.description;
 
                         return (
                             <article className={styles.applicationCard} key={item.application_id}>
                                 <div className={styles.applicationHero}>
-                                    {imageUrl ? (
-                                        <img src={imageUrl} alt={item.job_title} className={styles.applicationImage} />
+                                    {imageUrl && !imageFailed ? (
+                                        <img
+                                            src={imageUrl}
+                                            alt={item.job_title}
+                                            className={styles.applicationImage}
+                                            onError={() => setFailedImageIds((current) => new Set(current).add(item.application_id))}
+                                        />
                                     ) : (
                                         <div className={styles.applicationImageFallback}>{item.company_name.charAt(0).toUpperCase()}</div>
                                     )}

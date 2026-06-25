@@ -4,7 +4,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { RecruiterSidebar } from "./components/RecruiterSidebar";
 import { RecruiterToast } from "./components/RecruiterToast";
-import { RECRUITER_SESSION_STORAGE_KEY } from "./constants/recruiterConstants";
+import { RecruiterUploadJDModal } from "./components/RecruiterUploadJDModal";
+import { clearAuthSession } from "@/utils/authSession";
 import { useRecruiterData } from "./hooks/useRecruiterData";
 import CVDetailPage from "./pages/CVDetailPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -17,7 +18,7 @@ import {
     updateRecruiterJobStatus,
 } from "./services/recruiterApi";
 import type { CVLogItem, JobManagementStatus, RecruiterJob } from "./types/recruiterTypes";
-import { MOCK_FPT_CV_LOGS, MOCK_RECRUITER_JOBS, isFptSession } from "./utils/recruiterMockMappers";
+import { MOCK_FINT_CV_LOGS, MOCK_RECRUITER_JOBS, isFintSession } from "./utils/recruiterMockMappers";
 import styles from "../../app/recruiter_UI/page.module.css";
 
 type ActivePage = "dashboard" | "jobs" | "cvs" | "cv-detail";
@@ -42,7 +43,7 @@ export default function RecruiterLayout({ defaultPage = "dashboard" }: Recruiter
         companyName,
         isScreeningLoading,
         screeningError,
-        storedFptCvLogs,
+        storedFintCvLogs,
     } = useRecruiterData();
 
     const [activePage, setActivePage] = useState<ActivePage>(defaultPage);
@@ -83,11 +84,11 @@ export default function RecruiterLayout({ defaultPage = "dashboard" }: Recruiter
         setMessageType(type);
     }
 
-    const isFptRecruiter = isFptSession(session, companyName);
+    const isFintRecruiter = isFintSession(session, companyName);
 
     const recruiterJobs: RecruiterJob[] = useMemo(
-        () => (isFptRecruiter ? [...jobs, ...MOCK_RECRUITER_JOBS] : jobs),
-        [isFptRecruiter, jobs]
+        () => (isFintRecruiter ? [...jobs, ...MOCK_RECRUITER_JOBS] : jobs),
+        [isFintRecruiter, jobs]
     );
 
     const getManagedJobStatus = useCallback(
@@ -96,8 +97,8 @@ export default function RecruiterLayout({ defaultPage = "dashboard" }: Recruiter
     );
 
     const recruiterCvLogs: CVLogItem[] = useMemo(
-        () => (isFptRecruiter ? [...cvLogs, ...storedFptCvLogs, ...MOCK_FPT_CV_LOGS] : cvLogs),
-        [cvLogs, isFptRecruiter, storedFptCvLogs]
+        () => (isFintRecruiter ? [...cvLogs, ...storedFintCvLogs, ...MOCK_FINT_CV_LOGS] : cvLogs),
+        [cvLogs, isFintRecruiter, storedFintCvLogs]
     );
 
     const managedRecruiterJobs: RecruiterJob[] = useMemo(
@@ -165,8 +166,7 @@ export default function RecruiterLayout({ defaultPage = "dashboard" }: Recruiter
     }
 
     function handleLogout() {
-        localStorage.removeItem(RECRUITER_SESSION_STORAGE_KEY);
-        localStorage.removeItem("currentUser");
+        clearAuthSession();
         setSession(null);
         router.push("/login");
     }
@@ -268,12 +268,8 @@ export default function RecruiterLayout({ defaultPage = "dashboard" }: Recruiter
                         <JobManagementPage
                             managedRecruiterJobs={managedRecruiterJobs}
                             recruiterCvLogs={recruiterCvLogs}
-                            session={session}
-                            companyLabel={companyLabel}
                             getManagedJobStatus={getManagedJobStatus}
-                            isUploadPopupOpen={isUploadPopupOpen}
                             onOpenUpload={() => setIsUploadPopupOpen(true)}
-                            onCloseUpload={() => setIsUploadPopupOpen(false)}
                             onSelectJob={(jobId) => {
                                 setSelectedJobId(jobId);
                                 setIsScoringSummaryOpen(true);
@@ -286,12 +282,6 @@ export default function RecruiterLayout({ defaultPage = "dashboard" }: Recruiter
                                 void setManagedJobStatus(jobId, "deleted");
                                 if (selectedJobId === jobId) setSelectedJobId(null);
                             }}
-                            onJobsChanged={async () => {
-                                if (!session) return;
-                                setJobs(await fetchRecruiterJobs(session.user_id));
-                                setCvLogs(await fetchRecruiterCvLogs(session.user_id));
-                            }}
-                            onMessage={showMessage}
                             selectedJobId={selectedJobId}
                             isScoringSummaryOpen={isScoringSummaryOpen}
                             onCloseSummary={() => setIsScoringSummaryOpen(false)}
@@ -338,6 +328,19 @@ export default function RecruiterLayout({ defaultPage = "dashboard" }: Recruiter
 
                     {activePage === "cv-detail" && !selectedScreeningLog && (
                         <p className={styles.tableState}>Please select a CV to view details.</p>
+                    )}
+
+                    {isUploadPopupOpen && (
+                        <RecruiterUploadJDModal
+                            companyLabel={companyLabel}
+                            session={session}
+                            onClose={() => setIsUploadPopupOpen(false)}
+                            onJobsChanged={async () => {
+                                setJobs(await fetchRecruiterJobs(session.user_id));
+                                setCvLogs(await fetchRecruiterCvLogs(session.user_id));
+                            }}
+                            onMessage={showMessage}
+                        />
                     )}
                 </main>
             </div>

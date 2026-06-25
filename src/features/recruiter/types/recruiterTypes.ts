@@ -3,6 +3,8 @@ export type RecruiterSession = {
     user_id: number;
     role: string;
     email?: string;
+    full_name?: string | null;
+    phone?: string | null;
     company_name?: string;
     must_change_password?: boolean;
 };
@@ -99,7 +101,7 @@ export type CvSortMode = "score" | "experience";
 export type ExperienceFilter = "all" | "intern" | "gt1" | "gt3" | "gt5" | "gt7";
 export type JobManagementStatus = "draft" | "active" | "turned_off" | "closed" | "deleted";
 
-export type StoredFptMockApplication = {
+export type StoredFintMockApplication = {
     id: number;
     jobId: number;
     jobTitle: string;

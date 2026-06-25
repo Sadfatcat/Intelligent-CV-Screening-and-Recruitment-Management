@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { RECRUITER_SESSION_STORAGE_KEY } from "../constants/recruiterConstants";
+import { getStoredUser } from "@/utils/authSession";
 import {
     fetchRecruiterCvLogs,
     fetchRecruiterJobs,
     fetchRecruiterProfile,
 } from "../services/recruiterApi";
 import type { CVLogItem, RecruiterJob, RecruiterSession } from "../types/recruiterTypes";
-import { readStoredFptMockCvLogs } from "../utils/recruiterMockMappers";
+import { readStoredFintMockCvLogs } from "../utils/recruiterMockMappers";
 
 export function useRecruiterData() {
     const [session, setSession] = useState<RecruiterSession | null>(null);
@@ -18,9 +19,16 @@ export function useRecruiterData() {
     const [companyName, setCompanyName] = useState("");
     const [isScreeningLoading, setIsScreeningLoading] = useState(false);
     const [screeningError, setScreeningError] = useState("");
-    const [storedFptCvLogs, setStoredFptCvLogs] = useState<CVLogItem[]>([]);
+    const [storedFintCvLogs, setStoredFintCvLogs] = useState<CVLogItem[]>([]);
 
     useEffect(() => {
+        const sessionUser = getStoredUser("recruiter") as RecruiterSession | null;
+        if (sessionUser && !sessionUser.must_change_password) {
+            window.setTimeout(() => setSession(sessionUser), 0);
+            window.setTimeout(() => setIsSessionChecked(true), 0);
+            return;
+        }
+
         const saved = localStorage.getItem(RECRUITER_SESSION_STORAGE_KEY);
         if (saved) {
             try {
@@ -37,7 +45,7 @@ export function useRecruiterData() {
 
     useEffect(() => {
         function sync() {
-            setStoredFptCvLogs(readStoredFptMockCvLogs());
+            setStoredFintCvLogs(readStoredFintMockCvLogs());
         }
         sync();
         window.addEventListener("storage", sync);
@@ -73,10 +81,14 @@ export function useRecruiterData() {
                 const mergedSession: RecruiterSession = {
                     ...session,
                     email: data.email || session.email,
+                    full_name: data.full_name ?? session.full_name,
+                    phone: data.phone ?? session.phone,
                     company_name: accountCompany || session.company_name,
                 };
                 const hasChanged =
                     mergedSession.email !== session.email ||
+                    mergedSession.full_name !== session.full_name ||
+                    mergedSession.phone !== session.phone ||
                     mergedSession.company_name !== session.company_name;
                 if (hasChanged) {
                     setSession(mergedSession);
@@ -109,6 +121,6 @@ export function useRecruiterData() {
         companyName,
         isScreeningLoading,
         screeningError,
-        storedFptCvLogs,
+        storedFintCvLogs,
     };
 }

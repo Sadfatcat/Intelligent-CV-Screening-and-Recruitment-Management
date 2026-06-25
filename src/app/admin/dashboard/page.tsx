@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./dashboard.module.css";
 import { apiUrl } from "@/utils/api";
+import { clearAuthSession, getStoredUser } from "@/utils/authSession";
 import BrandLogoIcon from "@/components/brand/BrandLogoIcon";
 import { DashboardLineChart } from "@/components/charts/DashboardCharts";
 
@@ -56,6 +57,12 @@ const ACCOUNT_ACTIVITY_ACTIONS = new Set([
     "recruiter.password.change",
     "user.login",
 ]);
+
+const DEMO_ROUTES = [
+    { label: "Admin", href: "/admin/dashboard" },
+    { label: "Recruiter", href: "/recruiter_UI" },
+    { label: "Candidate", href: "/candidate" },
+];
 
 function getDateKey(value: Date) {
     const year = value.getFullYear();
@@ -123,6 +130,12 @@ export default function AdminDashboard() {
     const [recruitmentTrendRange, setRecruitmentTrendRange] = useState<DashboardRange>("7d");
 
     useEffect(() => {
+        const sessionAdmin = getStoredUser("admin");
+        if (sessionAdmin) {
+            setAdminId(sessionAdmin.user_id);
+            return;
+        }
+
         const adminRaw = localStorage.getItem("adminUser");
         if (!adminRaw) {
             router.push("/login");
@@ -206,9 +219,13 @@ export default function AdminDashboard() {
     const inactiveRecruiters = recruiters.length - activeRecruiters;
 
     const handleLogout = () => {
-        localStorage.removeItem("adminUser");
+        clearAuthSession();
         router.push("/login");
     };
+
+    function openDemoRoute(path: string) {
+        window.open(path, "_blank", "noopener,noreferrer");
+    }
 
     function formatActivityTime(value: string) {
         const date = new Date(value);
@@ -280,7 +297,14 @@ export default function AdminDashboard() {
         <div className={styles.dashboardContainer}>
             <aside className={styles.sidebar}>
                 <div className={styles.logo}>
-                    <BrandLogoIcon size={82} color="#ffffff" accentColor="#ffffff" title="intelliCV admin" style={{ margin: "0 auto" }} />
+                    <button
+                        type="button"
+                        onClick={() => router.push("/admin/dashboard")}
+                        aria-label="Go to admin home"
+                        style={{ all: "unset", cursor: "pointer", display: "block", margin: "0 auto" }}
+                    >
+                        <BrandLogoIcon size={82} color="#ffffff" accentColor="#ffffff" title="intelliCV admin" />
+                    </button>
                 </div>
                 <nav className={styles.navMenu}>
                     <ul>
@@ -290,6 +314,13 @@ export default function AdminDashboard() {
                         <li>Activity Logs</li>
                         <li onClick={handleLogout} className={styles.logoutItem}>Logout</li>
                     </ul>
+                    <div className={styles.quickSwapGroup}>
+                        {DEMO_ROUTES.map((route) => (
+                            <button key={route.href} type="button" className={styles.quickSwapButton} onClick={() => openDemoRoute(route.href)}>
+                                {route.label}
+                            </button>
+                        ))}
+                    </div>
                 </nav>
             </aside>
 

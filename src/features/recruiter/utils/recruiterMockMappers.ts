@@ -1,23 +1,23 @@
-// Mock Mapping: chuyển mock FPT data về cùng format với dữ liệu thật.
+// Mock Mapping: chuyển mock Fint data về cùng format với dữ liệu thật.
 import { MOCK_CANDIDATES, MOCK_JOB_DESCRIPTIONS, MOCK_MATCHING_RESULTS } from "@/mock/cvScreeningMockData";
-import { FPT_MOCK_APPLICATIONS_STORAGE_KEY } from "../constants/recruiterConstants";
-import type { CVLogItem, MatchingDetail, RecruiterJob, RecruiterSession, StoredFptMockApplication } from "../types/recruiterTypes";
+import { FINT_MOCK_APPLICATIONS_STORAGE_KEY } from "../constants/recruiterConstants";
+import type { CVLogItem, MatchingDetail, RecruiterJob, RecruiterSession, StoredFintMockApplication } from "../types/recruiterTypes";
 
 export const MOCK_RECRUITER_JOBS: RecruiterJob[] = MOCK_JOB_DESCRIPTIONS.map((job) => ({
     id: job.id,
     title: job.title,
-    company_name: "FPT Software",
+    company_name: job.company,
     location: job.location,
     level: job.level,
     deadline: job.createdAt.slice(0, 10),
     quantity: 3,
     salary: "Negotiable",
-    direct_contact: "mock-hr@fpt.com",
+    direct_contact: "fintvn@fint.vn",
     image_url: null,
     isMock: true,
 }));
 
-export const MOCK_FPT_CV_LOGS: CVLogItem[] = MOCK_MATCHING_RESULTS.map((result) => {
+export const MOCK_FINT_CV_LOGS: CVLogItem[] = MOCK_MATCHING_RESULTS.map((result) => {
     const candidate = MOCK_CANDIDATES.find((item) => item.id === result.cvId);
     const breakdown = result.scoreBreakdown || {};
     const matchingDetail: MatchingDetail = {
@@ -134,11 +134,11 @@ export const MOCK_FPT_CV_LOGS: CVLogItem[] = MOCK_MATCHING_RESULTS.map((result) 
     };
 });
 
-export function readStoredFptMockCvLogs(): CVLogItem[] {
+export function readStoredFintMockCvLogs(): CVLogItem[] {
     try {
-        const raw = localStorage.getItem(FPT_MOCK_APPLICATIONS_STORAGE_KEY);
+        const raw = localStorage.getItem(FINT_MOCK_APPLICATIONS_STORAGE_KEY);
         if (!raw) return [];
-        const parsed = JSON.parse(raw) as StoredFptMockApplication[];
+        const parsed = JSON.parse(raw) as StoredFintMockApplication[];
         if (!Array.isArray(parsed)) return [];
         return parsed.map((item) => ({
             log_id: 990000 + item.id,
@@ -164,14 +164,14 @@ export function readStoredFptMockCvLogs(): CVLogItem[] {
             projects: [],
             certifications: [],
             work_experience: [],
-            summary: item.additionalInfo || "Candidate submitted this CV from the mock FPT Software job listing.",
+            summary: item.additionalInfo || "Candidate submitted this CV from the mock Fint Vietnam job listing.",
         }));
     } catch {
         return [];
     }
 }
 
-export function isFptSession(session: RecruiterSession | null, companyName: string) {
+export function isFintSession(session: RecruiterSession | null, companyName: string) {
     const text = `${session?.company_name || ""} ${session?.email || ""} ${companyName}`.toLowerCase();
-    return text.includes("fpt");
+    return text.includes("fint") || text.includes("fintvn@fint.vn");
 }

@@ -3,8 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MOCK_JOB_DESCRIPTIONS } from "@/mock/cvScreeningMockData";
 import { apiUrl } from "@/utils/api";
+import { getStoredUser } from "@/utils/authSession";
 
-const FPT_MOCK_APPLICATIONS_STORAGE_KEY = "fptMockSubmittedCvLogs";
+const FINT_MOCK_APPLICATIONS_STORAGE_KEY = "fintMockSubmittedCvLogs";
 
 export type JobItem = {
     id: number;
@@ -19,6 +20,7 @@ export type JobItem = {
     image_url?: string;
     description: string;
     requirements?: string;
+    jd_parsed_text?: string | null;
     jd_file_path?: string | null;
     isMock?: boolean;
 };
@@ -64,7 +66,7 @@ export type CandidateSubmissionItem = {
     submitted_at: string | null;
 };
 
-export type StoredFptMockApplication = {
+export type StoredFintMockApplication = {
     id: number;
     jobId: number;
     jobTitle: string;
@@ -80,13 +82,13 @@ export type StoredFptMockApplication = {
 const MOCK_CANDIDATE_JOBS: JobItem[] = MOCK_JOB_DESCRIPTIONS.map((job) => ({
     id: job.id,
     title: job.title,
-    company_name: "FPT Software",
+    company_name: job.company,
     location: job.location,
     level: job.level,
     deadline: job.createdAt.slice(0, 10),
     quantity: 3,
     salary: "Negotiable",
-    direct_contact: "mock-hr@fpt.com",
+    direct_contact: "fintvn@fint.vn",
     description: `${job.department} | ${job.employmentType}. ${job.responsibilities.join(" ")}`,
     requirements: [
         `Required: ${job.requiredSkills.join(", ")}`,
@@ -99,14 +101,14 @@ const MOCK_CANDIDATE_JOBS: JobItem[] = MOCK_JOB_DESCRIPTIONS.map((job) => ({
     isMock: true,
 }));
 
-export function saveFptMockApplication(application: StoredFptMockApplication) {
+export function saveFintMockApplication(application: StoredFintMockApplication) {
     try {
-        const raw = localStorage.getItem(FPT_MOCK_APPLICATIONS_STORAGE_KEY);
+        const raw = localStorage.getItem(FINT_MOCK_APPLICATIONS_STORAGE_KEY);
         const current = raw ? JSON.parse(raw) : [];
         const list = Array.isArray(current) ? current : [];
-        localStorage.setItem(FPT_MOCK_APPLICATIONS_STORAGE_KEY, JSON.stringify([application, ...list]));
+        localStorage.setItem(FINT_MOCK_APPLICATIONS_STORAGE_KEY, JSON.stringify([application, ...list]));
     } catch {
-        localStorage.setItem(FPT_MOCK_APPLICATIONS_STORAGE_KEY, JSON.stringify([application]));
+        localStorage.setItem(FINT_MOCK_APPLICATIONS_STORAGE_KEY, JSON.stringify([application]));
     }
 }
 
@@ -177,33 +179,52 @@ export function useCandidateData() {
     }, []);
 
     useEffect(() => {
-        const raw = localStorage.getItem("currentUser");
-        if (!raw) return;
-        try {
-            const currentUser = JSON.parse(raw);
-            if (typeof currentUser?.user_id === "number") setCandidateId(currentUser.user_id);
-            const email = currentUser?.email || currentUser?.user?.email;
-            if (typeof email === "string" && email.includes("@")) {
-                setDisplayName(email.split("@")[0]);
-                setCandidateEmail(email);
+        const timer = window.setTimeout(() => {
+            const sessionUser = getStoredUser("candidate");
+            if (sessionUser) {
+                setCandidateId(sessionUser.user_id);
+                const email = sessionUser.email || "";
+                if (email.includes("@")) {
+                    setDisplayName(email.split("@")[0]);
+                    setCandidateEmail(email);
+                }
+                return;
             }
-        } catch {
-            setDisplayName("Candidate");
-        }
+
+            const raw = localStorage.getItem("currentUser");
+            if (!raw) return;
+            try {
+                const currentUser = JSON.parse(raw);
+                if (typeof currentUser?.user_id === "number") setCandidateId(currentUser.user_id);
+                const email = currentUser?.email || currentUser?.user?.email;
+                if (typeof email === "string" && email.includes("@")) {
+                    setDisplayName(email.split("@")[0]);
+                    setCandidateEmail(email);
+                }
+            } catch {
+                setDisplayName("Candidate");
+            }
+        }, 0);
+        return () => window.clearTimeout(timer);
     }, []);
 
     useEffect(() => {
         if (candidateId === null) {
-            setSubmittedJobs([]);
-            setIsCvScoring(false);
-            scoringApplicationIdsRef.current = new Set();
-            submittedJobsLoadedRef.current = false;
-            return;
+            const timer = window.setTimeout(() => {
+                setSubmittedJobs([]);
+                setIsCvScoring(false);
+                scoringApplicationIdsRef.current = new Set();
+                submittedJobsLoadedRef.current = false;
+            }, 0);
+            return () => window.clearTimeout(timer);
         }
-        loadSubmittedJobs(candidateId).catch(() => {
-            setSubmittedJobs([]);
-            setIsCvScoring(false);
-        });
+        const timer = window.setTimeout(() => {
+            loadSubmittedJobs(candidateId).catch(() => {
+                setSubmittedJobs([]);
+                setIsCvScoring(false);
+            });
+        }, 0);
+        return () => window.clearTimeout(timer);
     }, [candidateId, loadSubmittedJobs]);
 
     useEffect(() => {
@@ -242,6 +263,6 @@ export function useCandidateData() {
         setApplyStatus,
         loadSubmittedJobs,
         parseApiResponse,
-        saveFptMockApplication,
+        saveFintMockApplication,
     };
 }

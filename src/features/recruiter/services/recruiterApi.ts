@@ -25,6 +25,8 @@ export async function loginRecruiter(email: string, password: string): Promise<R
         user_id: data.user_id,
         role: data.role,
         email: data.email || email,
+        full_name: data.full_name,
+        phone: data.phone,
         company_name: data.company_name,
         must_change_password: data.must_change_password,
     };
@@ -45,7 +47,22 @@ export async function changeRecruiterPassword(userId: number, currentPassword: s
 
 export async function fetchRecruiterProfile(recruiterId: number) {
     const response = await fetch(apiUrl(`/api/recruiter/${recruiterId}/profile`));
-    return parseJsonResponse<{ email?: string; company_name?: string }>(response, "Failed to load recruiter profile");
+    return parseJsonResponse<{ email?: string; full_name?: string | null; company_name?: string; phone?: string | null }>(response, "Failed to load recruiter profile");
+}
+
+export async function updateRecruiterProfile(recruiterId: number, payload: { full_name: string; phone: string }) {
+    const response = await fetch(apiUrl(`/api/recruiter/${recruiterId}/profile`), {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+    });
+    return parseJsonResponse<{
+        message: string;
+        email?: string;
+        full_name?: string | null;
+        company_name?: string;
+        phone?: string | null;
+    }>(response, "Update profile failed");
 }
 
 export async function fetchRecruiterJobs(recruiterId: number): Promise<RecruiterJob[]> {

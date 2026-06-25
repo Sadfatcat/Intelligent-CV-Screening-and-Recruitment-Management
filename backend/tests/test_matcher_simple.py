@@ -88,6 +88,32 @@ def test_experience_match_and_rule_pass():
     assert any("4 years experience found" == item for item in experience["good"])
 
 
+def test_structured_experience_years_and_preferred_sections():
+    cv = """
+    Skills: React, TypeScript, CSS, REST API
+    Experience years: 2
+    Education: Bachelor of Software Engineering
+    Languages: English
+    Projects: Built responsive UI with React
+    """
+    jd = """
+    Required skills: React, TypeScript, CSS, REST API
+    Preferred skills: Playwright
+    Required experience years: 1 years
+    Education requirement: Bachelor in Computer Science or equivalent experience
+    Language requirements: English
+    Responsibilities: Build responsive UI; Integrate REST APIs
+    """
+    out = score_cv_vs_jd(cv, jd)
+    experience = _section(out, "experience")
+    technical = _section(out, "technical_skills")
+
+    assert "2 years experience found" in experience["good"]
+    assert "Preferred 1 years missing" not in experience["missing"]
+    assert "Preferred English missing" not in technical["missing"]
+    assert out["final_score"] >= 70
+
+
 def test_must_have_matched_missing_and_capped_penalty():
     cv = """
     Skills: Python

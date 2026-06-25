@@ -24,13 +24,18 @@ type JobCardProps = {
     isActive?: boolean;
 };
 
+import { useState } from "react";
 import styles from "./Jobcard.module.css";
+import { normalizeJobImageUrl } from "@/features/candidate/utils/candidateJobAssets";
 
 export default function JobCard({
     job,
     onClick,
     isActive = false,
 }: JobCardProps) {
+    const imageUrl = normalizeJobImageUrl(job.image_url);
+    const [imageFailed, setImageFailed] = useState(false);
+
     return (
         <div
             onClick={onClick}
@@ -39,8 +44,8 @@ export default function JobCard({
                 cursor: onClick ? "pointer" : "default",
             }}
         >
-            {job.image_url && (
-                <img src={job.image_url} alt={job.title} style={{ width: "100%", borderRadius: "8px", marginBottom: "12px" }} />
+            {imageUrl && !imageFailed && (
+                <img src={imageUrl} alt={job.title} className={styles.image} onError={() => setImageFailed(true)} />
             )}
 
             <h3 className={styles.title}>{job.title}</h3>
@@ -68,15 +73,6 @@ export default function JobCard({
                 <span className={styles.label}>Direct contact:</span> {job.direct_contact || "N/A"}
             </p>
 
-            <p className={styles.description}>
-                <span className={styles.label}>Description:</span> {job.description}
-            </p>
-            
-            {job.requirements && (
-                <p className={styles.description}>
-                    <span className={styles.label}>Requirements:</span> {job.requirements}
-                </p>
-            )}
         </div>
     );
 }

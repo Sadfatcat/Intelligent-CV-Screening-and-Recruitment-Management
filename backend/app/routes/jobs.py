@@ -1,5 +1,6 @@
 import os
 import uuid
+from pathlib import Path
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Query
 from fastapi.responses import FileResponse
 from sqlmodel import Session, select
@@ -14,8 +15,9 @@ PUBLIC_UPLOAD_BASE_URL = os.getenv("PUBLIC_UPLOAD_BASE_URL", "").rstrip("/")
 ENABLE_UPLOAD_VECTORS = os.getenv("ENABLE_UPLOAD_VECTORS", "0") == "1"
 
 # thư mục lưu file JD trên server
-UPLOAD_DIR = os.getenv("JD_UPLOAD_DIR", "/app/uploads/jd")
-JOB_COVER_UPLOAD_DIR = os.getenv("JOB_COVER_UPLOAD_DIR", "/app/uploads/job_cover")
+LOCAL_UPLOAD_ROOT = Path(__file__).resolve().parent.parent / "uploads"
+UPLOAD_DIR = os.getenv("JD_UPLOAD_DIR", str(LOCAL_UPLOAD_ROOT / "jd"))
+JOB_COVER_UPLOAD_DIR = os.getenv("JOB_COVER_UPLOAD_DIR", str(LOCAL_UPLOAD_ROOT / "job_cover"))
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(JOB_COVER_UPLOAD_DIR, exist_ok=True)
 

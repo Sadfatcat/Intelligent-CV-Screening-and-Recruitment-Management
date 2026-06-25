@@ -8,6 +8,7 @@ import { useCandidateData } from "./hooks/useCandidateData";
 import AppliedCVsPage from "./pages/AppliedCVsPage";
 import JobBrowsePage from "./pages/JobBrowsePage";
 import type { JobItem } from "./hooks/useCandidateData";
+import { normalizeJobImageUrl } from "./utils/candidateJobAssets";
 import styles from "../../app/candidate/page.module.css";
 
 const ALL_CATEGORIES = [
@@ -16,6 +17,12 @@ const ALL_CATEGORIES = [
     "Big Data Engineer", "Database Admin", "System Admin", "Cybersecurity",
     "UI/UX Designer", "Software Architect", "Engineering Manager",
     "Business Analyst", "Technical Writer",
+];
+
+const DEMO_ROUTES = [
+    { label: "Admin", href: "/admin/dashboard" },
+    { label: "Recruiter", href: "/recruiter_UI" },
+    { label: "Candidate", href: "/candidate" },
 ];
 
 export default function CandidateLayout() {
@@ -34,7 +41,7 @@ export default function CandidateLayout() {
         setApplyStatus,
         loadSubmittedJobs,
         parseApiResponse,
-        saveFptMockApplication,
+        saveFintMockApplication,
     } = useCandidateData();
 
     const [selectedJob, setSelectedJob] = useState<JobItem | null>(null);
@@ -43,6 +50,7 @@ export default function CandidateLayout() {
     const [showAllCategories, setShowAllCategories] = useState(false);
     const [activeSubTab, setActiveSubTab] = useState<"jobs" | "applications">("jobs");
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedJobImageFailed, setSelectedJobImageFailed] = useState(false);
     const [file, setFile] = useState<File | null>(null);
     const [candidateName, setCandidateName] = useState("");
     const [candidatePhone, setCandidatePhone] = useState("");
@@ -108,7 +116,20 @@ export default function CandidateLayout() {
             candidateJobDetailHistoryRef.current = true;
         }
         setSelectedJob(jobData);
+        setSelectedJobImageFailed(false);
         if (jobData.isMock) setIsModalOpen(true);
+        if (!jobData.isMock) {
+            fetch(apiUrl(`/api/jobs/${jobData.id}`))
+                .then(async (response) => {
+                    if (!response.ok) return null;
+                    return await response.json() as Pick<JobItem, "jd_parsed_text">;
+                })
+                .then((detail) => {
+                    if (!detail?.jd_parsed_text) return;
+                    setSelectedJob((current) => current?.id === jobData.id ? { ...current, jd_parsed_text: detail.jd_parsed_text } : current);
+                })
+                .catch(() => {});
+        }
     }
 
     function handleBackFromJobDetail() {
@@ -125,6 +146,10 @@ export default function CandidateLayout() {
         setFile(null);
         setAdditionalInfo("");
         setApplyStatus(null);
+    }
+
+    function openDemoRoute(path: string) {
+        window.open(path, "_blank", "noopener,noreferrer");
     }
 
     async function handleApply(e: React.FormEvent) {
@@ -167,7 +192,7 @@ export default function CandidateLayout() {
                     },
                     ...current,
                 ]);
-                saveFptMockApplication({
+                saveFintMockApplication({
                     id: mockApplicationId,
                     jobId: selectedJob.id,
                     jobTitle: selectedJob.title,
@@ -181,7 +206,7 @@ export default function CandidateLayout() {
                 });
                 setApplyStatus({
                     type: "success",
-                    message: `CV submitted to FPT Software for ${selectedJob.title}. The FPT recruiter mock account can now see it.`,
+                    message: `CV submitted to Fint Vietnam for ${selectedJob.title}. The Fint recruiter mock account can now see it.`,
                 });
                 setFile(null);
                 setAdditionalInfo("");
@@ -296,6 +321,13 @@ export default function CandidateLayout() {
                         </div>
                     </div>
                     <div className={styles.leftBottomBox}>
+                        <div className={styles.quickSwapBox}>
+                            {DEMO_ROUTES.map((route) => (
+                                <button key={route.href} type="button" className={styles.quickSwapButton} onClick={() => openDemoRoute(route.href)}>
+                                    {route.label}
+                                </button>
+                            ))}
+                        </div>
                         <div className={styles.leftBottomUser}>
                             <div className={styles.avatarCircle} title={displayName}>
                                 {displayName.charAt(0).toUpperCase()}
@@ -358,8 +390,10 @@ export default function CandidateLayout() {
                             <button type="button" className={styles.applyButton} onClick={handleBackFromJobDetail}>
                                 {"<"} Back
                             </button>
-                            {selectedJob.image_url && (
-                                <img src={selectedJob.image_url} alt={selectedJob.title} className={styles.detailsImage} />
+                            {normalizeJobImageUrl(selectedJob.image_url) && !selectedJobImageFailed ? (
+                                <img src={normalizeJobImageUrl(selectedJob.image_url)} alt={selectedJob.title} className={styles.detailsImage} onError={() => setSelectedJobImageFailed(true)} />
+                            ) : (
+                                <div className={styles.detailsImageFallback}>{selectedJob.company_name.charAt(0).toUpperCase()}</div>
                             )}
                             <h2 className={styles.detailsTitle}>{selectedJob.title}</h2>
                             <p className={styles.detailsMeta}>
@@ -369,6 +403,12 @@ export default function CandidateLayout() {
                                 <h4>Short Description:</h4>
                                 <p>{selectedJob.description}</p>
                             </div>
+                            {(selectedJob.requirements || selectedJob.jd_parsed_text) && (
+                                <div className={`${styles.detailsSection} ${styles.detailsRequirementSection}`}>
+                                    <h4>Requirements:</h4>
+                                    <p>{selectedJob.requirements || selectedJob.jd_parsed_text}</p>
+                                </div>
+                            )}
                             <div className={styles.detailsSection}>
                                 <h4>Requirements / Deadline:</h4>
                                 <p>Deadline: <strong>{selectedJob.deadline}</strong></p>

@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import BrandLogoFull from "@/components/brand/BrandLogoFull";
+import { getStoredHomeHref } from "@/utils/homeRoute";
 
 const navItems = [
     { label: "About Us", href: "https://usth.edu.vn/gioi-thieu/gioi-thieu-chung-ve-usth/" },
@@ -13,13 +14,18 @@ const navItems = [
 
 export default function Navbar() {
     const pathname = usePathname();
+    const [homeHref, setHomeHref] = useState("/candidate");
+
+    useEffect(() => {
+        setHomeHref(getStoredHomeHref());
+    }, []);
 
     return (
         <nav style={styles.navbar}>
             <div style={styles.container}>
-                <a style={styles.logo}>
+                <Link href={homeHref} style={styles.logo} aria-label="Go to home">
                     <BrandLogoFull iconSize={46} />
-                </a>
+                </Link>
 
                 <div style={styles.rightArea}>
                     <div style={styles.links}>

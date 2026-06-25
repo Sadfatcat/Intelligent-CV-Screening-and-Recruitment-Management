@@ -20,6 +20,11 @@ class UpdateJobStatusRequest(BaseModel):
     status: str
 
 
+class UpdateRecruiterProfileRequest(BaseModel):
+    full_name: str | None = None
+    phone: str | None = None
+
+
 VALID_JOB_STATUSES = {"draft", "active", "turned_off", "closed", "deleted"}
 
 
@@ -166,6 +171,45 @@ def extract_cv_detail_fields(cv: CV | None, matching_detail: dict | None) -> dic
 def get_recruiter_profile(recruiter_id: int, session: Session = Depends(get_session)):
     recruiter = require_recruiter(recruiter_id, session)
     return {
+        "id": recruiter.id,
+        "email": recruiter.email,
+        "full_name": recruiter.full_name,
+        "company_name": recruiter.company_name,
+        "phone": recruiter.phone,
+    }
+
+
+@router.put("/{recruiter_id}/profile")
+def update_recruiter_profile(
+    recruiter_id: int,
+    payload: UpdateRecruiterProfileRequest,
+    session: Session = Depends(get_session),
+):
+    recruiter = require_recruiter(recruiter_id, session)
+
+    if payload.full_name is not None:
+        recruiter.full_name = payload.full_name.strip() or None
+    if payload.phone is not None:
+        recruiter.phone = payload.phone.strip() or None
+
+    session.add(recruiter)
+    session.commit()
+    session.refresh(recruiter)
+
+    session.add(
+        ActivityLog(
+            actor_user_id=recruiter.id,
+            actor_role="recruiter",
+            action="recruiter.profile.update",
+            target_type="user",
+            target_id=recruiter.id,
+            detail=f"Recruiter updated profile: {recruiter.email}",
+        )
+    )
+    session.commit()
+
+    return {
+        "message": "Recruiter profile updated successfully",
         "id": recruiter.id,
         "email": recruiter.email,
         "full_name": recruiter.full_name,

@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import brightStyles from "./page.bright.module.css";
 import { handleLoginSubmit } from "@/utils/loginHandler";
+import { getAuthSession } from "@/utils/authSession";
+import { homeHrefForRole } from "@/utils/homeRoute";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -16,6 +18,11 @@ export default function LoginPage() {
   const [resultType, setResultType] = useState<"success" | "error" | "">("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const styles = brightStyles;
+
+  useEffect(() => {
+    const session = getAuthSession();
+    if (session) router.replace(homeHrefForRole(session.user.role));
+  }, [router]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

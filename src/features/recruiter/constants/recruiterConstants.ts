@@ -1,7 +1,7 @@
 // Recruiter Constants: key lưu localStorage và nhãn trạng thái dùng chung.
 import type { JobManagementStatus, ScoreStatus } from "../types/recruiterTypes";
 
-export const FPT_MOCK_APPLICATIONS_STORAGE_KEY = "fptMockSubmittedCvLogs";
+export const FINT_MOCK_APPLICATIONS_STORAGE_KEY = "fintMockSubmittedCvLogs";
 export const RECRUITER_SESSION_STORAGE_KEY = "recruiterUser";
 export const RECRUITER_PASSWORD_CHANGE_STORAGE_KEY = "recruiterPasswordChangeUser";
 

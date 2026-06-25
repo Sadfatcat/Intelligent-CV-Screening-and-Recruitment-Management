@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 import logging
 import os
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,8 +27,13 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan, title="Intelligent CV Screening API", version="1.0.0")
 
-os.makedirs("/app/uploads", exist_ok=True)
-app.mount("/uploads", StaticFiles(directory="/app/uploads"), name="uploads")
+upload_root = os.getenv("UPLOAD_ROOT", str(Path(__file__).resolve().parent / "uploads"))
+try:
+    os.makedirs(upload_root, exist_ok=True)
+except OSError:
+    upload_root = str(Path(__file__).resolve().parent.parent / "uploads")
+    os.makedirs(upload_root, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=upload_root), name="uploads")
 
 # mo cong cho frontend goi duoc
 app.add_middleware(

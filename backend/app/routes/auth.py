@@ -5,7 +5,7 @@ from typing import Optional
 
 from app.database import get_session
 from app.models import User, ActivityLog
-from app.security import get_password_hash, verify_password
+from app.security import ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, get_password_hash, verify_password
 
 # prefix /api/auth
 router = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -99,6 +99,9 @@ def login_user(user_data: UserLoginRequest, session: Session = Depends(get_sessi
 
     return {
         "message": "Login successful",
+        "access_token": create_access_token(user),
+        "token_type": "bearer",
+        "expires_in": ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         "user_id": user.id,
         "role": user.role,
         "email": user.email,

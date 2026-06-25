@@ -17,6 +17,7 @@ export interface SettersType {
 }
 
 import { apiUrl } from "./api";
+import { clearAuthSession, setAuthSession } from "./authSession";
 import { RECRUITER_PASSWORD_CHANGE_STORAGE_KEY, RECRUITER_SESSION_STORAGE_KEY } from "@/features/recruiter/constants/recruiterConstants";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -90,9 +91,8 @@ export async function handleLoginSubmit(
     // Backend báo OK 200, thành công!
     setters.setResultMessage("Login successful!");
     setters.setResultType("success");
-    localStorage.removeItem("currentUser");
-    localStorage.removeItem(RECRUITER_SESSION_STORAGE_KEY);
-    localStorage.removeItem("adminUser");
+    clearAuthSession();
+    setAuthSession(data);
 
     if (data.role === "recruiter") {
       if (data.must_change_password) {

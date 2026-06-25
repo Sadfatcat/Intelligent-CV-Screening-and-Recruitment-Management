@@ -64,7 +64,10 @@ HEADING_PHRASE_MAP = {
     "mandatory qualifications": "requirements",
     "essential qualifications": "requirements",
     "required skills": "requirements",
+    "required skill": "requirements",
     "required experience": "requirements",
+    "required experience years": "experience",
+    "experience years": "experience",
     "required competencies": "requirements",
     "minimum requirements": "requirements",
     "minimum skills": "requirements",
@@ -84,6 +87,7 @@ HEADING_PHRASE_MAP = {
     "qualifications": "requirements",
     "requirements": "requirements",
     "preferred qualifications": "preferred",
+    "preferred skill": "preferred",
     "nice to have": "preferred",
     "nice-to-have": "preferred",
     "nice-to-have skills": "preferred",
@@ -175,6 +179,8 @@ HEADING_PHRASE_MAP = {
     "portfolio": "projects",
     "project highlights": "projects",
     "education": "education",
+    "education requirement": "education",
+    "education requirements": "education",
     "educational background": "education",
     "academic background": "education",
     "academic qualifications": "education",
@@ -189,6 +195,9 @@ HEADING_PHRASE_MAP = {
     "training": "certificates",
     "courses": "certificates",
     "languages": "natural_languages",
+    "language": "natural_languages",
+    "language requirement": "natural_languages",
+    "language requirements": "natural_languages",
     "spoken languages": "natural_languages",
     "language skills": "natural_languages",
     "foreign languages": "natural_languages",
@@ -206,6 +215,9 @@ HEADING_PHRASE_MAP = {
     "benefits and work location": "ignored",
     "work location": "ignored",
     "location": "ignored",
+    "level": "ignored",
+    "keywords": "ignored",
+    "role category": "ignored",
 }
 
 SECTION_SYNONYMS = {
@@ -310,6 +322,12 @@ CERTIFICATE_HINTS = {
     "certification",
 }
 
+COMPATIBLE_SKILLS = {
+    "javascript": {"typescript"},
+    "rest": {"rest api"},
+    "rest api": {"rest"},
+}
+
 
 def clean_text(text: str) -> str:
     if not text:
@@ -363,6 +381,13 @@ def _line_blocks(text: str) -> List[str]:
         if line:
             lines.append(line)
     return lines
+
+
+def _list_blocks(text: str) -> List[str]:
+    blocks = []
+    for line in _line_blocks(text):
+        blocks.extend(item.strip() for item in re.split(r"[;\n•|]", line) if item.strip())
+    return blocks
 
 
 def _section_for_heading(line: str) -> str | None:
@@ -438,6 +463,9 @@ def extract_experience_years(text: str) -> float:
 def _required_experience_years(text: str) -> float:
     if not text:
         return 0.0
+    explicit_years = re.search(r"\bexperience\s+years?\s*:\s*(\d+(?:\.\d+)?)\b", text, flags=re.I)
+    if explicit_years:
+        return float(explicit_years.group(1))
     years = re.findall(r"(\d+(?:\.\d+)?)\s*\+?\s+years?", text, flags=re.I)
     if years:
         return float(years[0])
@@ -534,9 +562,17 @@ def _extract_section_items(section: str, text: str, alias_index: Dict[str, str])
     if section == "experience":
         items = []
         for line in _line_blocks(text):
+            bare_years = re.fullmatch(r"\d+(?:\.\d+)?", line.strip())
+            if bare_years:
+                items.append(f"{bare_years.group(0)} years")
+                continue
             if re.search(r"\b(years?|months?|experience|experienced)\b", line, flags=re.I):
+                explicit_years = re.search(r"\bexperience\s+years?\s*:\s*(\d+(?:\.\d+)?)\b", line, flags=re.I)
+                if explicit_years:
+                    items.append(f"{explicit_years.group(1)} years")
+                    continue
                 year_match = re.search(
-                    r"(\d+(?:\.\d+)?\s*\+?\s+years?(?:\s+[a-z]+){0,4})",
+                    r"(\d+(?:\.\d+)?\s*\+?\s+years?)",
                     line,
                     flags=re.I,
                 )
@@ -544,7 +580,7 @@ def _extract_section_items(section: str, text: str, alias_index: Dict[str, str])
                     items.append(year_match.group(1))
         return items
     if section in {"experience", "projects", "responsibilities", "education", "soft_skills"}:
-        return [item for item in _line_blocks(text) if len(item.split()) >= 2]
+        return [item for item in _list_blocks(text) if len(item.split()) >= 2]
     return _extract_list_items(text, alias_index)
 
 
@@ -694,6 +730,8 @@ def _strict_item_match(required_item: str, evidence_items: List[str], alias_inde
     evidence_set = {_canonicalize_item(item, alias_index) for item in evidence_items}
     if required in evidence_set:
         return True
+    if COMPATIBLE_SKILLS.get(required, set()).intersection(evidence_set):
+        return True
     pattern = r"(?<![a-z0-9+#.])" + re.escape(required) + r"(?![a-z0-9+#.])"
     return any(re.search(pattern, item) for item in evidence_set)
 
@@ -728,6 +766,55 @@ def _semantic_item_match(required_item: str, evidence_items: List[str], alpha: f
     return max((section_similarity(item, required_item, alpha=alpha) for item in evidence_items), default=0.0) >= 0.35
 
 
+def _stem_for_overlap(token: str) -> str:
+    token = re.sub(r"[^a-z0-9+#.]", "", token.lower())
+    for suffix in ("ing", "ed", "s"):
+        if len(token) > len(suffix) + 3 and token.endswith(suffix):
+            return token[: -len(suffix)]
+    return token
+
+
+def _token_overlap_item_match(required_item: str, evidence_items: List[str]) -> bool:
+    stopwords = {
+        "and",
+        "or",
+        "the",
+        "a",
+        "an",
+        "with",
+        "for",
+        "to",
+        "of",
+        "in",
+        "on",
+        "as",
+        "role",
+        "experience",
+        "required",
+        "requirement",
+    }
+    required_tokens = {
+        _stem_for_overlap(token)
+        for token in re.findall(r"[a-z0-9+#.]+", required_item.lower())
+        if token.lower() not in stopwords and len(token) > 2
+    }
+    if not required_tokens:
+        return False
+
+    for item in evidence_items:
+        evidence_tokens = {
+            _stem_for_overlap(token)
+            for token in re.findall(r"[a-z0-9+#.]+", item.lower())
+            if token.lower() not in stopwords and len(token) > 2
+        }
+        if not evidence_tokens:
+            continue
+        coverage = len(required_tokens.intersection(evidence_tokens)) / len(required_tokens)
+        if coverage >= (0.5 if len(required_tokens) <= 3 else 0.4):
+            return True
+    return False
+
+
 def _section_explanation(label: str, good: List[str], missing: List[str]) -> str:
     if good and missing:
         return f"Candidate has relevant {label.lower()} evidence but still misses some JD demands."
@@ -749,8 +836,8 @@ def _section_result(
 ) -> Dict:
     good = []
     missing = []
-    matched_required = 0
-    matched_preferred = 0
+    matched_required = 0.0
+    matched_preferred = 0.0
 
     semantic_required_items = required_items
     experience_year_required = section == "experience" and _required_experience_years(" ".join(required_items)) > 0
@@ -761,7 +848,8 @@ def _section_result(
     preferred_total = len(preferred_items)
     if experience_year_required:
         required_total += 1
-    denominator = (required_total * 1.0) + (preferred_total * 0.5)
+    preferred_weight = 0.25
+    denominator = (required_total * 1.0) + (preferred_total * preferred_weight)
     if denominator == 0:
         return {
             "key": section,
@@ -778,7 +866,11 @@ def _section_result(
         matched = (
             _strict_item_match(item, evidence_items, alias_index)
             if section in STRICT_SECTIONS
-            else _keyword_item_match(item, evidence_items, alias_index) or _semantic_item_match(item, evidence_items, alpha)
+            else (
+                _keyword_item_match(item, evidence_items, alias_index)
+                or _token_overlap_item_match(item, evidence_items)
+                or _semantic_item_match(item, evidence_items, alpha)
+            )
         )
         if matched:
             matched_required += 1
@@ -790,7 +882,11 @@ def _section_result(
         matched = (
             _strict_item_match(item, evidence_items, alias_index)
             if section in STRICT_SECTIONS
-            else _keyword_item_match(item, evidence_items, alias_index) or _semantic_item_match(item, evidence_items, alpha)
+            else (
+                _keyword_item_match(item, evidence_items, alias_index)
+                or _token_overlap_item_match(item, evidence_items)
+                or _semantic_item_match(item, evidence_items, alpha)
+            )
         )
         if matched:
             matched_preferred += 1
@@ -805,10 +901,15 @@ def _section_result(
             if candidate_years >= required_years:
                 matched_required += 1
                 good.append(f"{candidate_years:g} years experience found")
+            elif candidate_years > 0:
+                partial_credit = min(0.85, candidate_years / required_years)
+                matched_required += partial_credit
+                good.append(f"{candidate_years:g} years partial experience found")
+                missing.append(f"{required_years:g}+ years experience required")
             else:
                 missing.append(f"{required_years:g}+ years experience required")
 
-    score = ((matched_required * 1.0) + (matched_preferred * 0.5)) / denominator
+    score = ((matched_required * 1.0) + (matched_preferred * preferred_weight)) / denominator
 
     score100 = _score100(score)
     good = _dedupe(good)
@@ -865,6 +966,24 @@ def _infer_must_have(demands: Dict[str, Dict[str, List[str]]]) -> List[str]:
     return _dedupe(must_have)
 
 
+def _core_fit_score(section_scores: Dict[str, float | None]) -> float | None:
+    core_weights = {
+        "technical_skills": 0.45,
+        "programming_languages": 0.20,
+        "experience": 0.25,
+        "natural_languages": 0.10,
+    }
+    applicable = {
+        section: weight
+        for section, weight in core_weights.items()
+        if isinstance(section_scores.get(section), (int, float))
+    }
+    total = sum(applicable.values())
+    if total <= 0:
+        return None
+    return sum(float(section_scores[section]) * weight for section, weight in applicable.items()) / total
+
+
 def score_cv_vs_jd(
     cv_text: str,
     jd_text: str,
@@ -919,6 +1038,10 @@ def score_cv_vs_jd(
         ) / applicable_weight
     else:
         raw_score = 0.0
+    core_score = _core_fit_score(section_scores)
+    calibrated_score = raw_score
+    if core_score is not None:
+        calibrated_score = max(raw_score, (raw_score * 0.35) + (core_score * 0.65))
 
     must_have_items = must_have if must_have is not None else _infer_must_have(demands)
     must_have_matched = []
@@ -948,7 +1071,7 @@ def score_cv_vs_jd(
         if len(must_have_matched) >= len(must_have_missing):
             penalty *= 0.5
     penalty = round(penalty, 3)
-    final_score = round(_clamp_score(raw_score - penalty), 3)
+    final_score = round(_clamp_score(calibrated_score - penalty), 3)
 
     passes, fails = rule_based_checks(parsed_cv, parsed_jd, {})
     for missing in must_have_missing:
@@ -967,6 +1090,9 @@ def score_cv_vs_jd(
         "overall_score": final_score,
         "final_score": final_score,
         "summary": summary,
+        "raw_score": round(raw_score, 3),
+        "core_fit_score": round(core_score, 3) if core_score is not None else None,
+        "calibrated_score": round(calibrated_score, 3),
         "sections": sections,
         "good_points": good_points,
         "missing_points": missing_points,
