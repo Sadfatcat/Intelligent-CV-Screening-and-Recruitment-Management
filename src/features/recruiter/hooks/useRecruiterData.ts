@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { RECRUITER_SESSION_STORAGE_KEY } from "../constants/recruiterConstants";
 import { getStoredUser } from "@/utils/authSession";
 import {
     fetchRecruiterCvLogs,
@@ -27,18 +26,6 @@ export function useRecruiterData() {
             window.setTimeout(() => setSession(sessionUser), 0);
             window.setTimeout(() => setIsSessionChecked(true), 0);
             return;
-        }
-
-        const saved = localStorage.getItem(RECRUITER_SESSION_STORAGE_KEY);
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved) as RecruiterSession;
-                if (parsed.role === "recruiter" && !parsed.must_change_password) {
-                    window.setTimeout(() => setSession(parsed), 0);
-                }
-            } catch {
-                localStorage.removeItem(RECRUITER_SESSION_STORAGE_KEY);
-            }
         }
         window.setTimeout(() => setIsSessionChecked(true), 0);
     }, []);
@@ -92,7 +79,6 @@ export function useRecruiterData() {
                     mergedSession.company_name !== session.company_name;
                 if (hasChanged) {
                     setSession(mergedSession);
-                    localStorage.setItem(RECRUITER_SESSION_STORAGE_KEY, JSON.stringify(mergedSession));
                 }
             })
             .catch(() => {

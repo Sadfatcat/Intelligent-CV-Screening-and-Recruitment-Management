@@ -190,20 +190,9 @@ export function useCandidateData() {
                 }
                 return;
             }
-
-            const raw = localStorage.getItem("currentUser");
-            if (!raw) return;
-            try {
-                const currentUser = JSON.parse(raw);
-                if (typeof currentUser?.user_id === "number") setCandidateId(currentUser.user_id);
-                const email = currentUser?.email || currentUser?.user?.email;
-                if (typeof email === "string" && email.includes("@")) {
-                    setDisplayName(email.split("@")[0]);
-                    setCandidateEmail(email);
-                }
-            } catch {
-                setDisplayName("Candidate");
-            }
+            setCandidateId(null);
+            setDisplayName("Candidate");
+            setCandidateEmail("");
         }, 0);
         return () => window.clearTimeout(timer);
     }, []);

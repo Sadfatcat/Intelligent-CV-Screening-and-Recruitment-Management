@@ -1,4 +1,4 @@
-import { RECRUITER_SESSION_STORAGE_KEY } from "@/features/recruiter/constants/recruiterConstants";
+import { RECRUITER_PASSWORD_CHANGE_STORAGE_KEY, RECRUITER_SESSION_STORAGE_KEY } from "@/features/recruiter/constants/recruiterConstants";
 
 export const AUTH_SESSION_STORAGE_KEY = "authSession";
 const SESSION_TTL_MS = 24 * 60 * 60 * 1000;
@@ -55,5 +55,6 @@ export function clearAuthSession() {
     localStorage.removeItem(AUTH_SESSION_STORAGE_KEY);
     localStorage.removeItem("currentUser");
     localStorage.removeItem(RECRUITER_SESSION_STORAGE_KEY);
+    localStorage.removeItem(RECRUITER_PASSWORD_CHANGE_STORAGE_KEY);
     localStorage.removeItem("adminUser");
 }

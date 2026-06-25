@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Newsreader:wght@500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
 .container {
   --bg-1: #07111d;
@@ -120,28 +120,6 @@
   padding: 18px;
 }
 
-.quickSwapBox {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6px;
-  margin-bottom: 12px;
-}
-
-.quickSwapButton {
-  border: 1px solid rgba(129, 164, 194, 0.28);
-  border-radius: 10px;
-  background: rgba(47, 111, 165, 0.22);
-  color: var(--title);
-  cursor: pointer;
-  font-size: 11px;
-  font-weight: 800;
-  padding: 8px 6px;
-}
-
-.quickSwapButton:hover {
-  background: rgba(47, 111, 165, 0.34);
-}
-
 .leftBottomUser {
   width: 100%;
   display: flex;
@@ -184,6 +162,11 @@
   text-decoration: none;
   font-size: 13px;
   font-weight: 600;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
 }
 
 .settingLink {
@@ -388,7 +371,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .legendRow span {
@@ -397,9 +380,9 @@
   gap: 6px;
   border: 1px solid transparent;
   border-radius: 999px;
-  padding: 7px 10px;
-  font-size: 12px;
-  font-weight: 900;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 800;
 }
 
 .legendChipGood {
@@ -548,41 +531,43 @@
 }
 
 .applicationCard {
-  border: 1px solid rgba(129, 164, 194, 0.24);
+  border: 1px solid rgba(129, 164, 194, 0.18);
   border-radius: 16px;
-  background: rgba(13, 26, 42, 0.72);
-  padding: 14px;
+  background: #ffffff;
+  padding: 16px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .applicationHero {
   display: grid;
-  grid-template-columns: 190px minmax(0, 1fr);
-  gap: 14px;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 16px;
   align-items: stretch;
 }
 
 .applicationImage,
 .applicationImageFallback {
   width: 100%;
-  height: 160px;
+  height: 92px;
   border-radius: 12px;
 }
 
 .applicationImage {
   object-fit: cover;
+  border: 1px solid var(--candidate-line);
 }
 
 .applicationImageFallback {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(47, 111, 165, 0.28);
-  color: var(--title);
-  font-size: 42px;
+  background: #eef6fb;
+  color: var(--candidate-text);
+  font-size: 30px;
   font-weight: 900;
+  border: 1px solid var(--candidate-line);
 }
 
 .applicationIntro {
@@ -596,45 +581,51 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 112px;
   gap: 12px;
+  align-items: start;
 }
 
 .applicationTitleRow h3 {
   margin: 0;
-  color: var(--title);
-  font-size: 20px;
-  font-weight: 800;
+  color: var(--candidate-text);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
 }
 
 .applicationTitleRow p,
 .applicationDescription {
   margin: 4px 0 0;
-  color: var(--text);
-  line-height: 1.45;
-  opacity: 0.75;
+  color: var(--candidate-muted);
+  line-height: 1.5;
+  opacity: 1;
+  font-size: 12px;
 }
 
 .scoreBox {
   border: 1px solid rgba(18, 22, 29, 0.12);
   border-radius: 14px;
   padding: 10px;
-  background: #ffffff;
+  background: var(--candidate-soft);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  justify-content: center;
+  min-height: 88px;
 }
 
 .scoreBox strong {
-  color: var(--title);
-  font-size: 28px;
+  color: var(--candidate-text);
+  font-size: 26px;
   line-height: 1;
 }
 
 .scoreBox small {
-  color: var(--muted);
-  font-size: 11px;
+  color: var(--candidate-muted);
+  font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .scoreBoxSpinner {
@@ -687,16 +678,16 @@
 
 .applicationMetaGrid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
 }
 
 .applicationMetaGrid span {
-  border: 1px solid rgba(18, 22, 29, 0.1);
+  border: 1px solid var(--candidate-line);
   border-radius: 10px;
-  padding: 8px 10px;
-  color: rgba(18, 22, 29, 0.72);
-  background: #f7f7f5;
+  padding: 9px 10px;
+  color: var(--candidate-text);
+  background: #f8fafc;
   font-size: 12px;
   font-weight: 800;
   min-width: 0;
@@ -710,16 +701,16 @@
 }
 
 .criteriaBlock {
-  border: 1px solid rgba(18, 22, 29, 0.1);
+  border: 1px solid var(--candidate-line);
   border-radius: 14px;
-  padding: 12px;
-  background: #ffffff;
+  padding: 14px 12px;
+  background: #fbfcfd;
   min-width: 0;
 }
 
 .criteriaBlock h4 {
   margin: 0 0 10px;
-  color: var(--title);
+  color: var(--candidate-text);
   font-size: 13px;
   font-weight: 900;
 }
@@ -753,6 +744,156 @@
   font-weight: 800;
 }
 
+.criteriaMoreButton {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--candidate-text);
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  text-align: left;
+}
+
+.criteriaMoreButton:hover {
+  color: var(--candidate-green);
+}
+
+.criteriaModalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10010;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.42);
+  backdrop-filter: blur(3px);
+}
+
+.criteriaModal {
+  position: relative;
+  width: min(1180px, 100%);
+  max-height: min(88vh, 920px);
+  overflow: hidden;
+  border: 1px solid var(--candidate-line);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.18);
+  display: flex;
+  flex-direction: column;
+}
+
+.criteriaModalClose {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--candidate-line);
+  border-radius: 999px;
+  background: #ffffff;
+  color: var(--candidate-text);
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.criteriaModalClose:hover {
+  background: var(--candidate-soft);
+}
+
+.criteriaModalHeader {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--candidate-line);
+}
+
+.criteriaModalHeader h3 {
+  margin: 0;
+  color: var(--candidate-text);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.criteriaModalHeader p {
+  margin: 8px 0 4px;
+  color: var(--candidate-text);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.criteriaModalHeader span {
+  color: var(--candidate-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.criteriaModalGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.criteriaModalColumn {
+  min-width: 0;
+  min-height: 0;
+  padding: 18px 18px 20px;
+  border-right: 1px solid var(--candidate-line);
+  overflow-y: auto;
+  background: #ffffff;
+}
+
+.criteriaModalColumn:last-child {
+  border-right: 0;
+}
+
+.criteriaModalColumnActive {
+  background: #f8fbfd;
+}
+
+.criteriaModalColumnHeader {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  background: inherit;
+  border-bottom: 1px solid var(--candidate-line);
+}
+
+.criteriaModalColumnHeader h4 {
+  margin: 0;
+  color: var(--candidate-text);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.criteriaModalColumnHeader span {
+  min-width: 28px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--candidate-soft);
+  color: var(--candidate-text);
+  font-size: 11px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.criteriaModalList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .right {
   flex: 2.25;
   padding: 20px;
@@ -764,79 +905,88 @@
 .jobDetails {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   height: 100%;
 }
 
 .detailsImage {
   width: 100%;
-  height: 180px;
+  height: 126px;
   object-fit: cover;
   border-radius: 12px;
+  border: 1px solid var(--candidate-line);
 }
 
 .detailsImageFallback {
   width: 100%;
-  height: 180px;
+  height: 126px;
   border-radius: 12px;
-  background: rgba(47, 111, 165, 0.22);
-  color: var(--title);
+  background: #eef6fb;
+  color: var(--candidate-text);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 44px;
+  font-size: 34px;
   font-weight: 900;
+  border: 1px solid var(--candidate-line);
 }
 
 .detailsTitle {
-  color: var(--title);
+  color: var(--candidate-text);
   margin: 0;
-  font-size: 24px;
+  font-size: 15px;
   font-weight: 700;
+  line-height: 1.35;
 }
 
 .detailsMeta {
-  color: var(--text);
+  color: var(--candidate-muted);
   font-weight: 600;
   margin: 0;
   border-bottom: 1px solid rgba(30, 48, 63, 0.14);
   padding-bottom: 11px;
+  font-size: 12px;
+  line-height: 1.55;
 }
 
 .detailsSection h4 {
   margin: 0 0 6px 0;
-  color: #d7e6f4;
+  color: var(--candidate-text);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .detailsSection p {
   margin: 0;
-  color: var(--text);
+  color: var(--candidate-muted);
   line-height: 1.55;
+  font-size: 12px;
 }
 
 .detailsRequirementSection {
   overflow-y: auto;
-  max-height: 220px;
+  max-height: 160px;
   padding-right: 6px;
 }
 
 .applyButton {
   margin-top: auto;
-  background: var(--accent);
+  background: #1b2230;
   color: #fff;
   text-decoration: none;
-  padding: 13px 18px;
-  border-radius: 10px;
+  padding: 11px 14px;
+  border-radius: 12px;
   text-align: center;
-  font-weight: 700;
-  font-size: 15px;
+  font-weight: 800;
+  font-size: 13px;
   transition: 0.25s ease;
   border: none;
 }
 
 .applyButton:hover {
-  background: var(--accent-hover);
-  transform: translateY(-1px);
+  background: #2d3748;
 }
 
 .applyButton:disabled,
@@ -1280,7 +1430,7 @@
   --chip: #f4f3f0;
   gap: 24px;
   background: #fbfaf7;
-  font-family: "Inter", sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
 }
 
 .leftTopBox,
@@ -1296,7 +1446,7 @@
 .modalUploadCol,
 .submitActionBox {
   border: 1px solid var(--line);
-  border-radius: 24px;
+  border-radius: 16px;
   background: #ffffff;
   box-shadow: none;
   backdrop-filter: none;
@@ -1337,7 +1487,7 @@
 .companyHeader h3,
 .detailsTitle,
 .modalHeader h2 {
-  font-family: "Newsreader", serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
   color: #12161d;
   font-weight: 500;
   letter-spacing: 0;
@@ -1350,7 +1500,7 @@
 }
 
 .avatarCircle {
-  background: #b05a36;
+  background: var(--primary-strong);
   box-shadow: none;
 }
 
@@ -1420,7 +1570,7 @@
   --muted: #666666;
   --accent: #12161d;
   --accent-hover: #2a2f38;
-  --sidebar: #11161f;
+  --sidebar: #0a0e4b;
   --sidebar-panel: #20242b;
   --sidebar-line: #343942;
   --sidebar-text: #ecf4ff;
@@ -1429,7 +1579,7 @@
   background-attachment: scroll;
   gap: 24px;
   padding: 102px 24px 24px;
-  font-family: "Inter", sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
 }
 
 .left {
@@ -1438,7 +1588,7 @@
   height: calc(100vh - 126px);
   gap: 14px;
   border: 1px solid #30343b;
-  border-radius: 24px;
+  border-radius: 16px;
   background: var(--sidebar);
   padding: 16px;
   color: #fef9ef;
@@ -1544,8 +1694,8 @@
 .detailsTitle,
 .applicationTitleRow h3,
 .appliedHeader h2 {
-  font-family: "Newsreader", serif;
-  font-weight: 500;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 700;
   letter-spacing: 0;
   color: var(--title);
 }
@@ -1620,12 +1770,12 @@
 }
 
 .modalContent {
-  border-radius: 24px;
+  border-radius: 16px;
   background: #ffffff;
 }
 
 .modalHeader h2 {
-  font-family: "Newsreader", serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
   font-weight: 500;
   color: var(--title);
 }
@@ -1685,6 +1835,25 @@
   .right {
     height: auto;
   }
+
+  .criteriaModal {
+    max-height: 92vh;
+  }
+
+  .criteriaModalGrid {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+
+  .criteriaModalColumn {
+    max-height: none;
+    border-right: 0;
+    border-bottom: 1px solid var(--candidate-line);
+  }
+
+  .criteriaModalColumn:last-child {
+    border-bottom: 0;
+  }
 }
 
 /* Candidate visual standard: font and tone */
@@ -1698,19 +1867,19 @@
   --candidate-line: rgba(18, 22, 29, 0.12);
   --candidate-green: #006a4e;
   --candidate-brand: #b05a36;
-  --candidate-sidebar: #11161f;
+  --candidate-sidebar: #0a0e4b;
   --candidate-sidebar-panel: #20242b;
   --candidate-sidebar-line: #343942;
   --candidate-sidebar-text: #ecf4ff;
   background: var(--candidate-bg);
   color: var(--candidate-body);
-  font-family: "Inter", sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
 }
 
 .container button,
 .container input,
 .container textarea {
-  font-family: "Inter", sans-serif;
+  font-family: "Plus Jakarta Sans", sans-serif;
 }
 
 .left {
@@ -1744,8 +1913,8 @@
 .modalHeader h2,
 .criteriaBlock h4 {
   color: var(--candidate-text);
-  font-family: "Newsreader", serif;
-  font-weight: 500;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 700;
   letter-spacing: 0;
 }
 

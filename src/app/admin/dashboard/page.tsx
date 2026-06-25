@@ -58,12 +58,6 @@ const ACCOUNT_ACTIVITY_ACTIONS = new Set([
     "user.login",
 ]);
 
-const DEMO_ROUTES = [
-    { label: "Admin", href: "/admin/dashboard" },
-    { label: "Recruiter", href: "/recruiter_UI" },
-    { label: "Candidate", href: "/candidate" },
-];
-
 function getDateKey(value: Date) {
     const year = value.getFullYear();
     const month = String(value.getMonth() + 1).padStart(2, "0");
@@ -135,20 +129,7 @@ export default function AdminDashboard() {
             setAdminId(sessionAdmin.user_id);
             return;
         }
-
-        const adminRaw = localStorage.getItem("adminUser");
-        if (!adminRaw) {
-            router.push("/login");
-            return;
-        }
-
-        const parsed = JSON.parse(adminRaw);
-        if (parsed.role !== "admin") {
-            router.push("/login");
-            return;
-        }
-
-        setAdminId(parsed.user_id);
+        router.push("/login");
     }, [router]);
 
     useEffect(() => {
@@ -222,10 +203,6 @@ export default function AdminDashboard() {
         clearAuthSession();
         router.push("/login");
     };
-
-    function openDemoRoute(path: string) {
-        window.open(path, "_blank", "noopener,noreferrer");
-    }
 
     function formatActivityTime(value: string) {
         const date = new Date(value);
@@ -314,13 +291,6 @@ export default function AdminDashboard() {
                         <li>Activity Logs</li>
                         <li onClick={handleLogout} className={styles.logoutItem}>Logout</li>
                     </ul>
-                    <div className={styles.quickSwapGroup}>
-                        {DEMO_ROUTES.map((route) => (
-                            <button key={route.href} type="button" className={styles.quickSwapButton} onClick={() => openDemoRoute(route.href)}>
-                                {route.label}
-                            </button>
-                        ))}
-                    </div>
                 </nav>
             </aside>
 

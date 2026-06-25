@@ -16,12 +16,6 @@ type RecruiterAccount = {
     is_active: boolean;
 };
 
-const DEMO_ROUTES = [
-    { label: "Admin", href: "/admin/dashboard" },
-    { label: "Recruiter", href: "/recruiter_UI" },
-    { label: "Candidate", href: "/candidate" },
-];
-
 export default function AdminRecruitersPage() {
     const router = useRouter();
     const [adminId, setAdminId] = useState<number | null>(null);
@@ -49,20 +43,7 @@ export default function AdminRecruitersPage() {
             window.setTimeout(() => setAdminId(sessionAdmin.user_id), 0);
             return;
         }
-
-        const adminRaw = localStorage.getItem("adminUser");
-        if (!adminRaw) {
-            router.push("/login");
-            return;
-        }
-
-        const parsed = JSON.parse(adminRaw);
-        if (parsed.role !== "admin") {
-            router.push("/login");
-            return;
-        }
-
-        window.setTimeout(() => setAdminId(parsed.user_id), 0);
+        router.push("/login");
     }, [router]);
 
     useEffect(() => {
@@ -225,10 +206,6 @@ export default function AdminRecruitersPage() {
         router.push("/login");
     }
 
-    function openDemoRoute(path: string) {
-        window.open(path, "_blank", "noopener,noreferrer");
-    }
-
     return (
         <div className={styles.dashboardContainer}>
             <aside className={styles.sidebar}>
@@ -250,13 +227,6 @@ export default function AdminRecruitersPage() {
                         <li>Activity Logs</li>
                         <li onClick={handleLogout} className={styles.logoutItem}>Logout</li>
                     </ul>
-                    <div className={styles.quickSwapGroup}>
-                        {DEMO_ROUTES.map((route) => (
-                            <button key={route.href} type="button" className={styles.quickSwapButton} onClick={() => openDemoRoute(route.href)}>
-                                {route.label}
-                            </button>
-                        ))}
-                    </div>
                 </nav>
             </aside>
 

@@ -37,14 +37,24 @@ export default function JobManagementPage({
     const [jdSearchInput, setJdSearchInput] = useState("");
     const [jdSearchTerm, setJdSearchTerm] = useState("");
     const [jobPage, setJobPage] = useState(1);
+    const [jobStatusFilter, setJobStatusFilter] = useState<"all" | "active" | "draft" | "archived">("all");
 
     const filteredJobs = useMemo(() => {
         const q = jdSearchTerm.trim().toLowerCase();
-        if (!q) return managedRecruiterJobs;
-        return managedRecruiterJobs.filter((job) =>
-            [job.title, job.company_name, job.location, job.level].filter(Boolean).join(" ").toLowerCase().includes(q)
-        );
-    }, [jdSearchTerm, managedRecruiterJobs]);
+        return managedRecruiterJobs.filter((job) => {
+            const status = getManagedJobStatus(job.id);
+            const matchesStatus =
+                jobStatusFilter === "all"
+                    ? true
+                    : jobStatusFilter === "active"
+                        ? status === "active"
+                        : jobStatusFilter === "draft"
+                            ? status === "draft"
+                            : status !== "active" && status !== "draft";
+            const matchesQuery = !q || [job.title, job.company_name, job.location, job.level].filter(Boolean).join(" ").toLowerCase().includes(q);
+            return matchesStatus && matchesQuery;
+        });
+    }, [getManagedJobStatus, jdSearchTerm, jobStatusFilter, managedRecruiterJobs]);
 
     const paginatedJobs = useMemo(() => {
         const start = (jobPage - 1) * 5;
@@ -63,6 +73,9 @@ export default function JobManagementPage({
         const scopedLogs = recruiterCvLogs.filter((log) => log.job_id === selectedJobId);
         return calculateSummary(scopedLogs);
     }, [recruiterCvLogs, selectedJobId]);
+    const activeCount = managedRecruiterJobs.filter((job) => getManagedJobStatus(job.id) === "active").length;
+    const draftCount = managedRecruiterJobs.filter((job) => getManagedJobStatus(job.id) === "draft").length;
+    const archivedCount = managedRecruiterJobs.filter((job) => getManagedJobStatus(job.id) !== "active" && getManagedJobStatus(job.id) !== "draft").length;
 
     function submitSearch(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -77,13 +90,35 @@ export default function JobManagementPage({
 
     return (
         <>
+            <section className={`${styles.card} ${styles.panelCard} ${styles.dashboardSummaryPanel}`}>
+                <div className={styles.panelTitleRow}>
+                    <div>
+                        <h3>Job Management</h3>
+                        <p className={styles.subtleText}>Oversee active listings and streamline the talent acquisition pipeline.</p>
+                    </div>
+                    <button className={styles.button} type="button" onClick={onOpenUpload}>Post New Job</button>
+                </div>
+                <div className={styles.dashboardSummaryGrid}>
+                    <span><small>Total openings</small><strong>{managedRecruiterJobs.length}</strong></span>
+                    <span><small>Active listings</small><strong>{activeCount}</strong></span>
+                    <span><small>Drafts</small><strong>{draftCount}</strong></span>
+                    <span><small>Archived</small><strong>{archivedCount}</strong></span>
+                    <span className={styles.dashboardSummaryCompact}><small>Total CVs</small><strong>{recruiterCvLogs.length}</strong></span>
+                </div>
+            </section>
+
             <section className={`${styles.card} ${styles.panelCard}`} style={{ gridColumn: "1 / -1" }}>
                 <div className={styles.panelTitleRow}>
                     <div>
                         <h3>Choose JD For Screening</h3>
                         <p className={styles.subtleText}>Select, filter, add, turn off, or delete a job before viewing submitted CVs.</p>
                     </div>
-                    <button className={styles.button} type="button" onClick={onOpenUpload}>Add JD</button>
+                    <div className={styles.actionConfirmBox}>
+                        <button className={jobStatusFilter === "all" ? styles.rangeButton : styles.clearFilterBtn} type="button" onClick={() => setJobStatusFilter("all")}>All</button>
+                        <button className={jobStatusFilter === "active" ? styles.rangeButton : styles.clearFilterBtn} type="button" onClick={() => setJobStatusFilter("active")}>Active</button>
+                        <button className={jobStatusFilter === "draft" ? styles.rangeButton : styles.clearFilterBtn} type="button" onClick={() => setJobStatusFilter("draft")}>Drafts</button>
+                        <button className={jobStatusFilter === "archived" ? styles.rangeButton : styles.clearFilterBtn} type="button" onClick={() => setJobStatusFilter("archived")}>Archived</button>
+                    </div>
                 </div>
 
                 <form className={styles.screeningFilters} onSubmit={submitSearch}>

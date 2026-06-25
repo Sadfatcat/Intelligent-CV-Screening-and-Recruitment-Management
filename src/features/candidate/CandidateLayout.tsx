@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Navbar from "@/components/navbar/Navbar_candidate";
 import { apiUrl } from "@/utils/api";
+import { clearAuthSession } from "@/utils/authSession";
 import { useCandidateData } from "./hooks/useCandidateData";
 import AppliedCVsPage from "./pages/AppliedCVsPage";
 import JobBrowsePage from "./pages/JobBrowsePage";
@@ -19,13 +21,8 @@ const ALL_CATEGORIES = [
     "Business Analyst", "Technical Writer",
 ];
 
-const DEMO_ROUTES = [
-    { label: "Admin", href: "/admin/dashboard" },
-    { label: "Recruiter", href: "/recruiter_UI" },
-    { label: "Candidate", href: "/candidate" },
-];
-
 export default function CandidateLayout() {
+    const router = useRouter();
     const {
         candidateId,
         displayName,
@@ -148,8 +145,9 @@ export default function CandidateLayout() {
         setApplyStatus(null);
     }
 
-    function openDemoRoute(path: string) {
-        window.open(path, "_blank", "noopener,noreferrer");
+    function handleLogout() {
+        clearAuthSession();
+        router.push("/login");
     }
 
     async function handleApply(e: React.FormEvent) {
@@ -321,13 +319,6 @@ export default function CandidateLayout() {
                         </div>
                     </div>
                     <div className={styles.leftBottomBox}>
-                        <div className={styles.quickSwapBox}>
-                            {DEMO_ROUTES.map((route) => (
-                                <button key={route.href} type="button" className={styles.quickSwapButton} onClick={() => openDemoRoute(route.href)}>
-                                    {route.label}
-                                </button>
-                            ))}
-                        </div>
                         <div className={styles.leftBottomUser}>
                             <div className={styles.avatarCircle} title={displayName}>
                                 {displayName.charAt(0).toUpperCase()}
@@ -335,7 +326,7 @@ export default function CandidateLayout() {
                             <div className={styles.userMeta}>
                                 <p className={styles.userName}>{displayName}</p>
                                 <Link className={styles.settingLink} href="/candidate/settings">Settings</Link>
-                                <Link className={styles.logoutLink} href="/login">Logout</Link>
+                                <button type="button" className={styles.logoutLink} onClick={handleLogout}>Logout</button>
                             </div>
                         </div>
                     </div>

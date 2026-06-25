@@ -1,18 +1,18 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Newsreader:wght@500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
 .dashboardContainer {
-    --bg: #fbfaf7;
-    --surface: #ffffff;
-    --text: #12161d;
-    --body-text: #4a4a4a;
-    --muted: #666666;
-    --line: rgba(18, 22, 29, 0.12);
-    --accent: #b05a36;
-    --danger: #a63127;
-    --dashboard-purple: #200080;
+    --bg: var(--background);
+    --surface: var(--surface);
+    --text: var(--text-primary);
+    --body-text: var(--text-secondary);
+    --muted: var(--text-secondary);
+    --line: var(--border);
+    --accent: var(--primary);
+    --danger: var(--error);
+    --dashboard-purple: var(--primary);
     min-height: 100vh;
     display: flex;
-    font-family: "Inter", sans-serif;
+    font-family: "Plus Jakarta Sans", sans-serif;
     background: var(--bg);
     color: var(--body-text);
     position: relative;
@@ -27,32 +27,34 @@
     width: 280px;
     display: flex;
     flex-direction: column;
-    background: var(--text);
-    color: #fff;
-    border-right: 1px solid rgba(18, 22, 29, 0.16);
+    background: #0a0e4b;
+    color: #fef9ef;
+    border-right: 1px solid #30343b;
     box-shadow: none;
     position: relative;
     z-index: 1;
+    padding: 16px;
 }
 
 .logo {
-    padding: 26px 24px;
+    padding: 16px;
     text-align: left;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid #343942;
+    border-radius: 18px;
+    background: #20242b;
     overflow: hidden;
 }
 
 .logo h2 {
     margin: 0;
-    font-family: "Newsreader", serif;
+    font-family: "Plus Jakarta Sans", sans-serif;
     font-size: 1.4rem;
     font-weight: 500;
     letter-spacing: 0;
 }
 
 .navMenu {
-    padding: 18px 12px;
+    padding: 14px 0 0;
 }
 
 .navMenu ul {
@@ -61,15 +63,17 @@
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
 }
 
 .navMenu li {
-    padding: 14px 16px;
+    padding: 13px 16px;
     cursor: pointer;
-    border-radius: 12px;
-    color: rgba(255, 255, 255, 0.84);
-    transition: all 0.3s ease;
+    border-radius: 14px;
+    border: 1px solid #343942;
+    background: #20242b;
+    color: #ecf4ff;
+    transition: all 0.2s ease;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -77,43 +81,21 @@
 
 .navMenu li:hover,
 .navMenu li.active {
-    background: rgba(255, 255, 255, 0.14);
+    background: #11161f;
     color: #fff;
-    transform: translateY(-1px);
+    border-color: #4b5563;
 }
 
 .logoutItem {
     margin-top: 18px;
-    color: #ffb4b4;
-    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #fecaca;
+    border-top: 1px solid #343942 !important;
     padding-top: 18px !important;
 }
 
 .logoutItem:hover {
-    background: rgba(239, 68, 68, 0.18) !important;
+    background: #20242b !important;
     color: #fff;
-}
-
-.quickSwapGroup {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 6px;
-    margin-top: 12px;
-}
-
-.quickSwapButton {
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
-    cursor: pointer;
-    font-size: 0.72rem;
-    font-weight: 800;
-    padding: 8px 6px;
-}
-
-.quickSwapButton:hover {
-    background: rgba(255, 255, 255, 0.16);
 }
 
 .mainContent {
@@ -123,6 +105,7 @@
     min-width: 0;
     position: relative;
     z-index: 1;
+    max-width: calc(var(--content-max) + 320px);
 }
 
 .header {
@@ -139,9 +122,9 @@
 
 .header h1 {
     margin: 0;
-    font-family: "Newsreader", serif;
+    font-family: "Plus Jakarta Sans", sans-serif;
     font-size: 2rem;
-    font-weight: 500;
+    font-weight: 700;
     letter-spacing: 0;
     color: var(--text);
 }
@@ -160,7 +143,7 @@
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     border: 1px solid var(--line);
-    border-radius: 24px;
+    border-radius: 16px;
     box-shadow: none;
     padding: 24px;
     transition: all 0.3s ease;
@@ -183,9 +166,9 @@
 
 .statCard p {
     margin: 0;
-    font-family: "Newsreader", serif;
+    font-family: "Plus Jakarta Sans", sans-serif;
     font-size: 2.3rem;
-    font-weight: 500;
+    font-weight: 700;
     color: var(--dashboard-purple);
 }
 
@@ -224,9 +207,9 @@
 
 .accountStatusGrid strong {
     color: var(--dashboard-purple);
-    font-family: "Newsreader", serif;
+    font-family: "Plus Jakarta Sans", sans-serif;
     font-size: 1.8rem;
-    font-weight: 500;
+    font-weight: 700;
 }
 
 .passwordStatusBox {

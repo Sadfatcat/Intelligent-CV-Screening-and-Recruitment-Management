@@ -1,8 +1,10 @@
 "use client";
 
+import { useMemo } from "react";
 import CVLogItemRow from "../components/CVLogItem";
 import { useCVFilters } from "../hooks/useCVFilters";
 import type { CVLogItem, ExperienceFilter, ScoreStatus } from "../types/recruiterTypes";
+import { normalizeScore } from "../utils/cvScoringUtils";
 import styles from "../../../app/recruiter_UI/page.module.css";
 
 type Props = {
@@ -20,6 +22,17 @@ export default function SubmittedCVsPage({
     onSelectLog,
     onBackToJobs,
 }: Props) {
+    const summary = useMemo(() => {
+        const scores = submittedCvLogs.map((log) => normalizeScore(log.ai_matching_score)).filter((value): value is number => value !== null);
+        const passed = scores.filter((score) => score >= 85).length;
+        return {
+            total: submittedCvLogs.length,
+            average: scores.length ? (scores.reduce((sum, score) => sum + score, 0) / scores.length).toFixed(1) : "-",
+            passedRate: submittedCvLogs.length ? `${((passed / submittedCvLogs.length) * 100).toFixed(1)}%` : "0.0%",
+            pending: submittedCvLogs.filter((log) => log.status === "pending").length,
+        };
+    }, [submittedCvLogs]);
+
     const {
         scoreStatusFilter,
         setScoreStatusFilter,
@@ -35,6 +48,27 @@ export default function SubmittedCVsPage({
     } = useCVFilters(submittedCvLogs);
 
     return (
+        <>
+        <section className={`${styles.card} ${styles.panelCard} ${styles.dashboardSummaryPanel}`}>
+            <div className={styles.panelTitleRow}>
+                <div>
+                    <h3>Submitted CVs</h3>
+                    <p className={styles.subtleText}>Analyze and manage candidate applications across all active job roles.</p>
+                </div>
+                <div className={styles.actionConfirmBox}>
+                    <button className={styles.clearFilterBtn} type="button" onClick={clearFilters}>Filters</button>
+                    <button className={styles.button} type="button">Export Data</button>
+                </div>
+            </div>
+            <div className={styles.dashboardSummaryGrid}>
+                <span><small>Total submissions</small><strong>{summary.total}</strong></span>
+                <span><small>Avg. match score</small><strong>{summary.average}</strong></span>
+                <span><small>Passed rate</small><strong>{summary.passedRate}</strong></span>
+                <span><small>Pending review</small><strong>{summary.pending}</strong></span>
+                <span className={styles.dashboardSummaryCompact}><small>Visible rows</small><strong>{sortedFilteredLogs.length}</strong></span>
+            </div>
+        </section>
+
         <section className={`${styles.card} ${styles.panelCard}`} style={{ gridColumn: "1 / -1" }}>
             <div className={styles.panelTitleRow}>
                 <div>
@@ -140,5 +174,6 @@ export default function SubmittedCVsPage({
                 </table>
             </div>
         </section>
+        </>
     );
 }

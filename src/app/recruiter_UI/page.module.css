@@ -1,27 +1,27 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Newsreader:wght@500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
 .page,
 .dashboardContainer {
-    --bg: #fbfaf7;
-    --surface: #ffffff;
-    --surface-solid: #ffffff;
-    --text: #12161d;
-    --body-text: #4a4a4a;
-    --muted: #666666;
-    --line: rgba(18, 22, 29, 0.12);
-    --control-bg: #ffffff;
-    --control-bg-soft: #f4f3f0;
-    --strong-text: #12161d;
-    --primary-a: #12161d;
-    --primary-b: #12161d;
-    --primary-c: #b05a36;
-    --danger: #a63127;
-    --pastel-purple: #e7e7ff;
-    --pastel-green: #e2f5e9;
-    --pastel-pink: #ffe9e9;
-    --pastel-blue: #e2f0ff;
+    --bg: var(--background);
+    --surface: var(--surface);
+    --surface-solid: var(--surface);
+    --text: var(--text-primary);
+    --body-text: var(--text-secondary);
+    --muted: var(--text-secondary);
+    --line: var(--border);
+    --control-bg: var(--surface);
+    --control-bg-soft: var(--surface-muted);
+    --strong-text: var(--text-primary);
+    --primary-a: var(--primary);
+    --primary-b: var(--primary-strong);
+    --primary-c: var(--secondary);
+    --danger: var(--error);
+    --pastel-purple: #eef3ff;
+    --pastel-green: #eff9f5;
+    --pastel-pink: #fff3f1;
+    --pastel-blue: #eef8ff;
     min-height: 100vh;
-    font-family: "Inter", sans-serif;
+    font-family: "Plus Jakarta Sans", sans-serif;
     color: var(--body-text);
     background: var(--bg);
 }
@@ -60,9 +60,9 @@
 
 .title {
     margin: 0;
-    font-family: "Newsreader", serif;
+    font-family: "Plus Jakarta Sans", sans-serif;
     font-size: 1.9rem;
-    font-weight: 500;
+    font-weight: 700;
     letter-spacing: 0;
     color: var(--text);
 }
@@ -75,7 +75,7 @@
     width: 280px;
     display: flex;
     flex-direction: column;
-    background: #11161f;
+    background: #0a0e4b;
     border-right: 1px solid #30343b;
     box-shadow: none;
     color: #fef9ef;
@@ -83,7 +83,7 @@
 }
 
 .logoBox {
-    border-radius: 24px;
+    border-radius: 16px;
     border: 1px solid #484c54;
     background: #20242b;
     padding: 16px;
@@ -101,9 +101,9 @@
 
 .logoBox h2 {
     margin: 0 0 2px;
-    font-family: "Newsreader", serif;
+    font-family: "Plus Jakarta Sans", sans-serif;
     font-size: 1.15rem;
-    font-weight: 500;
+    font-weight: 700;
 }
 
 .logoBox p {
@@ -140,7 +140,7 @@
     font-weight: 800;
     font-size: 1rem;
     color: #fff;
-    background: #b05a36;
+    background: var(--primary-strong);
     border: 2px solid rgba(254, 249, 239, 0.72);
     box-shadow: none;
 }
@@ -172,7 +172,7 @@
 .navButtonPrimary {
     border: none;
     color: #fff;
-    background: #c4572f;
+    background: var(--primary-strong);
     box-shadow: none;
 }
 
@@ -180,28 +180,6 @@
     color: #fff;
     border-color: #6a6f78;
     background: #3a3e45;
-}
-
-.quickSwapGroup {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 6px;
-    margin-top: 4px;
-}
-
-.quickSwapButton {
-    border: 1px solid #343942;
-    border-radius: 10px;
-    background: #20242b;
-    color: #ecf4ff;
-    cursor: pointer;
-    font-size: 0.72rem;
-    font-weight: 800;
-    padding: 8px 6px;
-}
-
-.quickSwapButton:hover {
-    background: #30343b;
 }
 
 .logoutButton {
@@ -215,6 +193,7 @@
     display: flex;
     flex-direction: column;
     min-width: 0;
+    max-width: calc(var(--content-max) + 320px);
 }
 
 .header {
@@ -226,9 +205,9 @@
 
 .header h1 {
     margin: 0;
-    font-family: "Newsreader", serif;
+    font-family: "Plus Jakarta Sans", sans-serif;
     font-size: 2rem;
-    font-weight: 500;
+    font-weight: 700;
     letter-spacing: 0;
     color: var(--text);
 }
@@ -248,7 +227,7 @@
 .card {
     background: var(--surface);
     border: 1px solid var(--line);
-    border-radius: 24px;
+    border-radius: 16px;
     padding: 24px;
     box-shadow: none;
     backdrop-filter: none;
@@ -272,9 +251,9 @@
 
 .statCard p {
     margin: 0;
-    font-family: "Newsreader", serif;
+    font-family: "Plus Jakarta Sans", sans-serif;
     font-size: 2.2rem;
-    font-weight: 500;
+    font-weight: 700;
     white-space: nowrap;
     color: var(--text);
 }
@@ -339,10 +318,10 @@
 }
 
 .dashboardSummaryGrid span {
-    border: 1px solid rgba(32, 0, 128, 0.16);
-    border-radius: 14px;
+    border: 1px solid rgba(0, 94, 154, 0.16);
+    border-radius: 16px;
     background: #ffffff;
-    color: #200080;
+    color: var(--primary-a);
     padding: 14px;
     display: grid;
     gap: 6px;
@@ -350,7 +329,7 @@
 }
 
 .dashboardSummaryGrid small {
-    color: #200080;
+    color: var(--primary-a);
     font-size: 0.78rem;
     font-weight: 900;
     text-transform: uppercase;
@@ -358,10 +337,10 @@
 }
 
 .dashboardSummaryGrid strong {
-    color: #200080;
-    font-family: "Newsreader", serif;
+    color: var(--primary-a);
+    font-family: "Plus Jakarta Sans", sans-serif;
     font-size: 2rem;
-    font-weight: 500;
+    font-weight: 700;
     line-height: 1;
 }
 

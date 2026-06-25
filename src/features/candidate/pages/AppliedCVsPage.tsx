@@ -3,7 +3,7 @@
 import type { CandidateSubmissionItem, JobItem, MatchingDetail } from "../hooks/useCandidateData";
 import { normalizeJobImageUrl } from "../utils/candidateJobAssets";
 import styles from "../../../app/candidate/page.module.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Props = {
     submittedJobs: CandidateSubmissionItem[];
@@ -12,6 +12,17 @@ type Props = {
     hasScoringApplication: boolean;
     onBrowseJobs: () => void;
 };
+
+type CriteriaKind = "good" | "skill" | "requirement";
+
+type DetailModalState = {
+    title: string;
+    subtitle: string;
+    focus: CriteriaKind;
+    fulfilledCriteria: string[];
+    missingSkills: string[];
+    missingRequirements: string[];
+} | null;
 
 function normalizeScore(value: number | null | undefined) {
     if (typeof value !== "number" || Number.isNaN(value)) return null;
@@ -80,7 +91,12 @@ function getMissingRequirements(detail: MatchingDetail | null | undefined) {
     ]);
 }
 
-function renderCriteriaList(items: string[], kind: "good" | "skill" | "requirement", emptyText: string) {
+function renderCriteriaList(
+    items: string[],
+    kind: CriteriaKind,
+    emptyText: string,
+    onExpand: ((kind: CriteriaKind) => void) | null,
+) {
     if (items.length === 0) return <p className={styles.criteriaEmpty}>{emptyText}</p>;
     const visible = items.slice(0, 5);
     const overflow = items.length - visible.length;
@@ -94,13 +110,45 @@ function renderCriteriaList(items: string[], kind: "good" | "skill" | "requireme
                     <span>{item}</span>
                 </li>
             ))}
-            {overflow > 0 && <li className={styles.criteriaMore}>+{overflow} more</li>}
+            {overflow > 0 && (
+                <li>
+                    <button type="button" className={styles.criteriaMoreButton} onClick={() => onExpand?.(kind)}>
+                        +{overflow} more
+                    </button>
+                </li>
+            )}
+        </ul>
+    );
+}
+
+function renderFullCriteriaList(items: string[], kind: CriteriaKind, emptyText: string) {
+    if (items.length === 0) return <p className={styles.criteriaEmpty}>{emptyText}</p>;
+    return (
+        <ul className={styles.criteriaModalList}>
+            {items.map((item) => (
+                <li className={styles.criteriaItem} key={`${kind}-full-${item}`}>
+                    <span className={`${styles.criteriaIcon} ${styles[`criteriaIcon${kind[0].toUpperCase()}${kind.slice(1)}`]}`}>
+                        {kind === "good" ? "✓" : kind === "requirement" ? "!" : "✕"}
+                    </span>
+                    <span>{item}</span>
+                </li>
+            ))}
         </ul>
     );
 }
 
 export default function AppliedCVsPage({ submittedJobs, jobs, isCvScoring, hasScoringApplication, onBrowseJobs }: Props) {
     const [failedImageIds, setFailedImageIds] = useState<Set<number>>(() => new Set());
+    const [detailModal, setDetailModal] = useState<DetailModalState>(null);
+
+    useEffect(() => {
+        if (!detailModal) return;
+        function handleKeyDown(event: KeyboardEvent) {
+            if (event.key === "Escape") setDetailModal(null);
+        }
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [detailModal]);
 
     return (
         <div className={styles.appliedWorkspace}>
@@ -140,6 +188,14 @@ export default function AppliedCVsPage({ submittedJobs, jobs, isCvScoring, hasSc
                         const imageUrl = normalizeJobImageUrl(item.image_url || matchedJob?.image_url);
                         const imageFailed = failedImageIds.has(item.application_id);
                         const description = item.description || matchedJob?.description;
+                        const openDetailModal = (focus: CriteriaKind) => setDetailModal({
+                            title: item.job_title,
+                            subtitle: `${item.company_name} | ${item.level} | ${item.location}`,
+                            focus,
+                            fulfilledCriteria,
+                            missingSkills,
+                            missingRequirements,
+                        });
 
                         return (
                             <article className={styles.applicationCard} key={item.application_id}>
@@ -195,15 +251,15 @@ export default function AppliedCVsPage({ submittedJobs, jobs, isCvScoring, hasSc
                                     <div className={styles.criteriaGrid}>
                                         <section className={styles.criteriaBlock}>
                                             <h4>Matched in CV</h4>
-                                            {renderCriteriaList(fulfilledCriteria, "good", "No matched criteria returned yet.")}
+                                            {renderCriteriaList(fulfilledCriteria, "good", "No matched criteria returned yet.", openDetailModal)}
                                         </section>
                                         <section className={styles.criteriaBlock}>
                                             <h4>Missing skills</h4>
-                                            {renderCriteriaList(missingSkills, "skill", "No missing skills recorded.")}
+                                            {renderCriteriaList(missingSkills, "skill", "No missing skills recorded.", openDetailModal)}
                                         </section>
                                         <section className={styles.criteriaBlock}>
                                             <h4>Missing requirements</h4>
-                                            {renderCriteriaList(missingRequirements, "requirement", "No required condition missing.")}
+                                            {renderCriteriaList(missingRequirements, "requirement", "No required condition missing.", openDetailModal)}
                                         </section>
                                     </div>
                                 )}
@@ -217,6 +273,44 @@ export default function AppliedCVsPage({ submittedJobs, jobs, isCvScoring, hasSc
                 <div className={styles.scoringOverlay} aria-live="polite" aria-busy="true">
                     <div className={styles.scoringSpinner}><span /><span /><span /></div>
                     <p>Please wait...</p>
+                </div>
+            )}
+
+            {detailModal && (
+                <div className={styles.criteriaModalOverlay} onClick={() => setDetailModal(null)} role="presentation">
+                    <div className={styles.criteriaModal} onClick={(event) => event.stopPropagation()} role="dialog" aria-modal="true" aria-label="Matching details">
+                        <button type="button" className={styles.criteriaModalClose} onClick={() => setDetailModal(null)} aria-label="Close matching details">
+                            x
+                        </button>
+                        <div className={styles.criteriaModalHeader}>
+                            <h3>Matching Details</h3>
+                            <p>{detailModal.title}</p>
+                            <span>{detailModal.subtitle}</span>
+                        </div>
+                        <div className={styles.criteriaModalGrid}>
+                            <section className={`${styles.criteriaModalColumn} ${detailModal.focus === "good" ? styles.criteriaModalColumnActive : ""}`}>
+                                <div className={styles.criteriaModalColumnHeader}>
+                                    <h4>Matched in CV</h4>
+                                    <span>{detailModal.fulfilledCriteria.length}</span>
+                                </div>
+                                {renderFullCriteriaList(detailModal.fulfilledCriteria, "good", "No matched criteria returned yet.")}
+                            </section>
+                            <section className={`${styles.criteriaModalColumn} ${detailModal.focus === "skill" ? styles.criteriaModalColumnActive : ""}`}>
+                                <div className={styles.criteriaModalColumnHeader}>
+                                    <h4>Missing skills</h4>
+                                    <span>{detailModal.missingSkills.length}</span>
+                                </div>
+                                {renderFullCriteriaList(detailModal.missingSkills, "skill", "No missing skills recorded.")}
+                            </section>
+                            <section className={`${styles.criteriaModalColumn} ${detailModal.focus === "requirement" ? styles.criteriaModalColumnActive : ""}`}>
+                                <div className={styles.criteriaModalColumnHeader}>
+                                    <h4>Missing requirements</h4>
+                                    <span>{detailModal.missingRequirements.length}</span>
+                                </div>
+                                {renderFullCriteriaList(detailModal.missingRequirements, "requirement", "No required condition missing.")}
+                            </section>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
