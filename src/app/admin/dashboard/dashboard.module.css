@@ -1,15 +1,15 @@
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
 .dashboardContainer {
-    --bg: var(--background);
-    --surface: var(--surface);
-    --text: var(--text-primary);
-    --body-text: var(--text-secondary);
-    --muted: var(--text-secondary);
-    --line: var(--border);
-    --accent: var(--primary);
-    --danger: var(--error);
-    --dashboard-purple: var(--primary);
+    --bg: #0f172a;
+    --surface: #fdf9f0;
+    --text: #0f172a;
+    --body-text: #475569;
+    --muted: #94a3b8;
+    --line: rgba(148, 163, 184, 0.18);
+    --accent: #25a2e8;
+    --danger: #f87171;
+    --dashboard-purple: #25a2e8;
     min-height: 100vh;
     display: flex;
     font-family: "Plus Jakarta Sans", sans-serif;
@@ -27,10 +27,10 @@
     width: 280px;
     display: flex;
     flex-direction: column;
-    background: #0a0e4b;
+    background: #0f172a;
     color: #fef9ef;
-    border-right: 1px solid #30343b;
-    box-shadow: none;
+    border-right: 1px solid rgba(148, 163, 184, 0.14);
+    box-shadow: 0 20px 44px rgba(2, 6, 23, 0.4);
     position: relative;
     z-index: 1;
     padding: 16px;
@@ -39,9 +39,9 @@
 .logo {
     padding: 16px;
     text-align: left;
-    border: 1px solid #343942;
+    border: 1px solid rgba(148, 163, 184, 0.14);
     border-radius: 18px;
-    background: #20242b;
+    background: #1e2530;
     overflow: hidden;
 }
 
@@ -70,8 +70,8 @@
     padding: 13px 16px;
     cursor: pointer;
     border-radius: 14px;
-    border: 1px solid #343942;
-    background: #20242b;
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    background: #1e2530;
     color: #ecf4ff;
     transition: all 0.2s ease;
     display: flex;
@@ -81,20 +81,20 @@
 
 .navMenu li:hover,
 .navMenu li.active {
-    background: #11161f;
+    background: #151c62;
     color: #fff;
-    border-color: #4b5563;
+    border-color: rgba(37, 162, 232, 0.36);
 }
 
 .logoutItem {
     margin-top: 18px;
     color: #fecaca;
-    border-top: 1px solid #343942 !important;
+    border-top: 1px solid rgba(148, 163, 184, 0.14) !important;
     padding-top: 18px !important;
 }
 
 .logoutItem:hover {
-    background: #20242b !important;
+    background: rgba(127, 29, 29, 0.34) !important;
     color: #fff;
 }
 
@@ -113,10 +113,10 @@
     justify-content: space-between;
     align-items: center;
     padding: 24px 32px 14px;
-    background: var(--bg);
+    background: #151c62;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.14);
     box-shadow: none;
 }
 
@@ -126,7 +126,7 @@
     font-size: 2rem;
     font-weight: 700;
     letter-spacing: 0;
-    color: var(--text);
+    color: #f8fafc;
 }
 
 .contentArea {
@@ -136,6 +136,7 @@
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 24px;
+    background: var(--bg);
 }
 
 .card {
@@ -144,14 +145,14 @@
     -webkit-backdrop-filter: none;
     border: 1px solid var(--line);
     border-radius: 16px;
-    box-shadow: none;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
     padding: 24px;
     transition: all 0.3s ease;
 }
 
 .card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    transform: none;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
 }
 
 .statCard h3,
@@ -196,12 +197,13 @@
 }
 
 .accountStatusGrid span {
-    border: 1px solid var(--line);
+    border: 2px solid rgba(148, 163, 184, 0.5);
     border-radius: 12px;
     padding: 14px;
     display: grid;
     gap: 8px;
-    color: var(--dashboard-purple);
+    color: var(--text);
+    background: #fff7eb;
     font-weight: 800;
 }
 
@@ -214,7 +216,7 @@
 
 .passwordStatusBox {
     min-height: 116px;
-    border: 1px solid var(--line);
+    border: 2px solid rgba(148, 163, 184, 0.5);
     border-radius: 12px;
     padding: 18px;
     display: grid;
@@ -248,8 +250,8 @@
 .rangeButton {
     border: 1px solid var(--line);
     border-radius: 999px;
-    background: #fff;
-    color: var(--dashboard-purple);
+    background: rgba(255, 255, 255, 0.06);
+    color: #f8fafc;
     padding: 8px 12px;
     font-size: 0.78rem;
     font-weight: 800;
@@ -335,8 +337,8 @@
     border-radius: 24px;
     overflow: hidden;
     background: var(--surface);
-    border: 1px solid var(--line);
-    box-shadow: none;
+    border: 2px solid rgba(148, 163, 184, 0.5);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
     height: auto;
@@ -347,8 +349,8 @@
 }
 
 .recruiterCard:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    transform: none;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
 }
 
 .recruiterImageBox {
@@ -386,7 +388,7 @@
     color: #fff;
     font-size: 1.4rem;
     font-weight: 800;
-    background: var(--accent);
+    background: #f97316;
     box-shadow: none;
     border: 2px solid #fff;
 }
@@ -435,7 +437,7 @@
 .createForm input {
     width: 100%;
     border: 1px solid var(--line);
-    background: #fff;
+    background: #fffaf2;
     border-radius: 12px;
     padding: 13px 14px;
     font-size: 14px;
@@ -471,26 +473,26 @@
 }
 
 .primaryButton {
-    background: var(--text);
+    background: #25a2e8;
     color: #fff;
     box-shadow: none;
 }
 
 .primaryButton:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    transform: none;
+    box-shadow: 0 12px 24px rgba(37, 162, 232, 0.18);
 }
 
 .secondaryButton {
-    background: #fff;
+    background: #fffaf2;
     color: var(--text);
     border: 1px solid var(--line);
     box-shadow: none;
 }
 
 .secondaryButton:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.06);
+    transform: none;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.1);
 }
 
 .formActionRow,
@@ -516,8 +518,8 @@
     overflow-x: auto;
     margin-top: 10px;
     border-radius: 24px;
-    background: #fff;
-    border: 1px solid var(--line);
+    background: #fffaf2;
+    border: 2px solid rgba(148, 163, 184, 0.5);
     backdrop-filter: none;
 }
 
@@ -536,12 +538,12 @@
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 2px solid rgba(148, 163, 184, 0.5);
 }
 
 .dataTable tbody td {
     padding: 14px 16px;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 2px solid rgba(148, 163, 184, 0.5);
     color: var(--text);
     font-size: 14px;
     vertical-align: top;
@@ -584,7 +586,7 @@
     padding: 14px 16px;
     border-radius: 16px;
     background: #fff;
-    border: 1px solid var(--line);
+    border: 2px solid rgba(148, 163, 184, 0.5);
     color: var(--dashboard-purple);
     line-height: 1.5;
 }

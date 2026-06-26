@@ -24,7 +24,7 @@ export default function Navbar() {
         <nav style={styles.navbar}>
             <div style={styles.container}>
                 <Link href={homeHref} style={styles.logo} aria-label="Go to home">
-                    <BrandLogoFull iconSize={46} />
+                    <BrandLogoFull iconSize={46} color="#ffffff" textColor="#ffffff" accentColor="#25A2E8" style={{ gap: 4 }} />
                 </Link>
 
                 <div style={styles.rightArea}>
@@ -61,14 +61,14 @@ const styles: Record<string, React.CSSProperties> = {
         zIndex: 1000,
         backdropFilter: "blur(10px)",
         WebkitBackdropFilter: "blur(10px)",
-        background: "rgba(251, 250, 247, 0.94)",
-        borderBottom: "1px solid rgba(18, 22, 29, 0.12)",
-        boxShadow: "none",
+        background: "#151C62",
+        borderBottom: "1px solid rgba(255, 255, 255, 0.08)",
+        boxShadow: "0 12px 30px rgba(6, 11, 33, 0.38)",
     },
     container: {
         width: "100%",
         height: "100%",
-        padding: "10px 28px",
+        padding: "10px 18px 10px 12px",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -99,20 +99,20 @@ const styles: Record<string, React.CSSProperties> = {
         flexWrap: "wrap",
     },
     link: {
-        color: "#12161d",
+        color: "#f8fafc",
         textDecoration: "none",
         fontSize: "14px",
         fontWeight: 700,
         padding: "9px 12px",
-        borderRadius: "12px",
+        borderRadius: "8px",
         transition: "0.2s ease",
-        background: "#ffffff",
-        border: "1px solid rgba(18, 22, 29, 0.12)",
+        background: "rgba(255, 255, 255, 0.06)",
+        border: "1px solid rgba(255, 255, 255, 0.08)",
     },
     activeLink: {
-        background: "#12161d",
-        color: "#ffffff",
-        border: "1px solid transparent",
-        boxShadow: "none",
+        background: "#FDF9F0",
+        color: "#0F172A",
+        border: "1px solid rgba(255, 255, 255, 0.12)",
+        boxShadow: "0 6px 14px rgba(15, 23, 42, 0.18)",
     },
 };

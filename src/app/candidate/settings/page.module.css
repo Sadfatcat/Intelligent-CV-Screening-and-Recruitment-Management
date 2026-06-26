@@ -1,15 +1,15 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Newsreader:wght@500;600&display=swap");
 
 .container {
-  --candidate-bg: #fbfaf7;
-  --candidate-surface: #ffffff;
-  --candidate-soft: #f4f3f0;
-  --candidate-text: #12161d;
-  --candidate-body: #4a4a4a;
-  --candidate-muted: #666666;
-  --candidate-line: rgba(18, 22, 29, 0.12);
-  --candidate-green: #006a4e;
-  --candidate-brand: #b05a36;
+  --candidate-bg: #0f172a;
+  --candidate-surface: #fdf9f0;
+  --candidate-soft: #f6f1e7;
+  --candidate-text: #0f172a;
+  --candidate-body: #475569;
+  --candidate-muted: #64748b;
+  --candidate-line: rgba(148, 163, 184, 0.2);
+  --candidate-green: #4ade80;
+  --candidate-brand: #25a2e8;
   min-height: 100vh;
   padding: 110px 32px 32px;
   background: var(--candidate-bg);
@@ -23,7 +23,7 @@
   border: 1px solid var(--candidate-line);
   border-radius: 24px;
   background: var(--candidate-surface);
-  box-shadow: none;
+  box-shadow: 0 18px 40px rgba(2, 6, 23, 0.34);
   padding: 24px;
   transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
@@ -45,8 +45,8 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: var(--candidate-brand);
-  border: 2px solid rgba(254, 249, 239, 0.72);
+  background: #f97316;
+  border: 2px solid rgba(255, 255, 255, 0.72);
   color: #ffffff;
   display: flex;
   align-items: center;
@@ -201,7 +201,7 @@
 
 .primaryLink,
 .primaryButton {
-  background: #12161d;
+  background: var(--candidate-brand);
   color: #ffffff;
 }
 
@@ -213,7 +213,7 @@
 
 .primaryLink:hover,
 .primaryButton:hover {
-  background: #2a2f38;
+  opacity: 0.9;
 }
 
 .primaryButton:disabled {

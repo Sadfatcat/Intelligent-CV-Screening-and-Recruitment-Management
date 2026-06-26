@@ -1,11 +1,11 @@
 @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
 .container {
-  --bg-1: #07111d;
-  --bg-2: #0c1c2f;
-  --surface: rgba(13, 26, 42, 0.82);
-  --surface-strong: rgba(11, 23, 37, 0.9);
-  --line: rgba(129, 164, 194, 0.22);
+  --bg-1: #cfd5e4;
+  --bg-2: #cfd5e4;
+  --surface: #eef1f7;
+  --surface-strong: #e1e6f0;
+  --line: rgba(44, 54, 94, 0.16);
   --title: #e8f0f8;
   --text: #b5c8d9;
   --muted: #90a8bc;
@@ -16,11 +16,7 @@
   flex-direction: row;
   gap: 14px;
   padding: 90px 18px 18px;
-  background:
-    radial-gradient(circle at 14% 18%, rgba(31, 90, 138, 0.34), transparent 42%),
-    radial-gradient(circle at 86% 78%, rgba(59, 86, 122, 0.3), transparent 42%),
-    linear-gradient(150deg, var(--bg-1), var(--bg-2));
-  background-attachment: fixed;
+  background: var(--bg-1);
   font-family: "Source Sans 3", sans-serif;
   align-items: flex-start;
 }
@@ -40,7 +36,7 @@
 .right {
   background: var(--surface);
   border-radius: 14px;
-  box-shadow: 0 18px 30px rgba(4, 10, 18, 0.42);
+  box-shadow: 0 12px 28px rgba(21, 28, 98, 0.12);
   border: 1px solid var(--line);
   display: flex;
   flex-direction: column;
@@ -533,7 +529,7 @@
 .applicationCard {
   border: 1px solid rgba(129, 164, 194, 0.18);
   border-radius: 16px;
-  background: #ffffff;
+  background: #fffaf2;
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -542,7 +538,7 @@
 
 .applicationHero {
   display: grid;
-  grid-template-columns: 112px minmax(0, 1fr);
+  grid-template-columns: 188px minmax(0, 1fr);
   gap: 16px;
   align-items: stretch;
 }
@@ -550,13 +546,16 @@
 .applicationImage,
 .applicationImageFallback {
   width: 100%;
-  height: 92px;
+  height: 164px;
   border-radius: 12px;
 }
 
 .applicationImage {
-  object-fit: cover;
+  object-fit: contain;
+  background: #fff7eb;
+  padding: 6px;
   border: 1px solid var(--candidate-line);
+  image-rendering: -webkit-optimize-contrast;
 }
 
 .applicationImageFallback {
@@ -579,7 +578,7 @@
 
 .applicationTitleRow {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 112px;
+  grid-template-columns: minmax(0, 1fr) 120px;
   gap: 12px;
   align-items: start;
 }
@@ -587,7 +586,7 @@
 .applicationTitleRow h3 {
   margin: 0;
   color: var(--candidate-text);
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 700;
   line-height: 1.3;
 }
@@ -704,13 +703,13 @@
   border: 1px solid var(--candidate-line);
   border-radius: 14px;
   padding: 14px 12px;
-  background: #fbfcfd;
+  background: #fff7eb;
   min-width: 0;
 }
 
 .criteriaBlock h4 {
   margin: 0 0 10px;
-  color: var(--candidate-text);
+  color: #1f2937;
   font-size: 13px;
   font-weight: 900;
 }
@@ -842,11 +841,18 @@
   padding: 18px 18px 20px;
   border-right: 1px solid var(--candidate-line);
   overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   background: #ffffff;
 }
 
 .criteriaModalColumn:last-child {
   border-right: 0;
+}
+
+.criteriaModalColumn::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 .criteriaModalColumnActive {
@@ -878,8 +884,8 @@
   min-width: 28px;
   padding: 4px 8px;
   border-radius: 999px;
-  background: var(--candidate-soft);
-  color: var(--candidate-text);
+  background: #1f2937;
+  color: #f8fafc;
   font-size: 11px;
   font-weight: 800;
   text-align: center;
@@ -1858,20 +1864,20 @@
 
 /* Candidate visual standard: font and tone */
 .container {
-  --candidate-bg: #fbfaf7;
-  --candidate-surface: #ffffff;
-  --candidate-soft: #f4f3f0;
-  --candidate-text: #12161d;
-  --candidate-body: #4a4a4a;
-  --candidate-muted: #666666;
-  --candidate-line: rgba(18, 22, 29, 0.12);
-  --candidate-green: #006a4e;
-  --candidate-brand: #b05a36;
-  --candidate-sidebar: #0a0e4b;
-  --candidate-sidebar-panel: #20242b;
-  --candidate-sidebar-line: #343942;
-  --candidate-sidebar-text: #ecf4ff;
-  background: var(--candidate-bg);
+  --candidate-bg: #0f172a;
+  --candidate-surface: #fdf9f0;
+  --candidate-soft: #1e2530;
+  --candidate-text: #0f172a;
+  --candidate-body: #475569;
+  --candidate-muted: #94a3b8;
+  --candidate-line: rgba(148, 163, 184, 0.18);
+  --candidate-green: #4ade80;
+  --candidate-brand: #25a2e8;
+  --candidate-sidebar: #0f172a;
+  --candidate-sidebar-panel: #1e2530;
+  --candidate-sidebar-line: rgba(148, 163, 184, 0.14);
+  --candidate-sidebar-text: #f8fafc;
+  background: #0f172a;
   color: var(--candidate-body);
   font-family: "Plus Jakarta Sans", sans-serif;
 }
@@ -1884,7 +1890,8 @@
 
 .left {
   background: var(--candidate-sidebar);
-  border-color: #30343b;
+  border-color: rgba(148, 163, 184, 0.12);
+  box-shadow: 0 20px 44px rgba(2, 6, 23, 0.4);
 }
 
 .leftTopBox,
@@ -1895,7 +1902,13 @@
 }
 
 .middle,
-.right,
+.right {
+  background: var(--candidate-soft);
+  border-color: var(--candidate-sidebar-line);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02), 0 20px 40px rgba(2, 6, 23, 0.28);
+  color: var(--candidate-sidebar-text);
+}
+
 .companySection,
 .applicationCard,
 .scoreBox,
@@ -1903,6 +1916,7 @@
 .modalContent {
   background: var(--candidate-surface);
   border-color: var(--candidate-line);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
   color: var(--candidate-body);
 }
 
@@ -1932,8 +1946,6 @@
 .appliedHeader p,
 .applicationTitleRow p,
 .applicationDescription,
-.detailsMeta,
-.detailsSection p,
 .modalHeader p,
 .modalInput,
 .phonePrefix,
@@ -1942,37 +1954,79 @@
   color: var(--candidate-body);
 }
 
+.appliedHeader h2,
+.appliedHeader p {
+  color: #f8fafc;
+}
+
+.detailsMeta,
+.detailsSection p,
+.emptyText {
+  color: rgba(248, 250, 252, 0.78);
+}
+
 .searchHint,
 .companyHeader span,
 .appliedHeader > span,
 .subTabBar,
 .applicationMetaGrid span {
-  background: var(--candidate-soft);
+  background: rgba(37, 162, 232, 0.08);
   border-color: var(--candidate-line);
   color: var(--candidate-text);
 }
 
+.leftTopBox:hover,
+.leftMiddleBox:hover,
+.leftBottomBox:hover,
+.middle:hover,
+.right:hover,
+.companySection:hover,
+.applicationCard:hover {
+  box-shadow: none !important;
+}
+
+.leftTopBox:hover,
+.leftMiddleBox:hover,
+.leftBottomBox:hover {
+  border-color: var(--candidate-sidebar-line) !important;
+}
+
+.middle:hover,
+.right:hover {
+  border-color: var(--candidate-sidebar-line) !important;
+}
+
+.companySection:hover,
+.applicationCard:hover {
+  border-color: var(--candidate-line) !important;
+}
+
+.subTabButton {
+  border-radius: 8px;
+}
+
 .subTabButtonActive,
 .subTabButton:hover {
-  background: var(--candidate-green);
+  background: var(--candidate-brand);
   color: #ffffff;
 }
 
 .avatarCircle {
-  background: var(--candidate-brand);
+  background: #f97316;
 }
 
 .applyButton,
 .submitModalBtn,
 .closeBtn {
-  background: var(--candidate-text);
+  background: var(--candidate-brand);
   color: #ffffff;
 }
 
 .applyButton:hover,
 .submitModalBtn:hover,
 .closeBtn:hover {
-  background: #66ccff;
+  opacity: 0.9;
+  background: var(--candidate-brand);
 }
 
 .modalInput,
@@ -1984,12 +2038,12 @@
 }
 
 .modalUploadCol {
-  background: var(--candidate-bg);
-  border-color: rgba(176, 90, 54, 0.42);
+  background: #f6f1e7;
+  border-color: rgba(37, 162, 232, 0.34);
 }
 
 .modalUploadCol:hover {
-  background: var(--candidate-soft);
+  background: #f2ecdf;
 }
 
 .uploadIcon,
@@ -2010,11 +2064,11 @@
   width: min(920px, calc(100vw - 48px));
   max-height: calc(100vh - 48px);
   overflow-y: auto;
-  border: 1px solid rgba(18, 22, 29, 0.12);
+  border: 1px solid rgba(148, 163, 184, 0.18);
   border-radius: 18px;
-  background: #ffffff;
+  background: var(--candidate-surface);
   padding: 30px;
-  box-shadow: 0 24px 60px rgba(18, 22, 29, 0.24);
+  box-shadow: 0 24px 60px rgba(2, 6, 23, 0.38);
 }
 
 .modalHeader {
@@ -2041,9 +2095,9 @@
   height: 38px;
   border: 0;
   border-radius: 12px;
-  background: var(--candidate-text);
-  color: #200080;
-  box-shadow: 0 10px 24px rgba(18, 22, 29, 0.16);
+  background: var(--candidate-brand);
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(37, 162, 232, 0.24);
 }
 
 .modalBody {
@@ -2063,15 +2117,15 @@
 .phonePrefix,
 .jobTitleInput {
   min-height: 48px;
-  border: 1px solid rgba(18, 22, 29, 0.16);
+  border: 1px solid rgba(148, 163, 184, 0.24);
   border-radius: 12px;
-  background: #ffffff;
+  background: #fffdf7;
   color: var(--candidate-text);
   box-shadow: inset 0 1px 0 rgba(18, 22, 29, 0.03);
 }
 
 .modalInput::placeholder {
-  color: rgba(74, 74, 74, 0.72);
+  color: rgba(71, 85, 105, 0.72);
 }
 
 .phoneGroup {
@@ -2086,15 +2140,15 @@
 
 .modalUploadCol {
   min-height: 286px;
-  border: 2px dashed rgba(176, 90, 54, 0.52);
+  border: 2px dashed rgba(37, 162, 232, 0.42);
   border-radius: 18px;
-  background: #fbfaf7;
+  background: #f6f1e7;
   color: var(--candidate-text);
   padding: 28px;
 }
 
 .modalUploadCol:hover {
-  background: #f4f3f0;
+  background: #f2ecdf;
   border-color: var(--candidate-brand);
 }
 
@@ -2145,8 +2199,18 @@
   width: 100%;
   min-height: 48px;
   border-radius: 12px;
-  background: #99d9ff;
-  color: #12161d;
+  background: var(--candidate-brand);
+  color: #ffffff;
+}
+
+.right .detailsTitle,
+.right .detailsSection h4 {
+  color: #f8fafc;
+}
+
+.right .detailsSection {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(148, 163, 184, 0.14);
 }
 
 @media (max-width: 820px) {

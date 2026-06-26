@@ -2,24 +2,24 @@
 
 .page,
 .dashboardContainer {
-    --bg: var(--background);
-    --surface: var(--surface);
-    --surface-solid: var(--surface);
-    --text: var(--text-primary);
-    --body-text: var(--text-secondary);
-    --muted: var(--text-secondary);
-    --line: var(--border);
-    --control-bg: var(--surface);
-    --control-bg-soft: var(--surface-muted);
-    --strong-text: var(--text-primary);
-    --primary-a: var(--primary);
-    --primary-b: var(--primary-strong);
-    --primary-c: var(--secondary);
-    --danger: var(--error);
-    --pastel-purple: #eef3ff;
-    --pastel-green: #eff9f5;
-    --pastel-pink: #fff3f1;
-    --pastel-blue: #eef8ff;
+    --bg: #0f172a;
+    --surface: #fdf9f0;
+    --surface-solid: #fdf9f0;
+    --text: #0f172a;
+    --body-text: #475569;
+    --muted: #94a3b8;
+    --line: rgba(148, 163, 184, 0.18);
+    --control-bg: #fdf9f0;
+    --control-bg-soft: #f6f1e7;
+    --strong-text: #0f172a;
+    --primary-a: #25a2e8;
+    --primary-b: #25a2e8;
+    --primary-c: #4ade80;
+    --danger: #f87171;
+    --pastel-purple: #fff7eb;
+    --pastel-green: #fff7eb;
+    --pastel-pink: #fff7eb;
+    --pastel-blue: #fff7eb;
     min-height: 100vh;
     font-family: "Plus Jakarta Sans", sans-serif;
     color: var(--body-text);
@@ -75,17 +75,17 @@
     width: 280px;
     display: flex;
     flex-direction: column;
-    background: #0a0e4b;
-    border-right: 1px solid #30343b;
-    box-shadow: none;
+    background: #0f172a;
+    border-right: 1px solid rgba(148, 163, 184, 0.14);
+    box-shadow: 0 20px 44px rgba(2, 6, 23, 0.4);
     color: #fef9ef;
     padding: 24px 16px;
 }
 
 .logoBox {
     border-radius: 16px;
-    border: 1px solid #484c54;
-    background: #20242b;
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    background: #1e2530;
     padding: 16px;
     text-align: left;
 }
@@ -93,7 +93,7 @@
 .accountBox {
     margin-top: 18px;
     padding-top: 16px;
-    border-top: 1px solid #3a3e45;
+    border-top: 1px solid rgba(148, 163, 184, 0.14);
     display: flex;
     align-items: center;
     gap: 12px;
@@ -121,12 +121,12 @@
     font-size: 0.74rem;
     font-weight: 700;
     color: #fecaca;
-    background: rgba(36, 39, 47, 0.72);
+    background: rgba(30, 37, 48, 0.92);
     cursor: pointer;
 }
 
 .sidebarLogoutInline:hover {
-    background: rgba(71, 32, 37, 0.72);
+    background: rgba(127, 29, 29, 0.34);
 }
 
 .avatar {
@@ -140,7 +140,7 @@
     font-weight: 800;
     font-size: 1rem;
     color: #fff;
-    background: var(--primary-strong);
+    background: #f97316;
     border: 2px solid rgba(254, 249, 239, 0.72);
     box-shadow: none;
 }
@@ -153,8 +153,8 @@
 }
 
 .navButton {
-    border: 1px solid #343942;
-    background: #20242b;
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    background: #1e2530;
     color: #ecf4ff;
     padding: 12px 14px;
     border-radius: 12px;
@@ -165,21 +165,21 @@
 }
 
 .navButton:hover {
-    background: #30343b;
-    transform: translateY(-1px);
+    background: #1e2530;
+    transform: none;
 }
 
 .navButtonPrimary {
     border: none;
     color: #fff;
-    background: var(--primary-strong);
+    background: #25a2e8;
     box-shadow: none;
 }
 
 .navButtonActive {
     color: #fff;
-    border-color: #6a6f78;
-    background: #3a3e45;
+    border-color: rgba(37, 162, 232, 0.36);
+    background: #151c62;
 }
 
 .logoutButton {
@@ -198,8 +198,8 @@
 
 .header {
     padding: 28px 32px 16px;
-    border-bottom: 1px solid var(--line);
-    background: var(--bg);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+    background: #151c62;
     backdrop-filter: none;
 }
 
@@ -209,12 +209,12 @@
     font-size: 2rem;
     font-weight: 700;
     letter-spacing: 0;
-    color: var(--text);
+    color: #f8fafc;
 }
 
 .header p {
     margin: 6px 0 0;
-    color: var(--muted);
+    color: rgba(248, 250, 252, 0.78);
 }
 
 .contentArea {
@@ -222,6 +222,7 @@
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 24px;
+    background: var(--bg);
 }
 
 .card {
@@ -229,15 +230,15 @@
     border: 1px solid var(--line);
     border-radius: 16px;
     padding: 24px;
-    box-shadow: none;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
     backdrop-filter: none;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
-    transform: translateY(-4px);
-    border-color: #006a4e;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    transform: none;
+    border-color: var(--line);
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
 }
 
 .statCard h3,
@@ -246,7 +247,7 @@
     font-size: 0.85rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #2e8b57;
+    color: #25a2e8;
 }
 
 .statCard p {
@@ -318,10 +319,10 @@
 }
 
 .dashboardSummaryGrid span {
-    border: 1px solid rgba(0, 94, 154, 0.16);
+    border: 2px solid rgba(148, 163, 184, 0.5);
     border-radius: 16px;
-    background: #ffffff;
-    color: var(--primary-a);
+    background: #fff7eb;
+    color: var(--text);
     padding: 14px;
     display: grid;
     gap: 6px;
@@ -376,8 +377,8 @@
     background:
         radial-gradient(circle at center, transparent 48%, rgba(18, 22, 29, 0.035) 49%, transparent 50%),
         radial-gradient(circle at center, transparent 60%, rgba(18, 22, 29, 0.03) 61%, transparent 62%),
-        #ffffff;
-    box-shadow: 0 18px 34px rgba(18, 22, 29, 0.08);
+        #fff7eb;
+    box-shadow: 0 18px 34px rgba(15, 23, 42, 0.14);
 }
 
 .pieChart {
@@ -400,7 +401,7 @@
     transform: translate(-50%, -50%);
     border-radius: 999px;
     background: var(--surface);
-    border: 10px solid #ffffff;
+    border: 10px solid #fff7eb;
     box-shadow: inset 0 0 0 1px rgba(18, 22, 29, 0.06);
     display: flex;
     flex-direction: column;
@@ -466,16 +467,16 @@
     border: 1px solid var(--line);
     border-radius: 12px;
     padding: 8px 10px;
-    color: var(--text);
-    background: var(--control-bg-soft);
+    color: #f8fafc;
+    background: rgba(255, 255, 255, 0.06);
     cursor: pointer;
     font-weight: 800;
 }
 
 .rangeButtonActive {
     color: #fff;
-    border-color: #006a4e;
-    background: #006a4e;
+    border-color: #25a2e8;
+    background: #25a2e8;
 }
 
 .lineChart {
@@ -488,7 +489,7 @@
     min-width: 760px;
     border: 1px solid var(--line);
     border-radius: 16px;
-    background: #ffffff;
+    background: #fffaf2;
     padding: 12px;
 }
 
@@ -574,7 +575,7 @@
     gap: 12px;
     align-items: center;
     padding: 12px 0;
-    border-bottom: 1px solid var(--line);
+    border-bottom: 2px solid rgba(148, 163, 184, 0.5);
 }
 
 .dashboardActivityList span {
@@ -739,7 +740,7 @@
     flex-direction: column;
     justify-content: space-between;
     gap: 12px;
-    border: 1px solid var(--line);
+    border: 2px solid rgba(148, 163, 184, 0.5);
     border-radius: 24px;
     padding: 16px;
     background: var(--pastel-green);
@@ -964,7 +965,7 @@
 
 .table th,
 .table td {
-    border-bottom: 1px solid var(--line);
+    border-bottom: 2px solid rgba(148, 163, 184, 0.5);
     padding: 11px 10px;
     text-align: left;
     color: var(--text);
@@ -1093,7 +1094,7 @@
 }
 
 .cancelDeleteBtn {
-    border: 1px solid var(--line);
+    border: 2px solid rgba(148, 163, 184, 0.5);
     background: rgba(148, 163, 184, 0.18);
     color: var(--text);
 }
