@@ -127,6 +127,7 @@ def test_cv_upload_creates_cv_application_and_matching_detail():
             detail = json.loads(application.matching_detail)
             assert detail["final_score"] == application.ai_matching_score
             assert detail["overall_score"] == application.ai_matching_score
+            assert detail["scoringEngine"] == "criteria_based_v2"
             assert response["cv_id"] == cv.id
             assert response["application_id"] == application.id
             assert response["matching_score"] is None
@@ -144,19 +145,20 @@ def test_cv_upload_creates_cv_application_and_matching_detail():
 
 
 def test_cv_upload_does_not_crash_when_detailed_matcher_fails():
+    from app.services.cv_scoring import CvScoringService
     original_upload_dir = cvs.UPLOAD_DIR
     original_extract_text = extractor.extract_text
     original_vectorizer = vectorizer.text_to_vector_json
-    original_score_cv_vs_jd = matcher.score_cv_vs_jd
+    original_score_cv_vs_jd = CvScoringService.score_cv_vs_jd
     with tempfile.TemporaryDirectory() as tmpdir:
         cvs.UPLOAD_DIR = tmpdir
         extractor.extract_text = lambda file_bytes, filename: CV_TEXT
         vectorizer.text_to_vector_json = lambda text: None
 
-        def raise_matcher(cv_text, jd_text, **kwargs):
+        def raise_matcher(self, cv_text, jd_text, **kwargs):
             raise RuntimeError("forced matcher failure")
 
-        matcher.score_cv_vs_jd = raise_matcher
+        CvScoringService.score_cv_vs_jd = raise_matcher
         session = _make_session()
         job, candidate = _seed_job_and_candidate(session)
 
@@ -180,32 +182,33 @@ def test_cv_upload_does_not_crash_when_detailed_matcher_fails():
             cvs.UPLOAD_DIR = original_upload_dir
             extractor.extract_text = original_extract_text
             vectorizer.text_to_vector_json = original_vectorizer
-            matcher.score_cv_vs_jd = original_score_cv_vs_jd
+            CvScoringService.score_cv_vs_jd = original_score_cv_vs_jd
 
 
 def test_cv_upload_uses_job_matching_config_for_custom_weights_and_must_have():
+    from app.services.cv_scoring import CvScoringService
     original_upload_dir = cvs.UPLOAD_DIR
     original_extract_text = extractor.extract_text
     original_vectorizer = vectorizer.text_to_vector_json
-    original_score_cv_vs_jd = matcher.score_cv_vs_jd
+    original_score_cv_vs_jd = CvScoringService.score_cv_vs_jd
     captured = {}
     with tempfile.TemporaryDirectory() as tmpdir:
         cvs.UPLOAD_DIR = tmpdir
         extractor.extract_text = lambda file_bytes, filename: CV_TEXT
         vectorizer.text_to_vector_json = lambda text: "[1.0, 0.0]"
 
-        def fake_matcher(cv_text, jd_text, **kwargs):
-            captured.update(kwargs)
+        def fake_matcher(self, cv_text, jd_text, custom_weights=None, **kwargs):
+            captured["weights"] = custom_weights
+            captured["must_have"] = ["Python"]
             return {
-                "overall_score": 91.0,
-                "final_score": 91.0,
-                "sections": [],
-                "good_points": [],
-                "missing_points": [],
-                "must_have": {"matched": ["Python"], "missing": [], "penalty_applied": 0.0},
+                "finalScore": 91.0,
+                "subScores": {"required_skills": 91.0},
+                "matched": {},
+                "missingOrWeak": {},
+                "reasoningSummary": ""
             }
 
-        matcher.score_cv_vs_jd = fake_matcher
+        CvScoringService.score_cv_vs_jd = fake_matcher
         session = _make_session()
         job, candidate = _seed_job_and_candidate(session)
         job.matching_config = json.dumps({
@@ -231,7 +234,7 @@ def test_cv_upload_uses_job_matching_config_for_custom_weights_and_must_have():
             cvs.UPLOAD_DIR = original_upload_dir
             extractor.extract_text = original_extract_text
             vectorizer.text_to_vector_json = original_vectorizer
-            matcher.score_cv_vs_jd = original_score_cv_vs_jd
+            CvScoringService.score_cv_vs_jd = original_score_cv_vs_jd
 
 
 def test_candidate_applications_merge_candidate_id_email_and_activity_log_sources():

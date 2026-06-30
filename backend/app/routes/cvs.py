@@ -50,21 +50,35 @@ def score_application_background(application_id: int, cv_id: int, job_id: int, f
             job = session.get(Job, job_id)
             if parsed_text and job and job.jd_parsed_text:
                 try:
-                    import json
                     from app.services.matching_config import parse_matching_config
-                    from app.services.matcher import score_cv_vs_jd
+                    from app.services.cv_scoring import CvScoringService
 
                     config = parse_matching_config(job.matching_config, strict=False)
-                    matching_detail = score_cv_vs_jd(
-                        parsed_text,
-                        job.jd_parsed_text,
-                        weights=config.get("weights"),
-                        must_have=config.get("must_have"),
+                    scoring_service = CvScoringService()
+                    custom_weights = config.get("weights")
+                    matching_detail = scoring_service.score_cv_vs_jd(
+                        cv_text=parsed_text,
+                        jd_text=job.jd_parsed_text,
+                        custom_weights=custom_weights
                     )
-                    matching_score = matching_detail.get("final_score")
-                    matching_detail["overall_score"] = matching_score
-                    matching_detail["final_score"] = matching_score
-                    matching_detail_json = json.dumps(matching_detail, ensure_ascii=False)
+                    
+                    final_score_100 = float(matching_detail.get("finalScore", 0.0))
+                    sub_scores_100 = matching_detail.get("subScores", {})
+                    
+                    detail_data = {
+                        **matching_detail,
+                        "finalScore": final_score_100,
+                        "final_score": final_score_100,
+                        "overall_score": final_score_100,
+                        "subScores": sub_scores_100,
+                        "section_scores": {
+                            key: round(float(value) / 100, 4)
+                            for key, value in sub_scores_100.items()
+                        },
+                        "scoringEngine": "criteria_based_v2"
+                    }
+                    matching_score = final_score_100
+                    matching_detail_json = json.dumps(detail_data, ensure_ascii=False)
                 except Exception as exc:
                     logger.exception("Detailed CV/JD matcher failed for job_id=%s: %s", job_id, exc)
 
