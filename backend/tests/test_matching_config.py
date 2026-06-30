@@ -14,7 +14,7 @@ def test_parse_valid_matching_config_keeps_weights_and_must_have():
 
     config = parse_matching_config(raw, strict=True)
 
-    assert config["weights"] == {"technical_skills": 0.8, "experience": 0.2}
+    assert config["weights"] == {"required_skills": 0.8, "seniority": 0.2}
     assert config["must_have"] == ["Python", "Docker"]
 
 

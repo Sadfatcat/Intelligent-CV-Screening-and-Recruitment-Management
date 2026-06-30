@@ -449,7 +449,9 @@ def regex_extract(text: str) -> Dict[str, List[str]]:
     out["months"] = re.findall(r"(\d+(?:\.\d+)?)\s+months?", text, flags=re.I)
     out["years"].extend(re.findall(r"(\d+(?:\.\d+)?)\s*年以上", text))
     out["years"].extend(re.findall(r"(\d+(?:\.\d+)?)\s*年(?:間)?", text))
+    out["years"].extend(re.findall(r"(\d+(?:\.\d+)?)\s*năm", text, flags=re.I))
     out["months"].extend(re.findall(r"(\d+(?:\.\d+)?)\s*ヶ月", text))
+    out["months"].extend(re.findall(r"(\d+(?:\.\d+)?)\s*tháng", text, flags=re.I))
     return out
 
 
@@ -458,9 +460,10 @@ def _extract_year_values(text: str) -> List[float]:
         return []
     values = []
     patterns = [
-        r"(\d+(?:\.\d+)?)\s*\+?\s+years?",
+        r"(\d+(?:\.\d+)?)\s*\+?\s*years?",
         r"(\d+(?:\.\d+)?)\s*年以上",
         r"(\d+(?:\.\d+)?)\s*年(?:間)?",
+        r"(\d+(?:\.\d+)?)\s*năm",
     ]
     for pattern in patterns:
         values.extend(float(value) for value in re.findall(pattern, text, flags=re.I))
@@ -474,6 +477,7 @@ def _extract_month_values(text: str) -> List[float]:
     patterns = [
         r"(\d+(?:\.\d+)?)\s+months?",
         r"(\d+(?:\.\d+)?)\s*ヶ月",
+        r"(\d+(?:\.\d+)?)\s*tháng",
     ]
     for pattern in patterns:
         values.extend(float(value) for value in re.findall(pattern, text, flags=re.I))

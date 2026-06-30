@@ -305,7 +305,14 @@ export default function AppliedCVsPage({ submittedJobs, jobs, isCvScoring, hasSc
                                         </section>
                                         <section className={styles.criteriaBlock}>
                                             <h4>Missing requirements</h4>
-                                            {renderCriteriaList(missingRequirements, "requirement", "No required condition missing.", openDetailModal)}
+                                            {renderCriteriaList(
+                                                missingRequirements,
+                                                "requirement",
+                                                !hasMissingDetail && (item.ai_matching_score ?? 0) < BORDERLINE_SCORE_THRESHOLD
+                                                    ? "Detailed missing criteria not available."
+                                                    : "No required condition missing.",
+                                                openDetailModal,
+                                            )}
                                         </section>
                                     </div>
                                 )}
@@ -353,7 +360,7 @@ export default function AppliedCVsPage({ submittedJobs, jobs, isCvScoring, hasSc
                                     <h4>Missing requirements</h4>
                                     <span>{detailModal.missingRequirements.length}</span>
                                 </div>
-                                {renderFullCriteriaList(detailModal.missingRequirements, "requirement", "No required condition missing.")}
+                                {renderFullCriteriaList(detailModal.missingRequirements, "requirement", "Detailed missing criteria not available.")}
                             </section>
                         </div>
                     </div>

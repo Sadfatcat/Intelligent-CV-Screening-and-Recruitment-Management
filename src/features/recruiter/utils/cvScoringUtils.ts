@@ -3,7 +3,36 @@ import { JOB_MANAGEMENT_LABELS, SCORE_STATUS_LABELS } from "../constants/recruit
 import type { CVLogItem, CvSortMode, ExperienceFilter, JobManagementStatus, MatchingDetail, ScoreStatus, ScreeningSummary } from "../types/recruiterTypes";
 
 export function getRenderableMatchingSections(detail: MatchingDetail | null | undefined) {
-    return (detail?.sections || []).filter((section) => {
+    let sections = detail?.sections || [];
+    if (sections.length === 0 && detail?.subScores) {
+        const labels: Record<string, string> = {
+            required_skills: "Required Skills Match",
+            project_domain: "Project / Domain Relevance",
+            seniority: "Years of Experience / Seniority",
+            responsibility: "Responsibility Match",
+            testing_documentation: "Testing / Documentation / Quality Evidence",
+            language_collaboration: "Language / Collaboration",
+            bonus_skills: "Bonus Skills",
+        };
+        const order = [
+            "required_skills",
+            "project_domain",
+            "seniority",
+            "responsibility",
+            "testing_documentation",
+            "language_collaboration",
+            "bonus_skills",
+        ];
+        sections = order.map((key) => ({
+            key,
+            label: labels[key] || key,
+            score: detail.subScores?.[key] ?? null,
+            good: detail.matched?.[key] || [],
+            missing: detail.missingOrWeak?.[key] || [],
+            explanation: detail.reasoningSummary || "",
+        }));
+    }
+    return sections.filter((section) => {
         return (
             typeof section.score === "number" ||
             Boolean(section.explanation?.trim()) ||
@@ -40,14 +69,12 @@ export function getScoreStatusLabel(status: ScoreStatus, value?: number | null |
 }
 
 export function getRecommendationLabel(value: number | null | undefined) {
-    const status = getScoreStatus(value);
-    if (status === "passed") return "Strong match";
-    if (status === "borderline") return "Review manually";
-    if (status === "failed") {
-        const score = normalizeScore(value);
-        return score !== null && score >= WEAK_MATCH_SCORE_THRESHOLD ? "Potentially weak fit" : "Reject / Not suitable";
-    }
-    return "Pending scoring";
+    const score = normalizeScore(value);
+    if (score === null) return "Pending scoring";
+    if (score >= PASSED_SCORE_THRESHOLD) return "Strong match";
+    if (score >= BORDERLINE_SCORE_THRESHOLD) return "Potential match";
+    if (score >= WEAK_MATCH_SCORE_THRESHOLD) return "Weak match";
+    return "Not suitable";
 }
 
 export function calculateSummary(items: CVLogItem[]): ScreeningSummary {

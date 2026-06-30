@@ -18,9 +18,16 @@ def parse_matching_config(raw_config: str | None, strict: bool = False) -> dict[
         if weights is not None:
             if not isinstance(weights, dict):
                 raise ValueError("matching_config.weights must be an object")
+            
+            # Legacy and Criteria keys union
+            ALLOWED_KEYS = {
+                "technical_skills", "programming_languages", "experience", "projects", "responsibilities", "natural_languages", "soft_skills", "certificates", "education",
+                "required_skills", "project_domain", "seniority", "responsibility", "testing_documentation", "language_collaboration", "bonus_skills"
+            }
+            
             cleaned_weights: dict[str, float] = {}
             for key, value in weights.items():
-                if key not in DEFAULT_WEIGHTS:
+                if key not in ALLOWED_KEYS:
                     continue
                 try:
                     weight = float(value)
@@ -29,10 +36,39 @@ def parse_matching_config(raw_config: str | None, strict: bool = False) -> dict[
                 if weight < 0:
                     raise ValueError(f"Weight for section '{key}' must be non-negative")
                 cleaned_weights[key] = weight
-            if cleaned_weights and sum(cleaned_weights.values()) <= 0:
+            
+            # Map weights to criteria-based keys
+            mapped_weights: dict[str, float] = {}
+            for key, weight in cleaned_weights.items():
+                if key in {
+                    "required_skills", "project_domain", "seniority", "responsibility",
+                    "testing_documentation", "language_collaboration", "bonus_skills"
+                }:
+                    mapped_weights[key] = mapped_weights.get(key, 0.0) + weight
+                elif key in {"technical_skills", "programming_languages"}:
+                    mapped_weights["required_skills"] = mapped_weights.get("required_skills", 0.0) + weight
+                elif key == "experience":
+                    mapped_weights["seniority"] = mapped_weights.get("seniority", 0.0) + weight
+                elif key == "projects":
+                    mapped_weights["project_domain"] = mapped_weights.get("project_domain", 0.0) + weight
+                elif key == "responsibilities":
+                    mapped_weights["responsibility"] = mapped_weights.get("responsibility", 0.0) + weight
+                elif key in {"natural_languages", "soft_skills"}:
+                    mapped_weights["language_collaboration"] = mapped_weights.get("language_collaboration", 0.0) + weight
+                elif key in {"certificates", "education"}:
+                    mapped_weights["bonus_skills"] = mapped_weights.get("bonus_skills", 0.0) + weight
+                    
+            if cleaned_weights and not mapped_weights:
+                raise ValueError("No valid matching config weights specified")
+                
+            total = sum(mapped_weights.values())
+            if total > 0:
+                mapped_weights = {k: v / total for k, v in mapped_weights.items()}
+            elif cleaned_weights:
                 raise ValueError("At least one configured weight must be greater than zero")
-            if cleaned_weights:
-                config["weights"] = cleaned_weights
+                
+            if mapped_weights:
+                config["weights"] = {k: round(v, 4) for k, v in mapped_weights.items()}
 
         must_have = payload.get("must_have")
         if must_have is not None:

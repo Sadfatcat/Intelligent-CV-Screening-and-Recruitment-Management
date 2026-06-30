@@ -230,7 +230,11 @@ export default function CVDetailPage({ selectedLog, getManagedJobStatus, onBack,
                                 ))}
                             </ul>
                         ) : (
-                            <p className={styles.emptyNote}>No missing requirements recorded.</p>
+                            <p className={styles.emptyNote}>
+                                {(selectedLog.ai_matching_score ?? 0) < BORDERLINE_SCORE_THRESHOLD && !hasMissingDetail
+                                    ? "Detailed missing criteria not available."
+                                    : "No missing requirements recorded."}
+                            </p>
                         )}
                     </div>
                 )}

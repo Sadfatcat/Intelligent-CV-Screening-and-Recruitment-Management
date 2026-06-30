@@ -203,7 +203,7 @@ export default function JobManagementPage({
                                 <span>Submitted CVs<strong>{screeningSummary.total}</strong></span>
                                 <span>Passed<strong>{screeningSummary.passed}</strong></span>
                                 <span>Failed<strong>{screeningSummary.failed}</strong></span>
-                                <span>Borderline<strong>{screeningSummary.borderline}</strong></span>
+                                <span>Potential Match<strong>{screeningSummary.borderline}</strong></span>
                                 <span>Highest score<strong>{formatScore(screeningSummary.highestScore)}</strong></span>
                                 <span>Lowest score<strong>{formatScore(screeningSummary.lowestScore)}</strong></span>
                                 <span>Average score<strong>{formatScore(screeningSummary.averageScore)}</strong></span>

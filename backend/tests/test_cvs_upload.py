@@ -238,7 +238,7 @@ def test_cv_upload_uses_job_matching_config_for_custom_weights_and_must_have():
             response = _run_upload(session, job.id, candidate.id)
             application = session.exec(select(JobApplication)).first()
 
-            assert captured["weights"] == {"technical_skills": 0.8, "experience": 0.2}
+            assert captured["weights"] == {"required_skills": 0.8, "seniority": 0.2}
             assert captured["must_have"] == ["Python"]
             session.refresh(application)
             assert application.ai_matching_score == 91.0

@@ -1,13 +1,13 @@
 [
   {
     "filename": "Claire_Moreau_55.pdf",
-    "finalScore": 63.4,
+    "finalScore": 66.3,
     "overall_score": 74.826,
     "subScores": {
       "required_skills": 86.0,
       "project_domain": 82.0,
-      "seniority": 53.3,
-      "responsibility": 37.3,
+      "seniority": 74.3,
+      "responsibility": 34.8,
       "testing_documentation": 19.9,
       "language_collaboration": 24.8,
       "bonus_skills": 43.0
@@ -30,6 +30,7 @@
         "system replacement"
       ],
       "seniority": [
+        "7 years of stack-relevant experience (required: 5)",
         "architecture design"
       ],
       "responsibility": [
@@ -63,6 +64,7 @@
       ],
       "responsibility": [
         "test case design",
+        "collaboration with japanese team",
         "technical specification",
         "api specification"
       ],
@@ -77,7 +79,10 @@
       ],
       "language_collaboration": [
         "english design documents",
-        "japan collaboration"
+        "japanese communication",
+        "collaboration with japanese team",
+        "japan collaboration",
+        "offshore development"
       ],
       "bonus_skills": [
         "kubernetes",
@@ -92,13 +97,13 @@
   },
   {
     "filename": "David_Robe_85.pdf",
-    "finalScore": 67.7,
+    "finalScore": 70.6,
     "overall_score": 74.826,
     "subScores": {
       "required_skills": 88.0,
       "project_domain": 82.0,
-      "seniority": 70.4,
-      "responsibility": 37.2,
+      "seniority": 91.4,
+      "responsibility": 34.7,
       "testing_documentation": 19.7,
       "language_collaboration": 24.7,
       "bonus_skills": 65.6
@@ -122,6 +127,7 @@
         "system replacement"
       ],
       "seniority": [
+        "10 years of stack-relevant experience (required: 5)",
         "senior developer",
         "module lead",
         "technical lead",
@@ -159,6 +165,7 @@
       ],
       "responsibility": [
         "test case design",
+        "collaboration with japanese team",
         "technical specification",
         "api specification"
       ],
@@ -173,7 +180,10 @@
       ],
       "language_collaboration": [
         "english design documents",
-        "japan collaboration"
+        "japanese communication",
+        "collaboration with japanese team",
+        "japan collaboration",
+        "offshore development"
       ],
       "bonus_skills": [
         "performance tuning",
@@ -183,18 +193,18 @@
   },
   {
     "filename": "Le_Minh_Khoa_98_JP.pdf",
-    "finalScore": 79.4,
+    "finalScore": 86.0,
     "overall_score": 59.5,
     "subScores": {
       "required_skills": 88.0,
-      "project_domain": 85.0,
-      "seniority": 70.4,
-      "responsibility": 75.4,
+      "project_domain": 88.0,
+      "seniority": 91.4,
+      "responsibility": 85.0,
       "testing_documentation": 80.3,
-      "language_collaboration": 50.4,
+      "language_collaboration": 85.0,
       "bonus_skills": 61.7
     },
-    "reasoningSummary": "Strengths: senior java/spring experience, retail/pos/reuse domain evidence, english design/api/test documentation, system testing and qa automation.",
+    "reasoningSummary": "Strengths: senior java/spring experience, retail/pos/reuse domain evidence, english design/api/test documentation, system testing and qa automation, japan-side collaboration.",
     "matched": {
       "required_skills": [
         "java",
@@ -214,6 +224,7 @@
         "large data processing"
       ],
       "seniority": [
+        "11 years of stack-relevant experience (required: 5)",
         "module lead",
         "technical lead",
         "mentoring",
@@ -223,6 +234,7 @@
       "responsibility": [
         "system design",
         "test case design",
+        "collaboration with japanese team",
         "technical specification",
         "api specification"
       ],
@@ -236,7 +248,11 @@
         "api specification"
       ],
       "language_collaboration": [
-        "english design documents"
+        "english design documents",
+        "japanese communication",
+        "collaboration with japanese team",
+        "japan collaboration",
+        "offshore development"
       ],
       "bonus_skills": [
         "aws",
@@ -261,9 +277,7 @@
       ],
       "responsibility": [],
       "testing_documentation": [],
-      "language_collaboration": [
-        "japan collaboration"
-      ],
+      "language_collaboration": [],
       "bonus_skills": [
         "ci/cd",
         "performance tuning",
@@ -273,15 +287,15 @@
   },
   {
     "filename": "Lê_Minh_Khoa_98.pdf",
-    "finalScore": 80.4,
+    "finalScore": 85.6,
     "overall_score": 74.826,
     "subScores": {
       "required_skills": 86.0,
-      "project_domain": 85.0,
-      "seniority": 70.4,
-      "responsibility": 76.8,
+      "project_domain": 88.0,
+      "seniority": 91.4,
+      "responsibility": 85.0,
       "testing_documentation": 81.5,
-      "language_collaboration": 76.8,
+      "language_collaboration": 85.0,
       "bonus_skills": 63.2
     },
     "reasoningSummary": "Strengths: senior java/spring experience, retail/pos/reuse domain evidence, english design/api/test documentation, system testing and qa automation, japan-side collaboration.",
@@ -304,6 +318,7 @@
         "large data processing"
       ],
       "seniority": [
+        "11 years of stack-relevant experience (required: 5)",
         "module lead",
         "technical lead",
         "mentoring",
@@ -313,6 +328,7 @@
       "responsibility": [
         "system design",
         "test case design",
+        "collaboration with japanese team",
         "technical specification",
         "api specification"
       ],
@@ -327,7 +343,10 @@
       ],
       "language_collaboration": [
         "english design documents",
-        "japan collaboration"
+        "japanese communication",
+        "collaboration with japanese team",
+        "japan collaboration",
+        "offshore development"
       ],
       "bonus_skills": [
         "aws",
@@ -362,13 +381,13 @@
   },
   {
     "filename": "Nguyễn_Văn_Hải_25.pdf",
-    "finalScore": 62.5,
+    "finalScore": 65.4,
     "overall_score": 76.326,
     "subScores": {
       "required_skills": 86.0,
       "project_domain": 82.0,
-      "seniority": 53.3,
-      "responsibility": 37.3,
+      "seniority": 74.3,
+      "responsibility": 34.8,
       "testing_documentation": 19.8,
       "language_collaboration": 24.8,
       "bonus_skills": 24.8
@@ -391,6 +410,7 @@
         "system replacement"
       ],
       "seniority": [
+        "5 years of stack-relevant experience (required: 5)",
         "architecture design"
       ],
       "responsibility": [
@@ -419,6 +439,7 @@
       ],
       "responsibility": [
         "test case design",
+        "collaboration with japanese team",
         "technical specification",
         "api specification"
       ],
@@ -433,7 +454,10 @@
       ],
       "language_collaboration": [
         "english design documents",
-        "japan collaboration"
+        "japanese communication",
+        "collaboration with japanese team",
+        "japan collaboration",
+        "offshore development"
       ],
       "bonus_skills": [
         "aws",
@@ -452,18 +476,18 @@
   },
   {
     "filename": "Phạm_Quang_Huy_70.pdf",
-    "finalScore": 65.4,
+    "finalScore": 67.3,
     "overall_score": 74.826,
     "subScores": {
       "required_skills": 88.0,
       "project_domain": 49.8,
-      "seniority": 66.1,
-      "responsibility": 49.9,
+      "seniority": 87.1,
+      "responsibility": 44.9,
       "testing_documentation": 65.7,
-      "language_collaboration": 49.9,
+      "language_collaboration": 34.9,
       "bonus_skills": 52.1
     },
-    "reasoningSummary": "Strengths: senior java/spring experience.",
+    "reasoningSummary": "Strengths: senior java/spring experience. Weaknesses: thiếu bằng chứng rõ ràng về ngoại ngữ hoặc phối hợp đa quốc gia.",
     "matched": {
       "required_skills": [
         "java",
@@ -480,6 +504,7 @@
         "store operation"
       ],
       "seniority": [
+        "8 years of stack-relevant experience (required: 5)",
         "module lead",
         "technical lead",
         "mentoring",
@@ -525,14 +550,18 @@
       ],
       "responsibility": [
         "system design",
-        "test case design"
+        "test case design",
+        "collaboration with japanese team"
       ],
       "testing_documentation": [
         "system test scenario",
         "test design"
       ],
       "language_collaboration": [
-        "japan collaboration"
+        "japanese communication",
+        "collaboration with japanese team",
+        "japan collaboration",
+        "offshore development"
       ],
       "bonus_skills": [
         "kubernetes",
@@ -545,13 +574,13 @@
   },
   {
     "filename": "Trần_Minh_Đức_40.pdf",
-    "finalScore": 40.2,
+    "finalScore": 32.6,
     "overall_score": 79.561,
     "subScores": {
       "required_skills": 55.0,
       "project_domain": 27.0,
-      "seniority": 57.6,
-      "responsibility": 36.8,
+      "seniority": 8.6,
+      "responsibility": 34.3,
       "testing_documentation": 19.5,
       "language_collaboration": 24.3,
       "bonus_skills": 28.9
@@ -598,6 +627,7 @@
         "no direct POS integration"
       ],
       "seniority": [
+        "required: 5 years of stack-relevant experience",
         "5+ years of experience",
         "module lead",
         "technical lead",
@@ -606,6 +636,7 @@
       ],
       "responsibility": [
         "test case design",
+        "collaboration with japanese team",
         "technical specification",
         "api specification"
       ],
@@ -620,7 +651,10 @@
       ],
       "language_collaboration": [
         "english design documents",
-        "japan collaboration"
+        "japanese communication",
+        "collaboration with japanese team",
+        "japan collaboration",
+        "offshore development"
       ],
       "bonus_skills": [
         "aws",

@@ -63,7 +63,21 @@ class ScoringWeightsConfig:
         "senior developer": ["senior developer", "senior engineer", "senior full stack", "sr. developer", "sr. engineer"],
         "technical lead": ["technical lead", "tech lead", "lead engineer", "module lead", "mentor", "mentoring", "指導"],
         "architecture design": ["architecture design", "system design", "system replacement", "architecture"],
-        "collaboration with japanese team": ["japanese team", "japanese client", "japanese offshore", "offshore development", "japanese communication", "japan-side collaboration", "日本側", "日本チーム"],
+        "collaboration with japanese team": [
+            "japan collaboration",
+            "japanese team",
+            "japanese client",
+            "japanese offshore",
+            "offshore development",
+            "japanese communication",
+            "japan-side collaboration",
+            "日本側",
+            "日本チーム",
+            "日本側との連携",
+            "ブリッジSE",
+            "日本語",
+            "日本語コミュニケーション",
+        ],
         "large data processing": ["large data processing", "high volume data", "big data processing", "大規模データ処理"]
     }
 
@@ -423,6 +437,8 @@ class CriteriaScoringService:
             calibrated_floor = 82.0
             if len(matched_kws) >= 5 and strong_hits >= 4:
                 calibrated_floor = 85.0
+            if len(matched_kws) >= 6 and strong_hits >= 4:
+                calibrated_floor = 88.0
             final_sub_score = max(final_sub_score, calibrated_floor)
 
         return round(max(0.0, min(100.0, final_sub_score)), 1), matched_kws, missing_kws
@@ -437,6 +453,8 @@ class CriteriaScoringService:
         sem_score = max(0.0, min(100.0, sem_sim * 100.0))
 
         final_sub_score = 0.5 * kw_score + 0.5 * sem_score
+        if kw_score >= 90.0:
+            final_sub_score = max(final_sub_score, 85.0)
         return round(max(0.0, min(100.0, final_sub_score)), 1), matched_kws, missing_kws
 
     def score_testing_documentation(self, cv_text: str, jd_text: str, jd_keywords: List[str]) -> Tuple[float, List[str], List[str]]:
@@ -521,9 +539,8 @@ class CriteriaScoringService:
         if (
             "english design documents" in matched_norm
             and ("japan collaboration" in matched_norm or "collaboration with japanese team" in matched_norm)
-            and strong_hits >= 2
         ):
-            final_sub_score = max(final_sub_score, 82.0)
+            final_sub_score = max(final_sub_score, 85.0)
         elif (
             ("jlpt" in matched_norm or "toeic" in matched_norm)
             and ("japan collaboration" in matched_norm or "collaboration with japanese team" in matched_norm)

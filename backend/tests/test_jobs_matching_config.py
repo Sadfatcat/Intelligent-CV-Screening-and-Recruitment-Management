@@ -117,7 +117,7 @@ def test_upload_jd_with_valid_matching_config_saves_config():
             saved_config = json.loads(job.matching_config)
 
             assert response["matching_config_saved"] is True
-            assert saved_config["weights"] == {"technical_skills": 0.7, "experience": 0.3}
+            assert saved_config["weights"] == {"required_skills": 0.7, "seniority": 0.3}
             assert saved_config["must_have"] == ["Python", "FastAPI"]
         finally:
             session.close()
