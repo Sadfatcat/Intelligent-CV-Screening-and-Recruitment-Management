@@ -38,7 +38,7 @@ async def match_cv_vs_jd(
         raise HTTPException(status_code=400, detail=f"Failed to extract CV text: {str(e)}")
 
     try:
-        scoring_service = CvScoringService()
+        scoring_service = CvScoringService(alpha=alpha)
         result = scoring_service.score_cv_vs_jd(cv_text=cv_text, jd_text=jd_text)
         return _build_scoring_response(result)
     except Exception as e:
@@ -55,7 +55,7 @@ async def match_cv_vs_jd_text(
     Match CV text directly against Job Description text using the new criteria-based hybrid scoring engine.
     """
     try:
-        scoring_service = CvScoringService()
+        scoring_service = CvScoringService(alpha=alpha)
         result = scoring_service.score_cv_vs_jd(cv_text=cv_text, jd_text=jd_text)
         return _build_scoring_response(result)
     except Exception as e:

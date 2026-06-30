@@ -217,6 +217,31 @@ class ScoringExplanationBuilder:
         return summary
 
 
+def _extract_stack_experience_years(cv_text: str, jd_text: str) -> float:
+    core_techs = ["java", "spring", "python", "django", "react", "angular", "vue", "nodejs", "node.js", "php", "laravel", "c#", ".net"]
+    jd_lower = jd_text.lower()
+    required_techs = [tech for tech in core_techs if tech in jd_lower]
+    
+    if not required_techs:
+        return extract_experience_years(cv_text)
+        
+    cv_lower = cv_text.lower()
+    segments = re.split(r'[.\n•\-*;]', cv_lower)
+    stack_years = []
+    for segment in segments:
+        segment = segment.strip()
+        if not segment:
+            continue
+        if any(tech in segment for tech in required_techs):
+            years = [float(val) for val in re.findall(r"(\d+(?:\.\d+)?)\s*\+?\s+years?", segment)]
+            if years:
+                stack_years.extend(years)
+                
+    if stack_years:
+        return max(stack_years)
+    return 0.0
+
+
 class CriteriaScoringService:
     def __init__(self, config: ScoringWeightsConfig, alpha: float = 0.7):
         self.config = config
@@ -259,6 +284,22 @@ class CriteriaScoringService:
         sem_score = max(0.0, min(100.0, sem_sim * 100.0))
 
         final_sub_score = 0.3 * kw_score + 0.7 * sem_score
+
+        # Treat retail terms without POS/core-system/system-replacement evidence as weak domain evidence.
+        # If the CV explicitly says "No direct POS integration", reduce project_domain score.
+        cv_clean = cv_text.lower()
+        has_retail = any(term in cv_clean for term in ["retail", "bán lẻ", "store operation", "shop management", "vận hành cửa hàng"])
+        has_pos_evidence = any(term in cv_clean for term in ["pos", "point of sale", "core system", "system replacement", "modernization", "migration", "chuyển đổi hệ thống", "nâng cấp hệ thống"])
+        if has_retail and not has_pos_evidence:
+            final_sub_score = min(50.0, final_sub_score * 0.7)
+            if "weak domain evidence" not in missing_kws:
+                missing_kws.append("weak domain evidence (retail without POS/core-system/system-replacement evidence)")
+
+        if "no direct pos integration" in cv_clean or "no direct pos" in cv_clean:
+            final_sub_score = min(40.0, final_sub_score * 0.5)
+            if "no direct POS integration" not in missing_kws:
+                missing_kws.append("no direct POS integration")
+
         return round(max(0.0, min(100.0, final_sub_score)), 1), matched_kws, missing_kws
 
     def score_responsibility(self, cv_text: str, jd_text: str, jd_keywords: List[str]) -> Tuple[float, List[str], List[str]]:
@@ -288,7 +329,15 @@ class CriteriaScoringService:
     def score_seniority(self, cv_text: str, jd_text: str) -> Tuple[float, List[str], List[str]]:
         # Seniority relies on experience years + keywords
         req_years = _required_experience_years(jd_text)
-        cand_years = extract_experience_years(cv_text)
+        cand_total_years = extract_experience_years(cv_text)
+        cand_stack_years = _extract_stack_experience_years(cv_text, jd_text)
+        
+        # If total years is >= 5 but stack-specific years is less than required years,
+        # we do not give full seniority credit and use stack years instead.
+        if cand_total_years >= 5.0 and req_years >= 5.0 and cand_stack_years < req_years:
+            cand_years = cand_stack_years
+        else:
+            cand_years = cand_total_years
         
         matched = []
         missing = []
@@ -299,14 +348,14 @@ class CriteriaScoringService:
         else:
             if cand_years >= req_years:
                 years_score = 100.0
-                matched.append(f"{cand_years:g} years of experience (required: {req_years:g})")
+                matched.append(f"{cand_years:g} years of stack-relevant experience (required: {req_years:g})")
             elif cand_years > 0:
                 years_score = (cand_years / req_years) * 100.0
-                matched.append(f"{cand_years:g} years of experience")
-                missing.append(f"required: {req_years:g} years of experience")
+                matched.append(f"{cand_years:g} years of stack-relevant experience")
+                missing.append(f"required: {req_years:g} years of stack-relevant experience")
             else:
                 years_score = 0.0
-                missing.append(f"required: {req_years:g} years of experience")
+                missing.append(f"required: {req_years:g} years of stack-relevant experience")
 
         # Keywords checking for seniority context (e.g. mentor, architecture)
         matched_kws, missing_kws = self.keyword_matcher.match_unique_keywords(self.config.SENIORITY_KEYWORDS, cv_text)
@@ -416,8 +465,50 @@ class CvScoringService:
             "bonus_skills": bonus_score
         }
 
+        # Check if the JD requires Senior Java/Spring
+        jd_clean = jd_text.lower()
+        requires_java_spring = any(kw in demands["required_skills"] for kw in ["java", "spring", "springboot"]) or "java" in jd_clean or "spring" in jd_clean
+        is_senior_jd = any(kw in jd_clean for kw in ["senior", "lead", "5+ years", "5 years", "6+ years", "6 years", "experienced"])
+        
+        # Check for negative Java/Spring evidence
+        cv_clean = cv_text.lower()
+        negative_phrases = [
+            "basic java/spring",
+            "basic spring boot",
+            "training app",
+            "internal learning project",
+            "not yet used in production",
+            "not yet used in a large production java system",
+            "would need ramp-up",
+            "stronger in php/node.js than java/spring",
+            "stronger in php/nodejs than java/spring",
+            "stronger in php than java",
+            "stronger in node than java",
+            "stronger in node.js than java",
+            "stronger in nodejs than java"
+        ]
+        
+        has_negative_evidence = False
+        for phrase in negative_phrases:
+            if phrase in cv_clean:
+                has_negative_evidence = True
+                break
+            cleaned_phrase = phrase.replace("/", " ").replace(".", "")
+            cleaned_cv = cv_clean.replace("/", " ").replace(".", "")
+            if cleaned_phrase in cleaned_cv:
+                has_negative_evidence = True
+                break
+
+        if requires_java_spring and is_senior_jd and has_negative_evidence:
+            req_score = min(55.0, req_score)
+            sub_scores["required_skills"] = req_score
+            if "only basic/training Java/Spring evidence found" not in req_missing:
+                req_missing.append("only basic/training Java/Spring evidence found")
+
         # Final Score calculation
         final_score = sum(sub_scores[k] * weights[k] for k in weights)
+        if requires_java_spring and is_senior_jd and has_negative_evidence:
+            final_score = min(60.0, final_score)
         final_score = round(max(0.0, min(100.0, final_score)), 1)
 
         matched = {

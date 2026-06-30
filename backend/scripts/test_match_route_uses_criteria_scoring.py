@@ -47,6 +47,25 @@ def run_test():
       Fluent in English (written technical documentations) and Japanese.
     """
 
+    # Define Tran Minh Duc style CV
+    tran_minh_duc_cv = """
+    Trần Minh Đức
+    Position: Full Stack Web Developer
+    Total Experience: 5 years
+    
+    Technical Skills:
+    - Primary Stack: PHP (Laravel), Node.js (Express), JavaScript, MySQL.
+    - Other Skills: HTML, CSS, Git, basic Spring Boot.
+    
+    Work Experience:
+    - Web Developer at WebTech Co (3 years): Built several web applications using Laravel (PHP) and Node.js/Express. Wrote REST APIs and query optimization.
+    - Software Engineer at RetailShop (2 years): Maintained and expanded their e-commerce web platform. Handled HTML/CSS templates, MySQL queries.
+      Note: mostly PHP/Node.js, no direct POS integration.
+      
+    Personal Projects:
+    - Spring Boot training app: Built a simple CRUD inventory system as an internal learning project. Basic Java/Spring, not yet used in production.
+    """
+
     print("Sending Request for Weak CV...")
     weak_response = client.post(
         "/match/cv_vs_jd_text",
@@ -63,6 +82,14 @@ def run_test():
     assert strong_response.status_code == 200, f"Strong CV request failed with status: {strong_response.status_code}, detail: {strong_response.text}"
     strong_data = strong_response.json()
 
+    print("Sending Request for Tran Minh Duc CV...")
+    duc_response = client.post(
+        "/match/cv_vs_jd_text",
+        data={"cv_text": tran_minh_duc_cv, "jd_text": jd_text, "alpha": 0.7}
+    )
+    assert duc_response.status_code == 200, f"Duc CV request failed with status: {duc_response.status_code}, detail: {duc_response.text}"
+    duc_data = duc_response.json()
+
     # Assert response contains required fields
     required_fields = [
         "finalScore",
@@ -77,18 +104,23 @@ def run_test():
     for field in required_fields:
         assert field in weak_data, f"Field '{field}' missing from Weak CV response"
         assert field in strong_data, f"Field '{field}' missing from Strong CV response"
+        assert field in duc_data, f"Field '{field}' missing from Duc CV response"
 
     # Assert scoringEngine
     assert weak_data["scoringEngine"] == "criteria_based_v2", f"Expected scoringEngine 'criteria_based_v2', got {weak_data['scoringEngine']}"
     assert strong_data["scoringEngine"] == "criteria_based_v2", f"Expected scoringEngine 'criteria_based_v2', got {strong_data['scoringEngine']}"
+    assert duc_data["scoringEngine"] == "criteria_based_v2", f"Expected scoringEngine 'criteria_based_v2', got {duc_data['scoringEngine']}"
 
     # Assert strong CV finalScore > weak CV finalScore
     weak_score = weak_data["finalScore"]
     strong_score = strong_data["finalScore"]
+    duc_score = duc_data["finalScore"]
     print(f"Weak CV Score: {weak_score}")
     print(f"Strong CV Score: {strong_score}")
+    print(f"Duc CV Score: {duc_score}")
     
     assert strong_score > weak_score, f"Expected strong score ({strong_score}) to be higher than weak score ({weak_score})"
+    assert duc_score < 60.0, f"Expected Tran Minh Duc CV score to be below 60, got {duc_score}"
 
     print("\nAPI-level match route criteria scoring test passed successfully!")
 
