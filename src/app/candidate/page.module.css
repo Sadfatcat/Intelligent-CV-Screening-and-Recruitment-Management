@@ -2243,22 +2243,26 @@
   width: 100%;
   min-height: 48px;
   border-radius: 12px;
-  background: var(--candidate-brand);
-  color: #ffffff;
+  background: #dc2626 !important;
+  color: #ffffff !important;
   border: none;
   font-weight: 700;
+  box-shadow: 0 12px 24px rgba(220, 38, 38, 0.28);
+  opacity: 1;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .submitModalBtn:disabled {
-  background: #64748b;
-  color: #f8fafc;
-  opacity: 1;
+  background: #dc2626 !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
   cursor: not-allowed;
-  box-shadow: none;
+  box-shadow: 0 12px 24px rgba(220, 38, 38, 0.24);
 }
 
 .submitModalBtn:disabled:hover {
-  background: #64748b;
+  background: #b91c1c !important;
   transform: none;
 }
 
