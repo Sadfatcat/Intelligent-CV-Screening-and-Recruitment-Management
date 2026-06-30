@@ -14,16 +14,11 @@ function assert(condition, message) {
 }
 
 const requiredCandidateSnippets = [
-    "MOCK_CANDIDATE_JOBS",
-    "Fint Vietnam",
-    "fintvn@fint.vn",
+    "ENABLE_DEV_MOCK_DATA",
     "FINT_MOCK_APPLICATIONS_STORAGE_KEY",
     "saveFintMockApplication",
     "fetch(apiUrl(\"/api/jobs/\")",
     "fetch(apiUrl(\"/api/cvs/upload-cv\")",
-    "selectedJob.isMock",
-    "setIsModalOpen(true)",
-    "The Fint recruiter mock account can now see it.",
     "loadSubmittedJobs",
     "/api/cvs/candidate/",
 ];
@@ -33,10 +28,10 @@ for (const snippet of requiredCandidateSnippets) {
 }
 
 assert(jobCard.includes("props.job") || jobCard.includes("job"), "Jobcard component should still render job data.");
-assert(mockData.includes("requiredExperienceYears"), "Mock jobs should include required experience data.");
-assert(mockData.includes("overallScore"), "Mock matching results should include scoring data.");
-assert(mockData.includes('status: "Passed"'), "Mock data should include a passed CV.");
-assert(mockData.includes('status: "Borderline"'), "Mock data should include a borderline CV.");
-assert(mockData.includes('status: "Failed"'), "Mock data should include a failed CV.");
+assert(source.includes("if (!ENABLE_DEV_MOCK_DATA) return;"), "Mock application writes must be gated off by default.");
+assert(source.includes("setJobs(ENABLE_DEV_MOCK_DATA ? [...normalizedJobs, ...MOCK_CANDIDATE_JOBS] : normalizedJobs);"), "Candidate jobs should only append mock jobs behind the dev flag.");
+assert(source.includes(".catch(() => setJobs([]));"), "Candidate job loading should not fall back to mock jobs on API failure.");
+assert(!source.includes("if (/internal server error/i.test(msg))"), "Candidate submit flow should not fake success on backend failure.");
+assert(mockData.includes("requiredExperienceYears"), "Mock source should remain available for dev-only use.");
 
 console.log("candidate flow verification passed");

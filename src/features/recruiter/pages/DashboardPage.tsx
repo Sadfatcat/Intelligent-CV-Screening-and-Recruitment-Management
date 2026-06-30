@@ -8,7 +8,8 @@ import { getJobManagementLabel, getScoreStatus, normalizeScore } from "../utils/
 import { calculateSummary } from "../utils/cvScoringUtils";
 import styles from "../../../app/recruiter_UI/page.module.css";
 
-type DashboardRange = "today" | "7d" | "30d" | "all";
+type DashboardRange = "7d" | "30d" | "all";
+type TimeRange = DashboardRange | "today";
 
 type Props = {
     recruiterCvLogs: CVLogItem[];
@@ -21,13 +22,53 @@ type Props = {
     onOpenApplications: () => void;
 };
 
-function isWithinRange(value: string | null | undefined, range: DashboardRange) {
+function toLocalDateKey(value: Date) {
+    const year = value.getFullYear();
+    const month = String(value.getMonth() + 1).padStart(2, "0");
+    const day = String(value.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+}
+
+function toMonthKey(value: Date) {
+    const year = value.getFullYear();
+    const month = String(value.getMonth() + 1).padStart(2, "0");
+    return `${year}-${month}`;
+}
+
+function getRangeDateKeys(range: DashboardRange) {
+    if (range === "all") return [];
+    const now = new Date();
+    const days = range === "7d" ? 7 : 30;
+    const start = new Date(now);
+    start.setHours(0, 0, 0, 0);
+    start.setDate(start.getDate() - (days - 1));
+
+    return Array.from({ length: days }, (_, index) => {
+        const current = new Date(start);
+        current.setDate(start.getDate() + index);
+        return toLocalDateKey(current);
+    });
+}
+
+function getAllTimeMonthKeys() {
+    const current = new Date();
+    const start = new Date(2026, 2, 1);
+    const end = new Date(current.getFullYear(), current.getMonth(), 1);
+    const months: string[] = [];
+
+    for (const cursor = new Date(start); cursor <= end; cursor.setMonth(cursor.getMonth() + 1)) {
+        months.push(toMonthKey(cursor));
+    }
+
+    return months;
+}
+
+function isWithinRange(value: string | null | undefined, range: TimeRange) {
     if (!value) return range === "all";
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return range === "all";
     if (range === "all") return true;
     const now = new Date();
-    if (range === "today") return date.toDateString() === now.toDateString();
     const days = range === "7d" ? 7 : 30;
     const start = new Date(now);
     start.setHours(0, 0, 0, 0);
@@ -35,7 +76,13 @@ function isWithinRange(value: string | null | undefined, range: DashboardRange) 
     return date >= start;
 }
 
-function formatDashboardDate(value: string) {
+function formatDashboardDate(value: string, range: DashboardRange) {
+    if (range === "all") {
+        const [year, month] = value.split("-");
+        const date = new Date(Number(year), Number(month) - 1, 1);
+        if (Number.isNaN(date.getTime())) return value;
+        return date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+    }
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return value;
     return date.toLocaleDateString("en-US", { month: "short", day: "2-digit" });
@@ -86,17 +133,19 @@ export default function DashboardPage({
     const scoreDistribution = useMemo(() => {
         const buckets = [
             { label: "Strong Match", range: "90-100%", value: 0, color: "#166534" },
-            { label: "Good Match", range: "76-89%", value: 0, color: "#60a5fa" },
-            { label: "Consider Match", range: "50-75%", value: 0, color: "#f4a261" },
-            { label: "Weak Match", range: "Below 50%", value: 0, color: "#ef9a9a" },
+            { label: "Good Match", range: "75-89%", value: 0, color: "#60a5fa" },
+            { label: "Average Match", range: "55-74%", value: 0, color: "#f4a261" },
+            { label: "Below Average", range: "31-54%", value: 0, color: "#f59e0b" },
+            { label: "Bad Match", range: "0-30%", value: 0, color: "#ef9a9a" },
         ];
         recruiterCvLogs.forEach((log) => {
             const score = normalizeScore(log.ai_matching_score);
             if (score === null) return;
             if (score >= 90) buckets[0].value += 1;
-            else if (score >= 76) buckets[1].value += 1;
-            else if (score >= 50) buckets[2].value += 1;
-            else buckets[3].value += 1;
+            else if (score >= 75) buckets[1].value += 1;
+            else if (score >= 55) buckets[2].value += 1;
+            else if (score >= 31) buckets[3].value += 1;
+            else buckets[4].value += 1;
         });
         return buckets;
     }, [recruiterCvLogs]);
@@ -111,14 +160,25 @@ export default function DashboardPage({
         dashboardLogs.forEach((log) => {
             const date = new Date(log.created_at);
             if (Number.isNaN(date.getTime())) return;
-            const key = date.toISOString().slice(0, 10);
+            const key = dashboardRange === "all" ? toMonthKey(date) : toLocalDateKey(date);
             const current = grouped.get(key) ?? { date: key, newApplications: 0, reviewedApplications: 0 };
             current.newApplications += 1;
             if (log.status !== "pending") current.reviewedApplications += 1;
             grouped.set(key, current);
         });
-        return Array.from(grouped.values()).sort((a, b) => a.date.localeCompare(b.date));
-    }, [dashboardLogs]);
+
+        if (dashboardRange === "all") {
+            return getAllTimeMonthKeys().map((date) => {
+                const existing = grouped.get(date);
+                return existing ?? { date, newApplications: 0, reviewedApplications: 0 };
+            });
+        }
+
+        return getRangeDateKeys(dashboardRange).map((date) => {
+            const existing = grouped.get(date);
+            return existing ?? { date, newApplications: 0, reviewedApplications: 0 };
+        });
+    }, [dashboardLogs, dashboardRange]);
 
     const jobPerformanceRows = useMemo(() => {
         return managedRecruiterJobs.map((job) => {
@@ -136,8 +196,8 @@ export default function DashboardPage({
         });
     }, [getManagedJobStatus, managedRecruiterJobs, recruiterCvLogs]);
 
-    const RANGES: DashboardRange[] = ["today", "7d", "30d", "all"];
-    const rangeLabel: Record<DashboardRange, string> = { today: "Today", "7d": "Last 7 Days", "30d": "Last 30 Days", all: "All Time" };
+    const RANGES: DashboardRange[] = ["7d", "30d", "all"];
+    const rangeLabel: Record<DashboardRange, string> = { "7d": "Last 7 Days", "30d": "Last 30 Days", all: "All Time" };
 
     return (
         <>
@@ -160,11 +220,15 @@ export default function DashboardPage({
             <div className={styles.dashboardChartsRow}>
                 <section className={`${styles.card} ${styles.panelCard} ${styles.chartCard}`}>
                     <div className={styles.panelTitleRow}><div><h3>Screening Result Distribution</h3></div></div>
-                    <DashboardDoughnutChart items={screeningDistribution} textColor="#200080" />
+                    <div className={styles.chartInnerLayer}>
+                        <DashboardDoughnutChart items={screeningDistribution} textColor="#200080" />
+                    </div>
                 </section>
                 <section className={`${styles.card} ${styles.panelCard} ${styles.chartCard}`}>
                     <div className={styles.panelTitleRow}><div><h3>Matching Score Distribution</h3></div></div>
-                    <DashboardDoughnutChart items={scoreDistribution} textColor="#200080" />
+                    <div className={styles.chartInnerLayer}>
+                        <DashboardDoughnutChart items={scoreDistribution} textColor="#200080" />
+                    </div>
                 </section>
             </div>
 
@@ -187,7 +251,7 @@ export default function DashboardPage({
                 <div className={styles.lineChart}>
                     <DashboardLineChart
                         points={applicationsOverTime}
-                        getLabel={(point) => formatDashboardDate(point.date)}
+                        getLabel={(point) => formatDashboardDate(point.date, dashboardRange)}
                         emptyText="No applications in this period."
                         textColor="#200080"
                         series={[

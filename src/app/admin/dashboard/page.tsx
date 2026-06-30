@@ -326,20 +326,7 @@ export default function AdminDashboard() {
                         <div className={styles.accountStatusGrid}>
                             <span>Active Admins<strong>{overview?.active_admins ?? "-"}</strong></span>
                             <span>Inactive Admins<strong>{overview?.inactive_admins ?? "-"}</strong></span>
-                            <span>Active Recruiters<strong>{overview?.active_recruiters ?? activeRecruiters}</strong></span>
                             <span>Inactive Recruiters<strong>{overview?.inactive_recruiters ?? inactiveRecruiters}</strong></span>
-                        </div>
-                    </section>
-
-                    <section className={`${styles.card} ${styles.panelCard} ${styles.accountStatusPanel}`}>
-                        <div className={styles.panelTitleRow}>
-                            <div>
-                                <h3>Password Status</h3>
-                            </div>
-                        </div>
-                        <div className={styles.passwordStatusBox}>
-                            <strong>{overview?.recruiters_with_default_password ?? "-"}</strong>
-                            <span>Recruiter accounts still using the default password</span>
                         </div>
                     </section>
 

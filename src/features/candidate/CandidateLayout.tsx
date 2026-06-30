@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/navbar/Navbar_candidate";
 import { apiUrl } from "@/utils/api";
 import { clearAuthSession } from "@/utils/authSession";
+import { ENABLE_DEV_MOCK_DATA } from "@/features/recruiter/constants/recruiterConstants";
 import { useCandidateData } from "./hooks/useCandidateData";
 import AppliedCVsPage from "./pages/AppliedCVsPage";
 import JobBrowsePage from "./pages/JobBrowsePage";
@@ -114,7 +115,7 @@ export default function CandidateLayout() {
         }
         setSelectedJob(jobData);
         setSelectedJobImageFailed(false);
-        if (jobData.isMock) setIsModalOpen(true);
+        if (jobData.isMock && ENABLE_DEV_MOCK_DATA) setIsModalOpen(true);
         if (!jobData.isMock) {
             fetch(apiUrl(`/api/jobs/${jobData.id}`))
                 .then(async (response) => {
@@ -167,7 +168,7 @@ export default function CandidateLayout() {
         }
         try {
             setIsSubmitting(true);
-            if (selectedJob.isMock) {
+            if (selectedJob.isMock && ENABLE_DEV_MOCK_DATA) {
                 const mockApplicationId = Date.now();
                 const submittedAt = new Date().toISOString();
                 setSubmittedJobs((current) => [
@@ -244,14 +245,6 @@ export default function CandidateLayout() {
                     ? "Cannot connect to backend API."
                     : err instanceof Error ? err.message : "Failed to submit CV";
 
-            if (/internal server error/i.test(msg)) {
-                setApplyStatus({ type: "success", message: "Your CV is being scored, please wait." });
-                setFile(null);
-                setAdditionalInfo("");
-                setIsModalOpen(false);
-                setActiveSubTab("applications");
-                return;
-            }
             setApplyStatus({ type: "error", message: msg });
         } finally {
             setIsSubmitting(false);

@@ -1,6 +1,6 @@
 // Mock Mapping: chuyển mock Fint data về cùng format với dữ liệu thật.
 import { MOCK_CANDIDATES, MOCK_JOB_DESCRIPTIONS, MOCK_MATCHING_RESULTS } from "@/mock/cvScreeningMockData";
-import { FINT_MOCK_APPLICATIONS_STORAGE_KEY } from "../constants/recruiterConstants";
+import { ENABLE_DEV_MOCK_DATA, FINT_MOCK_APPLICATIONS_STORAGE_KEY } from "../constants/recruiterConstants";
 import type { CVLogItem, MatchingDetail, RecruiterJob, RecruiterSession, StoredFintMockApplication } from "../types/recruiterTypes";
 
 export const MOCK_RECRUITER_JOBS: RecruiterJob[] = MOCK_JOB_DESCRIPTIONS.map((job) => ({
@@ -135,6 +135,7 @@ export const MOCK_FINT_CV_LOGS: CVLogItem[] = MOCK_MATCHING_RESULTS.map((result)
 });
 
 export function readStoredFintMockCvLogs(): CVLogItem[] {
+    if (!ENABLE_DEV_MOCK_DATA) return [];
     try {
         const raw = localStorage.getItem(FINT_MOCK_APPLICATIONS_STORAGE_KEY);
         if (!raw) return [];
@@ -172,6 +173,7 @@ export function readStoredFintMockCvLogs(): CVLogItem[] {
 }
 
 export function isFintSession(session: RecruiterSession | null, companyName: string) {
+    if (!ENABLE_DEV_MOCK_DATA) return false;
     const text = `${session?.company_name || ""} ${session?.email || ""} ${companyName}`.toLowerCase();
     return text.includes("fint") || text.includes("fintvn@fint.vn");
 }

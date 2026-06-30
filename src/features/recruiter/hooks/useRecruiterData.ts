@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getStoredUser } from "@/utils/authSession";
+import { ENABLE_DEV_MOCK_DATA } from "../constants/recruiterConstants";
 import {
     fetchRecruiterCvLogs,
     fetchRecruiterJobs,
@@ -31,6 +32,7 @@ export function useRecruiterData() {
     }, []);
 
     useEffect(() => {
+        if (!ENABLE_DEV_MOCK_DATA) return;
         function sync() {
             setStoredFintCvLogs(readStoredFintMockCvLogs());
         }

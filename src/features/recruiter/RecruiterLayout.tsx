@@ -6,6 +6,7 @@ import { RecruiterSidebar } from "./components/RecruiterSidebar";
 import { RecruiterToast } from "./components/RecruiterToast";
 import { RecruiterUploadJDModal } from "./components/RecruiterUploadJDModal";
 import { clearAuthSession } from "@/utils/authSession";
+import { ENABLE_DEV_MOCK_DATA } from "./constants/recruiterConstants";
 import { useRecruiterData } from "./hooks/useRecruiterData";
 import CVDetailPage from "./pages/CVDetailPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -22,7 +23,7 @@ import { MOCK_FINT_CV_LOGS, MOCK_RECRUITER_JOBS, isFintSession } from "./utils/r
 import styles from "../../app/recruiter_UI/page.module.css";
 
 type ActivePage = "dashboard" | "jobs" | "cvs" | "cv-detail";
-type DashboardRange = "today" | "7d" | "30d" | "all";
+type DashboardRange = "7d" | "30d" | "all";
 
 type RecruiterLayoutProps = {
     defaultPage?: ActivePage;
@@ -84,7 +85,7 @@ export default function RecruiterLayout({ defaultPage = "dashboard" }: Recruiter
         setMessageType(type);
     }
 
-    const isFintRecruiter = isFintSession(session, companyName);
+    const isFintRecruiter = ENABLE_DEV_MOCK_DATA && isFintSession(session, companyName);
 
     const recruiterJobs: RecruiterJob[] = useMemo(
         () => (isFintRecruiter ? [...jobs, ...MOCK_RECRUITER_JOBS] : jobs),

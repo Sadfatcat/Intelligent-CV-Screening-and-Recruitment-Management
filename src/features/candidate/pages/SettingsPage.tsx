@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import Navbar from "@/components/navbar/Navbar_candidate";
 import { apiUrl } from "@/utils/api";
+import { AUTH_SESSION_STORAGE_KEY } from "@/utils/authSession";
 import styles from "../../../app/candidate/settings/page.module.css";
 
 type CurrentUser = {
@@ -80,6 +81,27 @@ export default function SettingsPage() {
             localStorage.setItem("currentUser", JSON.stringify(nextUser));
             return nextUser;
         });
+
+        try {
+            const rawSession = localStorage.getItem(AUTH_SESSION_STORAGE_KEY);
+            if (!rawSession) return;
+            const parsedSession = JSON.parse(rawSession) as {
+                access_token?: string;
+                expires_at: number;
+                user?: Record<string, unknown>;
+            };
+            if (!parsedSession?.user) return;
+            const nextSession = {
+                ...parsedSession,
+                user: {
+                    ...parsedSession.user,
+                    ...nextFields,
+                },
+            };
+            localStorage.setItem(AUTH_SESSION_STORAGE_KEY, JSON.stringify(nextSession));
+        } catch {
+            // Keep the current user cache updated even if the session cache cannot be parsed.
+        }
     }
 
     async function handleProfileSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -149,79 +171,80 @@ export default function SettingsPage() {
                     </div>
                 </div>
 
-                <form className={styles.formSection} onSubmit={handleProfileSubmit}>
-                    <div className={styles.sectionTitle}>
-                        <h2>Personal information</h2>
-                        <p>Only full name and phone number can be changed by candidates.</p>
-                    </div>
-                    <div className={styles.grid}>
-                        <label className={styles.field}>
-                            <span>Full name</span>
-                            <input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder={profile.name} />
-                        </label>
-                        <label className={styles.field}>
-                            <span>Phone</span>
-                            <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={profile.phone} />
-                        </label>
-                        <label className={`${styles.field} ${styles.disabledField}`}>
-                            <span>Email</span>
-                            <input value={profile.email} disabled />
-                        </label>
-                        <label className={`${styles.field} ${styles.disabledField}`}>
-                            <span>Role</span>
-                            <input value={profile.role} disabled />
-                        </label>
-                        <label className={`${styles.field} ${styles.disabledField}`}>
-                            <span>User ID</span>
-                            <input value={profile.userId} disabled />
-                        </label>
-                        <label className={`${styles.field} ${styles.disabledField}`}>
-                            <span>Address</span>
-                            <input value={profile.address} disabled />
-                        </label>
-                    </div>
-                    {profileStatus && (
-                        <p className={`${styles.statusMessage} ${profileStatus.type === "success" ? styles.success : styles.error}`}>
-                            {profileStatus.message}
-                        </p>
-                    )}
-                    <button className={styles.primaryButton} type="submit" disabled={isSavingProfile}>
-                        {isSavingProfile ? "Saving..." : "Save personal info"}
-                    </button>
-                </form>
+                <div className={styles.settingsGrid}>
+                    <form className={styles.settingsCard} onSubmit={handleProfileSubmit}>
+                        <div className={styles.sectionTitle}>
+                            <h2>Personal information</h2>
+                            <p>Only full name and phone number can be changed by candidates.</p>
+                        </div>
+                        <div className={styles.grid}>
+                            <label className={styles.field}>
+                                <span>Full name</span>
+                                <input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder={profile.name} />
+                            </label>
+                            <label className={styles.field}>
+                                <span>Phone</span>
+                                <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder={profile.phone} />
+                            </label>
+                            <label className={`${styles.field} ${styles.disabledField}`}>
+                                <span>Email</span>
+                                <input value={profile.email} disabled />
+                            </label>
+                            <label className={`${styles.field} ${styles.disabledField}`}>
+                                <span>Role</span>
+                                <input value={profile.role} disabled />
+                            </label>
+                            <label className={`${styles.field} ${styles.disabledField}`}>
+                                <span>User ID</span>
+                                <input value={profile.userId} disabled />
+                            </label>
+                            <label className={`${styles.field} ${styles.disabledField}`}>
+                                <span>Address</span>
+                                <input value={profile.address} disabled />
+                            </label>
+                        </div>
+                        {profileStatus && (
+                            <p className={`${styles.statusMessage} ${profileStatus.type === "success" ? styles.success : styles.error}`}>
+                                {profileStatus.message}
+                            </p>
+                        )}
+                        <button className={styles.primaryButton} type="submit" disabled={isSavingProfile}>
+                            {isSavingProfile ? "Saving..." : "Save personal info"}
+                        </button>
+                    </form>
 
-                <form className={styles.formSection} onSubmit={handlePasswordSubmit}>
-                    <div className={styles.sectionTitle}>
-                        <h2>Change password</h2>
-                        <p>Use your current password before setting a new one.</p>
-                    </div>
-                    <div className={styles.grid}>
-                        <label className={styles.field}>
-                            <span>Current password</span>
-                            <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required />
-                        </label>
-                        <label className={styles.field}>
-                            <span>New password</span>
-                            <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} minLength={6} required />
-                        </label>
-                        <label className={styles.field}>
-                            <span>Confirm password</span>
-                            <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} minLength={6} required />
-                        </label>
-                    </div>
-                    {passwordStatus && (
-                        <p className={`${styles.statusMessage} ${passwordStatus.type === "success" ? styles.success : styles.error}`}>
-                            {passwordStatus.message}
-                        </p>
-                    )}
-                    <button className={styles.primaryButton} type="submit" disabled={isChangingPassword}>
-                        {isChangingPassword ? "Changing..." : "Change password"}
-                    </button>
-                </form>
+                    <form className={styles.settingsCard} onSubmit={handlePasswordSubmit}>
+                        <div className={styles.sectionTitle}>
+                            <h2>Change password</h2>
+                            <p>Use your current password before setting a new one.</p>
+                        </div>
+                        <div className={styles.grid}>
+                            <label className={styles.field}>
+                                <span>Current password</span>
+                                <input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required />
+                            </label>
+                            <label className={styles.field}>
+                                <span>New password</span>
+                                <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} minLength={6} required />
+                            </label>
+                            <label className={styles.field}>
+                                <span>Confirm password</span>
+                                <input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} minLength={6} required />
+                            </label>
+                        </div>
+                        {passwordStatus && (
+                            <p className={`${styles.statusMessage} ${passwordStatus.type === "success" ? styles.success : styles.error}`}>
+                                {passwordStatus.message}
+                            </p>
+                        )}
+                        <button className={styles.primaryButton} type="submit" disabled={isChangingPassword}>
+                            {isChangingPassword ? "Changing..." : "Change password"}
+                        </button>
+                    </form>
+                </div>
 
                 <div className={styles.actions}>
                     <Link className={styles.primaryLink} href="/candidate">Back to Jobs</Link>
-                    <Link className={styles.secondaryLink} href="/login">Logout</Link>
                 </div>
             </section>
         </main>

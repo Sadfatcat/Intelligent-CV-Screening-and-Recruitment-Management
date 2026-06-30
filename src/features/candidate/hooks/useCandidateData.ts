@@ -4,8 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { MOCK_JOB_DESCRIPTIONS } from "@/mock/cvScreeningMockData";
 import { apiUrl } from "@/utils/api";
 import { getStoredUser } from "@/utils/authSession";
-
-const FINT_MOCK_APPLICATIONS_STORAGE_KEY = "fintMockSubmittedCvLogs";
+import { ENABLE_DEV_MOCK_DATA, FINT_MOCK_APPLICATIONS_STORAGE_KEY } from "@/features/recruiter/constants/recruiterConstants";
 
 export type JobItem = {
     id: number;
@@ -102,6 +101,7 @@ const MOCK_CANDIDATE_JOBS: JobItem[] = MOCK_JOB_DESCRIPTIONS.map((job) => ({
 }));
 
 export function saveFintMockApplication(application: StoredFintMockApplication) {
+    if (!ENABLE_DEV_MOCK_DATA) return;
     try {
         const raw = localStorage.getItem(FINT_MOCK_APPLICATIONS_STORAGE_KEY);
         const current = raw ? JSON.parse(raw) : [];
@@ -184,10 +184,9 @@ export function useCandidateData() {
             if (sessionUser) {
                 setCandidateId(sessionUser.user_id);
                 const email = sessionUser.email || "";
-                if (email.includes("@")) {
-                    setDisplayName(email.split("@")[0]);
-                    setCandidateEmail(email);
-                }
+                const fallbackName = email.includes("@") ? email.split("@")[0] : "Candidate";
+                setDisplayName(sessionUser.full_name?.trim() || fallbackName);
+                setCandidateEmail(email);
                 return;
             }
             setCandidateId(null);
@@ -232,9 +231,9 @@ export function useCandidateData() {
                 const normalizedJobs: JobItem[] = Array.isArray(data)
                     ? (data as JobItem[]).map((job) => ({ ...job, image_url: job.image_url ?? undefined }))
                     : [];
-                setJobs([...normalizedJobs, ...MOCK_CANDIDATE_JOBS]);
+                setJobs(ENABLE_DEV_MOCK_DATA ? [...normalizedJobs, ...MOCK_CANDIDATE_JOBS] : normalizedJobs);
             })
-            .catch(() => setJobs(MOCK_CANDIDATE_JOBS));
+            .catch(() => setJobs([]));
     }, []);
 
     return {

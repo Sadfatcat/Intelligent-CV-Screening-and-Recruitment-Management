@@ -40,3 +40,5 @@ Handle errors clearly: fail fast, include useful context, and never silently ign
 Reuse shared logic through utilities, services, or modules instead of duplicating code.
 Prioritize maintainability over cleverness. Code should be simple to debug today and easy to upgrade later.
 [Step] → verify: [check] Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.") require constant clarification.
+
+i usually communicate in english sometime vietnammese BUT you have to answer me in Vietnamese
