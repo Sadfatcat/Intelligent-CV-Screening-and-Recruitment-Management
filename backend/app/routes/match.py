@@ -13,6 +13,7 @@ def _build_scoring_response(result: dict) -> dict:
         **result,
         "finalScore": final_score_100,
         "final_score": round(final_score_100 / 100, 4),
+        "overall_score": round(final_score_100 / 100, 4),
         "subScores": sub_scores_100,
         "section_scores": {
             key: round(float(value) / 100, 4)

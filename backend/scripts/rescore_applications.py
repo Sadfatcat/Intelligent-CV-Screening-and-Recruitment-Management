@@ -53,6 +53,9 @@ def rescore_all(dry_run: bool = False):
                         key: round(float(value) / 100, 4)
                         for key, value in sub_scores_100.items()
                     },
+                    "matched": raw_result.get("matched", {}),
+                    "missingOrWeak": raw_result.get("missingOrWeak", {}),
+                    "reasoningSummary": raw_result.get("reasoningSummary", ""),
                     "scoringEngine": "criteria_based_v2",
                 }
                 
