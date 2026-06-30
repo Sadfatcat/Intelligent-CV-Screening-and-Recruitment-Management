@@ -2245,6 +2245,21 @@
   border-radius: 12px;
   background: var(--candidate-brand);
   color: #ffffff;
+  border: none;
+  font-weight: 700;
+}
+
+.submitModalBtn:disabled {
+  background: #64748b;
+  color: #f8fafc;
+  opacity: 1;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.submitModalBtn:disabled:hover {
+  background: #64748b;
+  transform: none;
 }
 
 .right .detailsTitle,

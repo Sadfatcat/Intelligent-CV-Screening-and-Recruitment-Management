@@ -2,7 +2,7 @@ import re
 import os
 from typing import Dict, List, Tuple, Set, Any
 from app.services.matcher import (
-    _embed_cosine,
+    section_similarity,
     _tfidf_cosine,
     _normalize_token,
     extract_experience_years,
@@ -43,9 +43,14 @@ class ScoringWeightsConfig:
         "retail": ["retail", "store operation", "shop management", "bán lẻ", "vận hành cửa hàng", "quản lý cửa hàng"],
         "pos": ["pos", "point of sale", "cashier system", "hệ thống tính tiền", "hệ thống pos"],
         "inventory": ["inventory", "stock management", "quản lý kho", "tồn kho"],
-        "technical specification": ["technical specification", "design document", "spec", "tài liệu thiết kế", "thiết kế kỹ thuật"],
-        "test case design": ["test case design", "testing scenario", "kịch bản kiểm thử", "thiết kế test case"],
-        "reuse": ["reuse", "second-hand", "pre-owned", "tái sử dụng", "đồ cũ"]
+        "technical specification": ["technical specification", "design specification", "specifications", "spec", "design doc", "design document", "tài liệu thiết kế", "thiết kế kỹ thuật"],
+        "test case design": ["test case design", "designed test case", "design test case", "write test case", "testing scenario", "kịch bản kiểm thử", "thiết kế test case"],
+        "reuse": ["reuse", "second-hand", "pre-owned", "tái sử dụng", "đồ cũ"],
+        "system design": ["system design", "architecture design", "designing systems", "designed system", "thiết kế hệ thống"],
+        "senior developer": ["senior developer", "senior engineer", "senior full stack", "sr. developer", "sr. engineer"],
+        "technical lead": ["technical lead", "tech lead", "lead engineer", "module lead"],
+        "architecture design": ["architecture design", "system design", "system replacement", "architecture"],
+        "collaboration with japanese team": ["japanese team", "japanese client", "japanese offshore", "offshore development", "japanese communication"]
     }
 
     # Action verbs and business contexts for project evidence scoring
@@ -66,7 +71,10 @@ class KeywordMatcher:
         self.synonym_dict = synonym_dict
 
     def _normalize(self, text: str) -> str:
-        return _normalize_token(text)
+        text = (text or "").lower()
+        # Replace slash and backslash with spaces to handle unit/integration
+        text = text.replace("/", " ").replace("\\", " ")
+        return re.sub(r"\s+", " ", text).strip(" .,:;()[]{}")
 
     def _match_term(self, term: str, text: str) -> bool:
         normalized_term = self._normalize(term)
@@ -89,6 +97,17 @@ class KeywordMatcher:
             pattern = r"(?<![a-z0-9+#.])" + re.escape(syn) + r"(?![a-z0-9+#.])"
             if re.search(pattern, normalized_text):
                 return True
+            # Also support singular/plural mismatch (e.g. if syn is "test case" and CV has "test cases")
+            if syn.endswith("s"):
+                singular = syn[:-1]
+                pattern_sing = r"(?<![a-z0-9+#.])" + re.escape(singular) + r"(?![a-z0-9+#.])"
+                if re.search(pattern_sing, normalized_text):
+                    return True
+            else:
+                plural = syn + "s"
+                pattern_plur = r"(?<![a-z0-9+#.])" + re.escape(plural) + r"(?![a-z0-9+#.])"
+                if re.search(pattern_plur, normalized_text):
+                    return True
         return False
 
     def match_unique_keywords(self, target_keywords: List[str], text: str) -> Tuple[List[str], List[str]]:
@@ -113,7 +132,14 @@ class SemanticMatcher:
     def score_similarity(self, a: str, b: str) -> float:
         if not a or not b:
             return 0.0
-        return _embed_cosine(a, b)
+        sim = section_similarity(a, b, alpha=self.alpha)
+        # If SBERT embeddings are disabled or fail, we scale the TF-IDF similarity to be more representative
+        if os.getenv("ENABLE_MATCHER_EMBEDDINGS") != "1":
+            if sim > 0:
+                sim = min(1.0, 0.4 + (sim / 0.3) * 0.6)
+        else:
+            sim = min(1.0, max(0.0, sim))
+        return sim
 
 
 class EvidenceExtractor:
@@ -192,10 +218,10 @@ class ScoringExplanationBuilder:
 
 
 class CriteriaScoringService:
-    def __init__(self, config: ScoringWeightsConfig):
+    def __init__(self, config: ScoringWeightsConfig, alpha: float = 0.7):
         self.config = config
         self.keyword_matcher = KeywordMatcher(config.SYNONYM_DICT)
-        self.semantic_matcher = SemanticMatcher()
+        self.semantic_matcher = SemanticMatcher(alpha=alpha)
         self.evidence_extractor = EvidenceExtractor(config.ACTION_VERBS, config.BUSINESS_CONTEXTS)
 
     def score_required_skills(self, cv_text: str, jd_text: str, jd_keywords: List[str]) -> Tuple[float, List[str], List[str]]:
@@ -211,7 +237,7 @@ class CriteriaScoringService:
             confidence = self.evidence_extractor.extract_evidence_confidence(kw, cv_text)
             evidence_scores.append(confidence)
         
-        evidence_mult = (sum(evidence_scores) / len(matched_kws)) if matched_kws else 1.0
+        evidence_mult = (sum(0.8 + 0.2 * c for c in evidence_scores) / len(matched_kws)) if matched_kws else 1.0
         kw_score = kw_score * evidence_mult
         
         # Semantic score
@@ -319,9 +345,9 @@ class CriteriaScoringService:
 
 
 class CvScoringService:
-    def __init__(self, config: ScoringWeightsConfig = None):
+    def __init__(self, config: ScoringWeightsConfig = None, alpha: float = 0.7):
         self.config = config or ScoringWeightsConfig()
-        self.criteria_service = CriteriaScoringService(self.config)
+        self.criteria_service = CriteriaScoringService(self.config, alpha=alpha)
 
     def parse_demands_from_text(self, text: str) -> Dict[str, List[str]]:
         """

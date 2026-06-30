@@ -1157,17 +1157,17 @@ def score_cv_vs_jd(
     ]
 
     return {
-        "overall_score": final_score,
-        "final_score": final_score,
+        "overall_score": orig_final_score,
+        "final_score": orig_final_score,
         "finalScore": final_score,
         "subScores": sub_scores,
         "matched": matched,
         "missingOrWeak": missing_or_weak,
         "reasoningSummary": reasoning_summary,
         "summary": summary,
-        "raw_score": final_score,
-        "core_fit_score": final_score,
-        "calibrated_score": final_score,
+        "raw_score": raw_score,
+        "core_fit_score": core_score,
+        "calibrated_score": calibrated_score,
         "sections": new_sections + sections,
         "good_points": good_points,
         "missing_points": missing_points,
