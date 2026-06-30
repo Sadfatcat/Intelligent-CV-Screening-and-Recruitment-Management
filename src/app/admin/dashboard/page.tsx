@@ -41,7 +41,7 @@ type ActivityItem = {
     created_at: string;
 };
 
-type DashboardRange = "today" | "7d" | "30d" | "all";
+type DashboardRange = "7d" | "30d" | "all";
 
 type TrendPoint = {
     date: string;
@@ -50,13 +50,6 @@ type TrendPoint = {
     jobs?: number;
     cvs?: number;
 };
-
-const ACCOUNT_ACTIVITY_ACTIONS = new Set([
-    "candidate.register",
-    "admin.create.recruiter",
-    "recruiter.password.change",
-    "user.login",
-]);
 
 function getDateKey(value: Date) {
     const year = value.getFullYear();
@@ -69,7 +62,7 @@ function getRangeDates(range: DashboardRange, allKeys: string[]) {
     if (range === "all") return allKeys;
 
     const now = new Date();
-    const days = range === "today" ? 1 : range === "7d" ? 7 : 30;
+    const days = range === "7d" ? 7 : 30;
     const dates: string[] = [];
     const start = new Date(now);
     start.setHours(0, 0, 0, 0);
@@ -167,11 +160,6 @@ export default function AdminDashboard() {
         loadData();
     }, [adminId]);
 
-    const accountActivities = useMemo(
-        () => activities.filter((activity) => ACCOUNT_ACTIVITY_ACTIONS.has(activity.action)),
-        [activities]
-    );
-
     const userTrend = useMemo(
         () => buildTrend(
             activities,
@@ -232,14 +220,14 @@ export default function AdminDashboard() {
     }) {
         return (
             <div className={styles.rangeControl}>
-                {(["today", "7d", "30d", "all"] as DashboardRange[]).map((range) => (
+                {(["7d", "30d", "all"] as DashboardRange[]).map((range) => (
                     <button
                         key={range}
                         className={`${styles.rangeButton} ${value === range ? styles.rangeButtonActive : ""}`}
                         type="button"
                         onClick={() => onChange(range)}
                     >
-                        {range === "today" ? "Today" : range === "7d" ? "Last 7 Days" : range === "30d" ? "Last 30 Days" : "All Time"}
+                        {range === "7d" ? "Last 7 Days" : range === "30d" ? "Last 30 Days" : "All Time"}
                     </button>
                 ))}
             </div>
@@ -286,9 +274,8 @@ export default function AdminDashboard() {
                 <nav className={styles.navMenu}>
                     <ul>
                         <li className={styles.active}>Dashboard</li>
-                        <li>Admin Accounts</li>
                         <li onClick={() => router.push("/admin/recruiters")}>Recruiter Accounts</li>
-                        <li>Activity Logs</li>
+                        <li onClick={() => router.push("/admin/activity-logs")}>Activity Logs</li>
                         <li onClick={handleLogout} className={styles.logoutItem}>Logout</li>
                     </ul>
                 </nav>
@@ -360,27 +347,6 @@ export default function AdminDashboard() {
                                 { key: "cvs", label: "CVs Applied", color: "#dc2626" },
                             ]}
                         />
-                    </section>
-
-                    <section className={`${styles.card} ${styles.panelCard}`} style={{ gridColumn: "1 / -1" }}>
-                        <div className={styles.panelTitleRow}>
-                            <div>
-                                <h3>Recent Account Activity</h3>
-                            </div>
-                        </div>
-                        {accountActivities.length === 0 ? <p className={styles.emptyState}>No account activity yet</p> : (
-                            <ul className={styles.activityList}>
-                                {accountActivities.slice(0, 12).map((activity) => (
-                                    <li key={activity.id} className={styles.activityItem}>
-                                        <div className={styles.activityMeta}>
-                                            <span className={styles.activityTime}>{formatActivityTime(activity.created_at)}</span>
-                                            <span className={styles.activityRole}>[{activity.actor_role}]</span>
-                                        </div>
-                                        <div className={styles.activityDetail}>{activity.detail || activity.action}</div>
-                                    </li>
-                                ))}
-                            </ul>
-                        )}
                     </section>
 
                     {message && (

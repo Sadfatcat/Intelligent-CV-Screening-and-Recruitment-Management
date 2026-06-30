@@ -447,14 +447,44 @@ def regex_extract(text: str) -> Dict[str, List[str]]:
     ]
     out["years"] = re.findall(r"(\d+(?:\.\d+)?)\s+years?", text, flags=re.I)
     out["months"] = re.findall(r"(\d+(?:\.\d+)?)\s+months?", text, flags=re.I)
+    out["years"].extend(re.findall(r"(\d+(?:\.\d+)?)\s*年以上", text))
+    out["years"].extend(re.findall(r"(\d+(?:\.\d+)?)\s*年(?:間)?", text))
+    out["months"].extend(re.findall(r"(\d+(?:\.\d+)?)\s*ヶ月", text))
     return out
+
+
+def _extract_year_values(text: str) -> List[float]:
+    if not text:
+        return []
+    values = []
+    patterns = [
+        r"(\d+(?:\.\d+)?)\s*\+?\s+years?",
+        r"(\d+(?:\.\d+)?)\s*年以上",
+        r"(\d+(?:\.\d+)?)\s*年(?:間)?",
+    ]
+    for pattern in patterns:
+        values.extend(float(value) for value in re.findall(pattern, text, flags=re.I))
+    return [value for value in values if 0.0 < value <= 50.0]
+
+
+def _extract_month_values(text: str) -> List[float]:
+    if not text:
+        return []
+    values = []
+    patterns = [
+        r"(\d+(?:\.\d+)?)\s+months?",
+        r"(\d+(?:\.\d+)?)\s*ヶ月",
+    ]
+    for pattern in patterns:
+        values.extend(float(value) for value in re.findall(pattern, text, flags=re.I))
+    return [value for value in values if 0.0 < value <= 600.0]
 
 
 def extract_experience_years(text: str) -> float:
     if not text:
         return 0.0
-    years = [float(value) for value in re.findall(r"(\d+(?:\.\d+)?)\s*\+?\s+years?", text, flags=re.I)]
-    months = [float(value) for value in re.findall(r"(\d+(?:\.\d+)?)\s+months?", text, flags=re.I)]
+    years = _extract_year_values(text)
+    months = _extract_month_values(text)
     total_years = max(years) if years else 0.0
     total_months = (max(months) / 12.0) if months else 0.0
     return total_years + total_months
@@ -466,10 +496,10 @@ def _required_experience_years(text: str) -> float:
     explicit_years = re.search(r"\bexperience\s+years?\s*:\s*(\d+(?:\.\d+)?)\b", text, flags=re.I)
     if explicit_years:
         return float(explicit_years.group(1))
-    years = re.findall(r"(\d+(?:\.\d+)?)\s*\+?\s+years?", text, flags=re.I)
+    years = _extract_year_values(text)
     if years:
         return float(years[0])
-    months = re.findall(r"(\d+(?:\.\d+)?)\s+months?", text, flags=re.I)
+    months = _extract_month_values(text)
     if months:
         return float(months[0]) / 12.0
     return 0.0
@@ -566,7 +596,7 @@ def _extract_section_items(section: str, text: str, alias_index: Dict[str, str])
             if bare_years:
                 items.append(f"{bare_years.group(0)} years")
                 continue
-            if re.search(r"\b(years?|months?|experience|experienced)\b", line, flags=re.I):
+            if re.search(r"\b(years?|months?|experience|experienced)\b|年|ヶ月|経験", line, flags=re.I):
                 explicit_years = re.search(r"\bexperience\s+years?\s*:\s*(\d+(?:\.\d+)?)\b", line, flags=re.I)
                 if explicit_years:
                     items.append(f"{explicit_years.group(1)} years")
@@ -578,6 +608,10 @@ def _extract_section_items(section: str, text: str, alias_index: Dict[str, str])
                 )
                 if year_match:
                     items.append(year_match.group(1))
+                    continue
+                jp_year_match = re.search(r"(\d+(?:\.\d+)?)\s*(年以上|年(?:間)?)", line)
+                if jp_year_match:
+                    items.append(f"{jp_year_match.group(1)} years")
         return items
     if section in {"experience", "projects", "responsibilities", "education", "soft_skills"}:
         return [item for item in _list_blocks(text) if len(item.split()) >= 2]

@@ -5,6 +5,10 @@ import { normalizeJobImageUrl } from "../utils/candidateJobAssets";
 import styles from "../../../app/candidate/page.module.css";
 import { useEffect, useState } from "react";
 
+const PASSED_SCORE_THRESHOLD = 75;
+const BORDERLINE_SCORE_THRESHOLD = 60;
+const WEAK_MATCH_SCORE_THRESHOLD = 45;
+
 type Props = {
     submittedJobs: CandidateSubmissionItem[];
     jobs: JobItem[];
@@ -45,16 +49,17 @@ function formatSubmittedTime(value: string | null) {
 function getScoreStatus(value: number | null | undefined) {
     const score = normalizeScore(value);
     if (score === null) return "pending";
-    if (score >= 85) return "passed";
-    if (score >= 50) return "borderline";
+    if (score >= PASSED_SCORE_THRESHOLD) return "passed";
+    if (score >= BORDERLINE_SCORE_THRESHOLD) return "borderline";
     return "failed";
 }
 
 function getScoreStatusLabel(value: number | null | undefined) {
     const status = getScoreStatus(value);
-    if (status === "passed") return "Passed";
-    if (status === "borderline") return "Borderline";
-    if (status === "failed") return "Failed";
+    const score = normalizeScore(value);
+    if (status === "passed") return "Strong match";
+    if (status === "borderline") return "Potential match";
+    if (status === "failed") return score !== null && score >= WEAK_MATCH_SCORE_THRESHOLD ? "Weak match" : "Not suitable";
     return "Pending";
 }
 
@@ -71,6 +76,19 @@ function getSectionPoints(detail: MatchingDetail | null | undefined, keys: strin
 }
 
 function getFulfilledCriteria(detail: MatchingDetail | null | undefined) {
+    const grouped = detail?.matched ?? {};
+    const orderedKeys = [
+        "required_skills",
+        "project_domain",
+        "seniority",
+        "responsibility",
+        "testing_documentation",
+        "language_collaboration",
+        "bonus_skills",
+    ];
+    const directMatches = orderedKeys.flatMap((key) => grouped[key] ?? []);
+    if (directMatches.length > 0) return uniqueItems(directMatches);
+
     const sectionGood = (detail?.sections ?? [])
         .filter((s) => (s.good ?? []).length > 0)
         .flatMap((s) => (s.good ?? []).map((p) => `${s.label || s.key}: ${p}`));
@@ -78,17 +96,37 @@ function getFulfilledCriteria(detail: MatchingDetail | null | undefined) {
 }
 
 function getMissingSkills(detail: MatchingDetail | null | undefined) {
+    const grouped = detail?.missingOrWeak ?? {};
+    const directMissing = [...(grouped.required_skills ?? []), ...(grouped.bonus_skills ?? [])];
+    if (directMissing.length > 0) return uniqueItems(directMissing);
+
     return uniqueItems([
-        ...getSectionPoints(detail, ["skills", "technical_skills", "tools", "required_skills", "bonus_skills"], "missing"),
-        ...(detail?.missing_points ?? []).filter((p) => /skill|tool|framework|language|stack/i.test(p)),
+        ...getSectionPoints(detail, ["required_skills", "bonus_skills"], "missing"),
+        ...(detail?.missing_points ?? []).filter((p) => /skill|tool|framework|language|stack|java|spring|html|css|javascript|typescript|aws|docker|kubernetes|redis|kafka/i.test(p)),
     ]);
 }
 
 function getMissingRequirements(detail: MatchingDetail | null | undefined) {
+    const grouped = detail?.missingOrWeak ?? {};
+    const directMissing = [
+        ...(grouped.project_domain ?? []),
+        ...(grouped.seniority ?? []),
+        ...(grouped.responsibility ?? []),
+        ...(grouped.testing_documentation ?? []),
+        ...(grouped.language_collaboration ?? []),
+        ...(detail?.must_have?.missing ?? []),
+    ];
+    if (directMissing.length > 0) return uniqueItems(directMissing);
+
     return uniqueItems([
-        ...getSectionPoints(detail, ["requirements", "education", "experience", "languages", "project_domain", "seniority", "responsibility", "testing_documentation", "language_collaboration"], "missing"),
+        ...getSectionPoints(detail, ["project_domain", "seniority", "responsibility", "testing_documentation", "language_collaboration"], "missing"),
         ...(detail?.must_have?.missing ?? []),
     ]);
+}
+
+function hasDetailedMissingCriteria(detail: MatchingDetail | null | undefined) {
+    const grouped = detail?.missingOrWeak ?? {};
+    return Object.values(grouped).some((items) => Array.isArray(items) && items.length > 0);
 }
 
 function renderCriteriaList(
@@ -164,9 +202,9 @@ export default function AppliedCVsPage({ submittedJobs, jobs, isCvScoring, hasSc
                 <span className={styles.legendChipGood}><i className={`${styles.legendIcon} ${styles.criteriaIconGood}`}>✓</i>Matched criteria</span>
                 <span className={styles.legendChipSkill}><i className={`${styles.legendIcon} ${styles.criteriaIconSkill}`}>✕</i>Missing skill, can be improved</span>
                 <span className={styles.legendChipRequirement}><i className={`${styles.legendIcon} ${styles.criteriaIconRequirement}`}>✕</i>Missing required condition</span>
-                <span className={styles.legendChipScore}><i className={`${styles.scoreLegend} ${styles.scorePassed}`}>Passed</i></span>
-                <span className={styles.legendChipScore}><i className={`${styles.scoreLegend} ${styles.scoreBorderline}`}>Borderline</i></span>
-                <span className={styles.legendChipScore}><i className={`${styles.scoreLegend} ${styles.scoreFailed}`}>Failed</i></span>
+                <span className={styles.legendChipScore}><i className={`${styles.scoreLegend} ${styles.scorePassed}`}>Strong match</i></span>
+                <span className={styles.legendChipScore}><i className={`${styles.scoreLegend} ${styles.scoreBorderline}`}>Potential match</i></span>
+                <span className={styles.legendChipScore}><i className={`${styles.scoreLegend} ${styles.scoreFailed}`}>Weak / Not suitable</i></span>
             </div>
 
             {submittedJobs.length === 0 ? (
@@ -184,6 +222,7 @@ export default function AppliedCVsPage({ submittedJobs, jobs, isCvScoring, hasSc
                         const fulfilledCriteria = getFulfilledCriteria(item.matching_detail);
                         const missingSkills = getMissingSkills(item.matching_detail);
                         const missingRequirements = getMissingRequirements(item.matching_detail);
+                        const hasMissingDetail = hasDetailedMissingCriteria(item.matching_detail);
                         const scoreStatus = getScoreStatus(item.ai_matching_score);
                         const imageUrl = normalizeJobImageUrl(item.image_url || matchedJob?.image_url);
                         const imageFailed = failedImageIds.has(item.application_id);
@@ -255,7 +294,14 @@ export default function AppliedCVsPage({ submittedJobs, jobs, isCvScoring, hasSc
                                         </section>
                                         <section className={styles.criteriaBlock}>
                                             <h4>Missing skills</h4>
-                                            {renderCriteriaList(missingSkills, "skill", "No missing skills recorded.", openDetailModal)}
+                                            {renderCriteriaList(
+                                                missingSkills,
+                                                "skill",
+                                                !hasMissingDetail && (item.ai_matching_score ?? 0) < BORDERLINE_SCORE_THRESHOLD
+                                                    ? "Detailed missing criteria not available."
+                                                    : "No missing skills recorded.",
+                                                openDetailModal,
+                                            )}
                                         </section>
                                         <section className={styles.criteriaBlock}>
                                             <h4>Missing requirements</h4>
@@ -300,7 +346,7 @@ export default function AppliedCVsPage({ submittedJobs, jobs, isCvScoring, hasSc
                                     <h4>Missing skills</h4>
                                     <span>{detailModal.missingSkills.length}</span>
                                 </div>
-                                {renderFullCriteriaList(detailModal.missingSkills, "skill", "No missing skills recorded.")}
+                                {renderFullCriteriaList(detailModal.missingSkills, "skill", "Detailed missing criteria not available.")}
                             </section>
                             <section className={`${styles.criteriaModalColumn} ${detailModal.focus === "requirement" ? styles.criteriaModalColumnActive : ""}`}>
                                 <div className={styles.criteriaModalColumnHeader}>

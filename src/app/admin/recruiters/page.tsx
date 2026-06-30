@@ -222,9 +222,8 @@ export default function AdminRecruitersPage() {
                 <nav className={styles.navMenu}>
                     <ul>
                         <li onClick={() => router.push("/admin/dashboard")}>Dashboard</li>
-                        <li>Admin Accounts</li>
                         <li className={styles.active}>Recruiter Accounts</li>
-                        <li>Activity Logs</li>
+                        <li onClick={() => router.push("/admin/activity-logs")}>Activity Logs</li>
                         <li onClick={handleLogout} className={styles.logoutItem}>Logout</li>
                     </ul>
                 </nav>

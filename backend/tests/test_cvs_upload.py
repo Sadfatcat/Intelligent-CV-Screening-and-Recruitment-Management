@@ -128,6 +128,12 @@ def test_cv_upload_creates_cv_application_and_matching_detail():
             assert detail["final_score"] == round(application.ai_matching_score / 100, 4)
             assert detail["overall_score"] == round(application.ai_matching_score / 100, 4)
             assert detail["scoringEngine"] == "criteria_based_v2"
+            assert isinstance(detail.get("sections"), list)
+            assert len(detail["sections"]) >= 1
+            assert isinstance(detail.get("good_points"), list)
+            assert isinstance(detail.get("missing_points"), list)
+            assert isinstance(detail.get("must_have"), dict)
+            assert isinstance(detail.get("summary"), dict)
             assert response["cv_id"] == cv.id
             assert response["application_id"] == application.id
             assert response["matching_score"] is None
@@ -203,9 +209,19 @@ def test_cv_upload_uses_job_matching_config_for_custom_weights_and_must_have():
             return {
                 "finalScore": 91.0,
                 "subScores": {"required_skills": 91.0},
-                "matched": {},
-                "missingOrWeak": {},
-                "reasoningSummary": ""
+                "matched": {"required_skills": ["Python"]},
+                "missingOrWeak": {"required_skills": []},
+                "reasoningSummary": "",
+                "sections": [],
+                "good_points": ["Python"],
+                "missing_points": [],
+                "must_have": {"matched": ["Python"], "missing": [], "penalty_applied": 0},
+                "summary": {
+                    "good_count": 1,
+                    "missing_count": 0,
+                    "must_have_matched_count": 1,
+                    "must_have_missing_count": 0,
+                },
             }
 
         CvScoringService.score_cv_vs_jd = fake_matcher
@@ -226,7 +242,10 @@ def test_cv_upload_uses_job_matching_config_for_custom_weights_and_must_have():
             assert captured["must_have"] == ["Python"]
             session.refresh(application)
             assert application.ai_matching_score == 91.0
-            assert json.loads(application.matching_detail)["final_score"] == 0.91
+            detail = json.loads(application.matching_detail)
+            assert detail["final_score"] == 0.91
+            assert detail["good_points"] == ["Python"]
+            assert detail["must_have"]["matched"] == ["Python"]
             assert response["matching_detail"] is None
             assert response["matching_score"] is None
         finally:

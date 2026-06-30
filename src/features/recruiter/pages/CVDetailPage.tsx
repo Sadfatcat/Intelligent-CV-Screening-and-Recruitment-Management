@@ -6,10 +6,16 @@ import { getRecruiterCvFileUrl } from "../services/recruiterApi";
 import type { CVLogItem, JobManagementStatus, RecruiterSession } from "../types/recruiterTypes";
 import { formatLogTime, formatScore } from "../utils/recruiterFormatters";
 import {
+    BORDERLINE_SCORE_THRESHOLD,
+    hasDetailedMissingCriteria,
+    getMatchedItems,
     getJobManagementLabel,
+    getMissingRequirements,
+    getMissingSkills,
     getRenderableMatchingSections,
     getScoreStatus,
-    getSectionPoints,
+    PASSED_SCORE_THRESHOLD,
+    WEAK_MATCH_SCORE_THRESHOLD,
 } from "../utils/cvScoringUtils";
 import styles from "./CVDetailPage.module.css";
 
@@ -24,8 +30,8 @@ type Props = {
 function scoreColor(score: number | null | undefined): string {
     const s = typeof score === "number" && !Number.isNaN(score) ? Math.min(100, Math.max(0, score)) : null;
     if (s === null) return "var(--muted, #666)";
-    if (s >= 85) return "#166534";
-    if (s >= 50) return "#1e40af";
+    if (s >= PASSED_SCORE_THRESHOLD) return "#166534";
+    if (s >= BORDERLINE_SCORE_THRESHOLD) return "#1e40af";
     return "#991b1b";
 }
 
@@ -40,13 +46,10 @@ function statusBadgeClass(status: ReturnType<typeof getScoreStatus>, styles: Rec
 }
 
 function statusLabel(status: ReturnType<typeof getScoreStatus>) {
-    const map: Record<string, string> = {
-        passed: "Good",
-        borderline: "Borderline",
-        failed: "Poor",
-        not_scored: "Not Scored",
-    };
-    return map[status] ?? "Unknown";
+    if (status === "passed") return "Strong match";
+    if (status === "borderline") return "Potential match";
+    if (status === "failed") return "Not suitable";
+    return "Not Scored";
 }
 
 export default function CVDetailPage({ selectedLog, getManagedJobStatus, onBack, onDelete, session }: Props) {
@@ -56,13 +59,11 @@ export default function CVDetailPage({ selectedLog, getManagedJobStatus, onBack,
     const detail = selectedLog.matching_detail ?? null;
     const sections = getRenderableMatchingSections(detail);
     const scoreStatus = getScoreStatus(selectedLog.ai_matching_score);
+    const hasMissingDetail = hasDetailedMissingCriteria(detail);
 
-    const matchedSkills = getSectionPoints(detail, ["technical_skills", "programming_languages", "required_skills", "bonus_skills"], "good");
-    const missingSkills = getSectionPoints(detail, ["technical_skills", "programming_languages", "required_skills", "bonus_skills"], "missing");
-    const missingRequirements = [
-        ...getSectionPoints(detail, ["experience", "responsibilities", "projects", "project_domain", "seniority", "responsibility", "testing_documentation", "language_collaboration"], "missing"),
-        ...(detail?.must_have?.missing ?? []),
-    ];
+    const matchedSkills = getMatchedItems(detail);
+    const missingSkills = getMissingSkills(detail);
+    const missingRequirements = getMissingRequirements(detail);
 
     const skillTotal = matchedSkills.length + missingSkills.length;
     const skillMatchPct = skillTotal > 0 ? Math.round((matchedSkills.length / skillTotal) * 100) : 0;
@@ -71,7 +72,7 @@ export default function CVDetailPage({ selectedLog, getManagedJobStatus, onBack,
     const radarValues = sections.slice(0, 7).map((s) => (typeof s.score === "number" ? Math.min(100, Math.max(0, s.score)) : 0));
 
     const jobStatus = getManagedJobStatus(selectedLog.job_id);
-    const explanation = (detail as any)?.reasoningSummary || detail?.sections?.[0]?.explanation || null;
+    const explanation = detail?.reasoningSummary || detail?.sections?.[0]?.explanation || null;
 
     const displayScore = typeof selectedLog.ai_matching_score === "number" ? `${formatScore(selectedLog.ai_matching_score)}/100` : "—";
 
@@ -91,7 +92,9 @@ export default function CVDetailPage({ selectedLog, getManagedJobStatus, onBack,
                         {displayScore}
                     </span>
                     <span className={`${styles.statusBadge} ${statusBadgeClass(scoreStatus, styles)}`}>
-                        {statusLabel(scoreStatus)}
+                        {scoreStatus === "failed" && (selectedLog.ai_matching_score ?? 0) >= WEAK_MATCH_SCORE_THRESHOLD
+                            ? "Weak match"
+                            : statusLabel(scoreStatus)}
                     </span>
                     <div className={styles.headerActions}>
                         <button type="button" className={styles.btnBack} onClick={onBack}>
@@ -171,7 +174,11 @@ export default function CVDetailPage({ selectedLog, getManagedJobStatus, onBack,
                             </li>
                         ))}
                         {matchedSkills.length === 0 && missingSkills.length === 0 && (
-                            <li className={styles.noData}>No skills data recorded.</li>
+                            <li className={styles.noData}>
+                                {(selectedLog.ai_matching_score ?? 0) < BORDERLINE_SCORE_THRESHOLD && !hasMissingDetail
+                                    ? "Detailed missing criteria not available."
+                                    : "No skills data recorded."}
+                            </li>
                         )}
                     </ul>
                     {skillTotal > 0 && (

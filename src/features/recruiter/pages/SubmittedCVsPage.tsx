@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import CVLogItemRow from "../components/CVLogItem";
 import { useCVFilters } from "../hooks/useCVFilters";
 import type { CVLogItem, ExperienceFilter, ScoreStatus } from "../types/recruiterTypes";
-import { normalizeScore } from "../utils/cvScoringUtils";
+import { normalizeScore, PASSED_SCORE_THRESHOLD } from "../utils/cvScoringUtils";
 import styles from "../../../app/recruiter_UI/page.module.css";
 
 type Props = {
@@ -24,7 +24,7 @@ export default function SubmittedCVsPage({
 }: Props) {
     const summary = useMemo(() => {
         const scores = submittedCvLogs.map((log) => normalizeScore(log.ai_matching_score)).filter((value): value is number => value !== null);
-        const passed = scores.filter((score) => score >= 85).length;
+        const passed = scores.filter((score) => score >= PASSED_SCORE_THRESHOLD).length;
         return {
             total: submittedCvLogs.length,
             average: scores.length ? (scores.reduce((sum, score) => sum + score, 0) / scores.length).toFixed(1) : "-",
@@ -113,20 +113,21 @@ export default function SubmittedCVsPage({
                     onChange={(e) => setScoreStatusFilter(e.target.value as ScoreStatus | "all")}
                 >
                     <option value="all">All statuses</option>
-                    <option value="passed">Passed</option>
-                    <option value="borderline">Borderline</option>
-                    <option value="failed">Failed</option>
+                    <option value="passed">Strong match</option>
+                    <option value="borderline">Potential match</option>
+                    <option value="failed">Weak / Not suitable</option>
                     <option value="not_scored">Not scored</option>
                 </select>
                 <select
                     className={styles.filterSelect}
                     value={scoreRangeFilter}
-                    onChange={(e) => setScoreRangeFilter(e.target.value as "all" | "85-100" | "50-84" | "0-49")}
+                    onChange={(e) => setScoreRangeFilter(e.target.value as "all" | "75-100" | "60-74" | "45-59" | "0-44")}
                 >
                     <option value="all">All score ranges</option>
-                    <option value="85-100">85-100</option>
-                    <option value="50-84">50-84</option>
-                    <option value="0-49">0-49</option>
+                    <option value="75-100">75-100</option>
+                    <option value="60-74">60-74</option>
+                    <option value="45-59">45-59</option>
+                    <option value="0-44">0-44</option>
                 </select>
                 <button className={styles.clearFilterBtn} type="button" onClick={() => setCvSortMode("experience")}>
                     Sort by experience

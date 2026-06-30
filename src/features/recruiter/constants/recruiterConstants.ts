@@ -7,9 +7,9 @@ export const RECRUITER_PASSWORD_CHANGE_STORAGE_KEY = "recruiterPasswordChangeUse
 export const ENABLE_DEV_MOCK_DATA = process.env.NEXT_PUBLIC_ENABLE_DEV_MOCK_DATA === "1";
 
 export const SCORE_STATUS_LABELS: Record<ScoreStatus, string> = {
-    passed: "Passed",
-    borderline: "Borderline",
-    failed: "Failed",
+    passed: "Strong match",
+    borderline: "Potential match",
+    failed: "Not suitable",
     not_scored: "Not scored",
 };
 

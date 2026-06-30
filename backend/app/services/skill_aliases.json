@@ -87,7 +87,7 @@
   "fastapi": ["fast api", "starlette"],
   "express": ["expressjs", "express.js"],
   "nestjs": ["nest.js", "nest"],
-  "spring": ["spring boot", "spring framework", "springboot", "spring mvc"],
+  "spring": ["spring boot", "spring framework", "springboot", "spring mvc", "java spring", "java/spring"],
   "spring security": ["springsecurity"],
   "jpa": ["java persistence api", "spring data jpa"],
   "hibernate": ["hibernate orm", "jpa hibernate"],

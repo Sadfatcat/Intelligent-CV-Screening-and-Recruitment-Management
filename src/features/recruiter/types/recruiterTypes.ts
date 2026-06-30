@@ -37,6 +37,12 @@ export type MatchingSection = {
 export type MatchingDetail = {
     overall_score?: number | null;
     final_score?: number | null;
+    finalScore?: number | null;
+    subScores?: Record<string, number | null> | null;
+    matched?: Record<string, string[] | undefined> | null;
+    missingOrWeak?: Record<string, string[] | undefined> | null;
+    reasoningSummary?: string | null;
+    scoringEngine?: string | null;
     summary?: {
         good_count?: number;
         missing_count?: number;

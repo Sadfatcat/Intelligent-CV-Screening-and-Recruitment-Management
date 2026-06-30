@@ -1,0 +1,639 @@
+[
+  {
+    "filename": "Claire_Moreau_55.pdf",
+    "finalScore": 63.4,
+    "overall_score": 74.826,
+    "subScores": {
+      "required_skills": 86.0,
+      "project_domain": 82.0,
+      "seniority": 53.3,
+      "responsibility": 37.3,
+      "testing_documentation": 19.9,
+      "language_collaboration": 24.8,
+      "bonus_skills": 43.0
+    },
+    "reasoningSummary": "Strengths: senior java/spring experience, retail/pos/reuse domain evidence. Weaknesses: missing testing or documentation experience, thiếu bằng chứng rõ ràng về ngoại ngữ hoặc phối hợp đa quốc gia.",
+    "matched": {
+      "required_skills": [
+        "java",
+        "spring framework",
+        "spring boot",
+        "html",
+        "css",
+        "javascript",
+        "spring security"
+      ],
+      "project_domain": [
+        "retail",
+        "pos",
+        "store operation",
+        "system replacement"
+      ],
+      "seniority": [
+        "architecture design"
+      ],
+      "responsibility": [
+        "system design"
+      ],
+      "testing_documentation": [],
+      "language_collaboration": [],
+      "bonus_skills": [
+        "aws",
+        "docker",
+        "security",
+        "oauth2"
+      ]
+    },
+    "missingOrWeak": {
+      "required_skills": [
+        "full stack",
+        "ui/ux"
+      ],
+      "project_domain": [
+        "reuse",
+        "large data processing"
+      ],
+      "seniority": [
+        "5+ years of experience",
+        "senior developer",
+        "module lead",
+        "technical lead",
+        "mentoring",
+        "code review"
+      ],
+      "responsibility": [
+        "test case design",
+        "technical specification",
+        "api specification"
+      ],
+      "testing_documentation": [
+        "system test scenario",
+        "test design",
+        "test design document",
+        "english design documents",
+        "basic design document",
+        "detailed design document",
+        "api specification"
+      ],
+      "language_collaboration": [
+        "english design documents",
+        "japan collaboration"
+      ],
+      "bonus_skills": [
+        "kubernetes",
+        "ci/cd",
+        "redis",
+        "kafka",
+        "performance tuning",
+        "jwt",
+        "playwright"
+      ]
+    }
+  },
+  {
+    "filename": "David_Robe_85.pdf",
+    "finalScore": 67.7,
+    "overall_score": 74.826,
+    "subScores": {
+      "required_skills": 88.0,
+      "project_domain": 82.0,
+      "seniority": 70.4,
+      "responsibility": 37.2,
+      "testing_documentation": 19.7,
+      "language_collaboration": 24.7,
+      "bonus_skills": 65.6
+    },
+    "reasoningSummary": "Strengths: senior java/spring experience, retail/pos/reuse domain evidence. Weaknesses: missing testing or documentation experience, thiếu bằng chứng rõ ràng về ngoại ngữ hoặc phối hợp đa quốc gia.",
+    "matched": {
+      "required_skills": [
+        "java",
+        "spring framework",
+        "spring boot",
+        "html",
+        "css",
+        "javascript",
+        "spring security",
+        "full stack"
+      ],
+      "project_domain": [
+        "retail",
+        "pos",
+        "store operation",
+        "system replacement"
+      ],
+      "seniority": [
+        "senior developer",
+        "module lead",
+        "technical lead",
+        "mentoring",
+        "architecture design"
+      ],
+      "responsibility": [
+        "system design"
+      ],
+      "testing_documentation": [],
+      "language_collaboration": [],
+      "bonus_skills": [
+        "aws",
+        "docker",
+        "kubernetes",
+        "ci/cd",
+        "redis",
+        "kafka",
+        "security",
+        "oauth2",
+        "jwt"
+      ]
+    },
+    "missingOrWeak": {
+      "required_skills": [
+        "ui/ux"
+      ],
+      "project_domain": [
+        "reuse",
+        "large data processing"
+      ],
+      "seniority": [
+        "5+ years of experience",
+        "code review"
+      ],
+      "responsibility": [
+        "test case design",
+        "technical specification",
+        "api specification"
+      ],
+      "testing_documentation": [
+        "system test scenario",
+        "test design",
+        "test design document",
+        "english design documents",
+        "basic design document",
+        "detailed design document",
+        "api specification"
+      ],
+      "language_collaboration": [
+        "english design documents",
+        "japan collaboration"
+      ],
+      "bonus_skills": [
+        "performance tuning",
+        "playwright"
+      ]
+    }
+  },
+  {
+    "filename": "Le_Minh_Khoa_98_JP.pdf",
+    "finalScore": 79.4,
+    "overall_score": 59.5,
+    "subScores": {
+      "required_skills": 88.0,
+      "project_domain": 85.0,
+      "seniority": 70.4,
+      "responsibility": 75.4,
+      "testing_documentation": 80.3,
+      "language_collaboration": 50.4,
+      "bonus_skills": 61.7
+    },
+    "reasoningSummary": "Strengths: senior java/spring experience, retail/pos/reuse domain evidence, english design/api/test documentation, system testing and qa automation.",
+    "matched": {
+      "required_skills": [
+        "java",
+        "spring framework",
+        "spring boot",
+        "html",
+        "css",
+        "javascript",
+        "spring security"
+      ],
+      "project_domain": [
+        "retail",
+        "pos",
+        "reuse",
+        "store operation",
+        "system replacement",
+        "large data processing"
+      ],
+      "seniority": [
+        "module lead",
+        "technical lead",
+        "mentoring",
+        "code review",
+        "architecture design"
+      ],
+      "responsibility": [
+        "system design",
+        "test case design",
+        "technical specification",
+        "api specification"
+      ],
+      "testing_documentation": [
+        "system test scenario",
+        "test design",
+        "test design document",
+        "english design documents",
+        "basic design document",
+        "detailed design document",
+        "api specification"
+      ],
+      "language_collaboration": [
+        "english design documents"
+      ],
+      "bonus_skills": [
+        "aws",
+        "docker",
+        "kubernetes",
+        "redis",
+        "kafka",
+        "security",
+        "oauth2",
+        "jwt"
+      ]
+    },
+    "missingOrWeak": {
+      "required_skills": [
+        "full stack",
+        "ui/ux"
+      ],
+      "project_domain": [],
+      "seniority": [
+        "5+ years of experience",
+        "senior developer"
+      ],
+      "responsibility": [],
+      "testing_documentation": [],
+      "language_collaboration": [
+        "japan collaboration"
+      ],
+      "bonus_skills": [
+        "ci/cd",
+        "performance tuning",
+        "playwright"
+      ]
+    }
+  },
+  {
+    "filename": "Lê_Minh_Khoa_98.pdf",
+    "finalScore": 80.4,
+    "overall_score": 74.826,
+    "subScores": {
+      "required_skills": 86.0,
+      "project_domain": 85.0,
+      "seniority": 70.4,
+      "responsibility": 76.8,
+      "testing_documentation": 81.5,
+      "language_collaboration": 76.8,
+      "bonus_skills": 63.2
+    },
+    "reasoningSummary": "Strengths: senior java/spring experience, retail/pos/reuse domain evidence, english design/api/test documentation, system testing and qa automation, japan-side collaboration.",
+    "matched": {
+      "required_skills": [
+        "java",
+        "spring framework",
+        "spring boot",
+        "html",
+        "css",
+        "javascript",
+        "spring security"
+      ],
+      "project_domain": [
+        "retail",
+        "pos",
+        "reuse",
+        "store operation",
+        "system replacement",
+        "large data processing"
+      ],
+      "seniority": [
+        "module lead",
+        "technical lead",
+        "mentoring",
+        "code review",
+        "architecture design"
+      ],
+      "responsibility": [
+        "system design",
+        "test case design",
+        "technical specification",
+        "api specification"
+      ],
+      "testing_documentation": [
+        "system test scenario",
+        "test design",
+        "test design document",
+        "english design documents",
+        "basic design document",
+        "detailed design document",
+        "api specification"
+      ],
+      "language_collaboration": [
+        "english design documents",
+        "japan collaboration"
+      ],
+      "bonus_skills": [
+        "aws",
+        "docker",
+        "kubernetes",
+        "redis",
+        "kafka",
+        "security",
+        "oauth2",
+        "jwt"
+      ]
+    },
+    "missingOrWeak": {
+      "required_skills": [
+        "full stack",
+        "ui/ux"
+      ],
+      "project_domain": [],
+      "seniority": [
+        "5+ years of experience",
+        "senior developer"
+      ],
+      "responsibility": [],
+      "testing_documentation": [],
+      "language_collaboration": [],
+      "bonus_skills": [
+        "ci/cd",
+        "performance tuning",
+        "playwright"
+      ]
+    }
+  },
+  {
+    "filename": "Nguyễn_Văn_Hải_25.pdf",
+    "finalScore": 62.5,
+    "overall_score": 76.326,
+    "subScores": {
+      "required_skills": 86.0,
+      "project_domain": 82.0,
+      "seniority": 53.3,
+      "responsibility": 37.3,
+      "testing_documentation": 19.8,
+      "language_collaboration": 24.8,
+      "bonus_skills": 24.8
+    },
+    "reasoningSummary": "Strengths: senior java/spring experience, retail/pos/reuse domain evidence. Weaknesses: missing testing or documentation experience, thiếu bằng chứng rõ ràng về ngoại ngữ hoặc phối hợp đa quốc gia.",
+    "matched": {
+      "required_skills": [
+        "java",
+        "spring framework",
+        "spring boot",
+        "html",
+        "css",
+        "javascript",
+        "spring security"
+      ],
+      "project_domain": [
+        "retail",
+        "pos",
+        "store operation",
+        "system replacement"
+      ],
+      "seniority": [
+        "architecture design"
+      ],
+      "responsibility": [
+        "system design"
+      ],
+      "testing_documentation": [],
+      "language_collaboration": [],
+      "bonus_skills": []
+    },
+    "missingOrWeak": {
+      "required_skills": [
+        "full stack",
+        "ui/ux"
+      ],
+      "project_domain": [
+        "reuse",
+        "large data processing"
+      ],
+      "seniority": [
+        "5+ years of experience",
+        "senior developer",
+        "module lead",
+        "technical lead",
+        "mentoring",
+        "code review"
+      ],
+      "responsibility": [
+        "test case design",
+        "technical specification",
+        "api specification"
+      ],
+      "testing_documentation": [
+        "system test scenario",
+        "test design",
+        "test design document",
+        "english design documents",
+        "basic design document",
+        "detailed design document",
+        "api specification"
+      ],
+      "language_collaboration": [
+        "english design documents",
+        "japan collaboration"
+      ],
+      "bonus_skills": [
+        "aws",
+        "docker",
+        "kubernetes",
+        "ci/cd",
+        "redis",
+        "kafka",
+        "performance tuning",
+        "security",
+        "oauth2",
+        "jwt",
+        "playwright"
+      ]
+    }
+  },
+  {
+    "filename": "Phạm_Quang_Huy_70.pdf",
+    "finalScore": 65.4,
+    "overall_score": 74.826,
+    "subScores": {
+      "required_skills": 88.0,
+      "project_domain": 49.8,
+      "seniority": 66.1,
+      "responsibility": 49.9,
+      "testing_documentation": 65.7,
+      "language_collaboration": 49.9,
+      "bonus_skills": 52.1
+    },
+    "reasoningSummary": "Strengths: senior java/spring experience.",
+    "matched": {
+      "required_skills": [
+        "java",
+        "spring framework",
+        "spring boot",
+        "html",
+        "css",
+        "javascript",
+        "spring security"
+      ],
+      "project_domain": [
+        "retail",
+        "pos",
+        "store operation"
+      ],
+      "seniority": [
+        "module lead",
+        "technical lead",
+        "mentoring",
+        "code review"
+      ],
+      "responsibility": [
+        "technical specification",
+        "api specification"
+      ],
+      "testing_documentation": [
+        "test design document",
+        "english design documents",
+        "basic design document",
+        "detailed design document",
+        "api specification"
+      ],
+      "language_collaboration": [
+        "english design documents"
+      ],
+      "bonus_skills": [
+        "aws",
+        "docker",
+        "redis",
+        "security",
+        "oauth2",
+        "jwt"
+      ]
+    },
+    "missingOrWeak": {
+      "required_skills": [
+        "full stack",
+        "ui/ux"
+      ],
+      "project_domain": [
+        "reuse",
+        "system replacement",
+        "large data processing"
+      ],
+      "seniority": [
+        "5+ years of experience",
+        "senior developer",
+        "architecture design"
+      ],
+      "responsibility": [
+        "system design",
+        "test case design"
+      ],
+      "testing_documentation": [
+        "system test scenario",
+        "test design"
+      ],
+      "language_collaboration": [
+        "japan collaboration"
+      ],
+      "bonus_skills": [
+        "kubernetes",
+        "ci/cd",
+        "kafka",
+        "performance tuning",
+        "playwright"
+      ]
+    }
+  },
+  {
+    "filename": "Trần_Minh_Đức_40.pdf",
+    "finalScore": 40.2,
+    "overall_score": 79.561,
+    "subScores": {
+      "required_skills": 55.0,
+      "project_domain": 27.0,
+      "seniority": 57.6,
+      "responsibility": 36.8,
+      "testing_documentation": 19.5,
+      "language_collaboration": 24.3,
+      "bonus_skills": 28.9
+    },
+    "reasoningSummary": "Strengths: 6 years of relevant experience. Weaknesses: kinh nghiệm dự án trong lĩnh vực tương tự còn hạn chế, missing testing or documentation experience, thiếu bằng chứng rõ ràng về ngoại ngữ hoặc phối hợp đa quốc gia.",
+    "matched": {
+      "required_skills": [
+        "java",
+        "spring framework",
+        "spring boot",
+        "html",
+        "css",
+        "javascript",
+        "spring security"
+      ],
+      "project_domain": [
+        "retail",
+        "pos",
+        "store operation",
+        "system replacement"
+      ],
+      "seniority": [
+        "senior developer",
+        "architecture design"
+      ],
+      "responsibility": [
+        "system design"
+      ],
+      "testing_documentation": [],
+      "language_collaboration": [],
+      "bonus_skills": [
+        "docker"
+      ]
+    },
+    "missingOrWeak": {
+      "required_skills": [
+        "full stack",
+        "ui/ux",
+        "only basic/training Java/Spring evidence found"
+      ],
+      "project_domain": [
+        "reuse",
+        "large data processing",
+        "no direct POS integration"
+      ],
+      "seniority": [
+        "5+ years of experience",
+        "module lead",
+        "technical lead",
+        "mentoring",
+        "code review"
+      ],
+      "responsibility": [
+        "test case design",
+        "technical specification",
+        "api specification"
+      ],
+      "testing_documentation": [
+        "system test scenario",
+        "test design",
+        "test design document",
+        "english design documents",
+        "basic design document",
+        "detailed design document",
+        "api specification"
+      ],
+      "language_collaboration": [
+        "english design documents",
+        "japan collaboration"
+      ],
+      "bonus_skills": [
+        "aws",
+        "kubernetes",
+        "ci/cd",
+        "redis",
+        "kafka",
+        "performance tuning",
+        "security",
+        "oauth2",
+        "jwt",
+        "playwright"
+      ]
+    }
+  }
+]

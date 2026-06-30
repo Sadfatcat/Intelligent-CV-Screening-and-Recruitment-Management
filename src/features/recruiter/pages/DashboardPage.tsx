@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { DashboardDoughnutChart, DashboardLineChart } from "@/components/charts/DashboardCharts";
 import type { CVLogItem, JobManagementStatus, RecruiterJob } from "../types/recruiterTypes";
 import { formatLogTime, formatScore } from "../utils/recruiterFormatters";
-import { getJobManagementLabel, getScoreStatus, normalizeScore } from "../utils/cvScoringUtils";
+import { BORDERLINE_SCORE_THRESHOLD, getJobManagementLabel, getScoreStatus, normalizeScore, PASSED_SCORE_THRESHOLD } from "../utils/cvScoringUtils";
 import { calculateSummary } from "../utils/cvScoringUtils";
 import styles from "../../../app/recruiter_UI/page.module.css";
 
@@ -125,27 +125,25 @@ export default function DashboardPage({
     }, [getManagedJobStatus, managedRecruiterJobs, recruiterCvLogs]);
 
     const screeningDistribution = useMemo(() => [
-        { label: "Failed", value: allScreeningSummary.failed, color: "#f4a6a6" },
-        { label: "Passed", value: allScreeningSummary.passed, color: "#9bd8b2" },
-        { label: "Borderline", value: allScreeningSummary.borderline, color: "#f4c48d" },
+        { label: "Under Threshold", value: allScreeningSummary.failed, color: "#f4a6a6" },
+        { label: "Strong Match", value: allScreeningSummary.passed, color: "#9bd8b2" },
+        { label: "Potential Match", value: allScreeningSummary.borderline, color: "#f4c48d" },
     ], [allScreeningSummary]);
 
     const scoreDistribution = useMemo(() => {
         const buckets = [
-            { label: "Strong Match", range: "90-100%", value: 0, color: "#166534" },
-            { label: "Good Match", range: "75-89%", value: 0, color: "#60a5fa" },
-            { label: "Average Match", range: "55-74%", value: 0, color: "#f4a261" },
-            { label: "Below Average", range: "31-54%", value: 0, color: "#f59e0b" },
-            { label: "Bad Match", range: "0-30%", value: 0, color: "#ef9a9a" },
+            { label: "Strong Match", range: "75-100%", value: 0, color: "#166534" },
+            { label: "Potential Match", range: "60-74%", value: 0, color: "#1e40af" },
+            { label: "Weak Match", range: "45-59%", value: 0, color: "#f4c48d" },
+            { label: "Not Suitable", range: "0-44%", value: 0, color: "#ef9a9a" },
         ];
         recruiterCvLogs.forEach((log) => {
             const score = normalizeScore(log.ai_matching_score);
             if (score === null) return;
-            if (score >= 90) buckets[0].value += 1;
-            else if (score >= 75) buckets[1].value += 1;
-            else if (score >= 55) buckets[2].value += 1;
-            else if (score >= 31) buckets[3].value += 1;
-            else buckets[4].value += 1;
+            if (score >= PASSED_SCORE_THRESHOLD) buckets[0].value += 1;
+            else if (score >= BORDERLINE_SCORE_THRESHOLD) buckets[1].value += 1;
+            else if (score >= 45) buckets[2].value += 1;
+            else buckets[3].value += 1;
         });
         return buckets;
     }, [recruiterCvLogs]);
@@ -190,7 +188,7 @@ export default function DashboardPage({
                 totalApplications: logs.length,
                 newCvs: logs.filter((log) => isWithinRange(log.created_at, "today")).length,
                 averageScore: scores.length ? scores.reduce((sum, s) => sum + s, 0) / scores.length : null,
-                highMatchCount: scores.filter((s) => s >= 90).length,
+                highMatchCount: scores.filter((s) => s >= PASSED_SCORE_THRESHOLD).length,
                 pendingReviews: logs.filter((log) => log.status === "pending").length,
             };
         });
