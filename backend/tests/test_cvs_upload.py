@@ -125,8 +125,8 @@ def test_cv_upload_creates_cv_application_and_matching_detail():
             assert application.ai_matching_score is not None
             assert application.matching_detail is not None
             detail = json.loads(application.matching_detail)
-            assert detail["final_score"] == application.ai_matching_score
-            assert detail["overall_score"] == application.ai_matching_score
+            assert detail["final_score"] == round(application.ai_matching_score / 100, 4)
+            assert detail["overall_score"] == round(application.ai_matching_score / 100, 4)
             assert detail["scoringEngine"] == "criteria_based_v2"
             assert response["cv_id"] == cv.id
             assert response["application_id"] == application.id
@@ -226,7 +226,7 @@ def test_cv_upload_uses_job_matching_config_for_custom_weights_and_must_have():
             assert captured["must_have"] == ["Python"]
             session.refresh(application)
             assert application.ai_matching_score == 91.0
-            assert json.loads(application.matching_detail)["final_score"] == 91.0
+            assert json.loads(application.matching_detail)["final_score"] == 0.91
             assert response["matching_detail"] is None
             assert response["matching_score"] is None
         finally:

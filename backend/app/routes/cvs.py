@@ -56,29 +56,29 @@ def score_application_background(application_id: int, cv_id: int, job_id: int, f
                     config = parse_matching_config(job.matching_config, strict=False)
                     scoring_service = CvScoringService()
                     custom_weights = config.get("weights")
-                    matching_detail = scoring_service.score_cv_vs_jd(
+                    raw_result = scoring_service.score_cv_vs_jd(
                         cv_text=parsed_text,
                         jd_text=job.jd_parsed_text,
                         custom_weights=custom_weights
                     )
                     
-                    final_score_100 = float(matching_detail.get("finalScore", 0.0))
-                    sub_scores_100 = matching_detail.get("subScores", {})
+                    final_score_100 = float(raw_result.get("finalScore", 0))
+                    sub_scores_100 = raw_result.get("subScores", {})
                     
-                    detail_data = {
-                        **matching_detail,
+                    matching_detail = {
+                        **raw_result,
                         "finalScore": final_score_100,
-                        "final_score": final_score_100,
-                        "overall_score": final_score_100,
+                        "final_score": round(final_score_100 / 100, 4),
+                        "overall_score": round(final_score_100 / 100, 4),
                         "subScores": sub_scores_100,
                         "section_scores": {
                             key: round(float(value) / 100, 4)
                             for key, value in sub_scores_100.items()
                         },
-                        "scoringEngine": "criteria_based_v2"
+                        "scoringEngine": "criteria_based_v2",
                     }
                     matching_score = final_score_100
-                    matching_detail_json = json.dumps(detail_data, ensure_ascii=False)
+                    matching_detail_json = json.dumps(matching_detail, ensure_ascii=False)
                 except Exception as exc:
                     logger.exception("Detailed CV/JD matcher failed for job_id=%s: %s", job_id, exc)
 
