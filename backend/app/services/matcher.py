@@ -1071,7 +1071,7 @@ def score_cv_vs_jd(
         if len(must_have_matched) >= len(must_have_missing):
             penalty *= 0.5
     penalty = round(penalty, 3)
-    final_score = round(_clamp_score(calibrated_score - penalty), 3)
+    orig_final_score = round(_clamp_score(calibrated_score - penalty), 3)
 
     passes, fails = rule_based_checks(parsed_cv, parsed_jd, {})
     for missing in must_have_missing:
@@ -1086,14 +1086,89 @@ def score_cv_vs_jd(
         "must_have_missing_count": len(must_have_missing),
     }
 
+    # Now call our new hybrid scoring system
+    from app.services.cv_scoring import CvScoringService
+    scoring_service = CvScoringService()
+    scoring_result = scoring_service.score_cv_vs_jd(cv_text, jd_text, custom_weights=weights)
+
+    final_score = scoring_result["finalScore"]
+    sub_scores = scoring_result["subScores"]
+    matched = scoring_result["matched"]
+    missing_or_weak = scoring_result["missingOrWeak"]
+    reasoning_summary = scoring_result["reasoningSummary"]
+
+    new_sections = [
+        {
+            "key": "required_skills",
+            "label": "Required Skills Match",
+            "score": sub_scores["required_skills"],
+            "good": matched["required_skills"],
+            "missing": missing_or_weak["required_skills"],
+            "explanation": reasoning_summary
+        },
+        {
+            "key": "project_domain",
+            "label": "Project / Domain Relevance",
+            "score": sub_scores["project_domain"],
+            "good": matched["project_domain"],
+            "missing": missing_or_weak["project_domain"],
+            "explanation": reasoning_summary
+        },
+        {
+            "key": "seniority",
+            "label": "Years of Experience / Seniority",
+            "score": sub_scores["seniority"],
+            "good": matched["seniority"],
+            "missing": missing_or_weak["seniority"],
+            "explanation": reasoning_summary
+        },
+        {
+            "key": "responsibility",
+            "label": "Responsibility Match",
+            "score": sub_scores["responsibility"],
+            "good": matched["responsibility"],
+            "missing": missing_or_weak["responsibility"],
+            "explanation": reasoning_summary
+        },
+        {
+            "key": "testing_documentation",
+            "label": "Testing / Documentation / Quality Evidence",
+            "score": sub_scores["testing_documentation"],
+            "good": matched["testing_documentation"],
+            "missing": missing_or_weak["testing_documentation"],
+            "explanation": reasoning_summary
+        },
+        {
+            "key": "language_collaboration",
+            "label": "Language / Collaboration",
+            "score": sub_scores["language_collaboration"],
+            "good": matched["language_collaboration"],
+            "missing": missing_or_weak["language_collaboration"],
+            "explanation": reasoning_summary
+        },
+        {
+            "key": "bonus_skills",
+            "label": "Bonus Skills",
+            "score": sub_scores["bonus_skills"],
+            "good": matched["bonus_skills"],
+            "missing": missing_or_weak["bonus_skills"],
+            "explanation": reasoning_summary
+        }
+    ]
+
     return {
         "overall_score": final_score,
         "final_score": final_score,
+        "finalScore": final_score,
+        "subScores": sub_scores,
+        "matched": matched,
+        "missingOrWeak": missing_or_weak,
+        "reasoningSummary": reasoning_summary,
         "summary": summary,
-        "raw_score": round(raw_score, 3),
-        "core_fit_score": round(core_score, 3) if core_score is not None else None,
-        "calibrated_score": round(calibrated_score, 3),
-        "sections": sections,
+        "raw_score": final_score,
+        "core_fit_score": final_score,
+        "calibrated_score": final_score,
+        "sections": new_sections + sections,
         "good_points": good_points,
         "missing_points": missing_points,
         "must_have": {
@@ -1106,7 +1181,7 @@ def score_cv_vs_jd(
         "regex_cv": regex_cv,
         "regex_jd": regex_jd,
         "mapped_skills": map_skills(parsed_cv.get("skills", ""), aliases),
-        "section_scores": section_scores,
+        "section_scores": {**section_scores, **sub_scores},
         "passes": passes,
         "fails": fails,
         "alpha_map": effective_alpha_map,

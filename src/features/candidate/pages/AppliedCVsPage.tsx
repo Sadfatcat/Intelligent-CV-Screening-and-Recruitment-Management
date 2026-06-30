@@ -79,14 +79,14 @@ function getFulfilledCriteria(detail: MatchingDetail | null | undefined) {
 
 function getMissingSkills(detail: MatchingDetail | null | undefined) {
     return uniqueItems([
-        ...getSectionPoints(detail, ["skills", "technical_skills", "tools"], "missing"),
+        ...getSectionPoints(detail, ["skills", "technical_skills", "tools", "required_skills", "bonus_skills"], "missing"),
         ...(detail?.missing_points ?? []).filter((p) => /skill|tool|framework|language|stack/i.test(p)),
     ]);
 }
 
 function getMissingRequirements(detail: MatchingDetail | null | undefined) {
     return uniqueItems([
-        ...getSectionPoints(detail, ["requirements", "education", "experience", "languages"], "missing"),
+        ...getSectionPoints(detail, ["requirements", "education", "experience", "languages", "project_domain", "seniority", "responsibility", "testing_documentation", "language_collaboration"], "missing"),
         ...(detail?.must_have?.missing ?? []),
     ]);
 }

@@ -57,21 +57,21 @@ export default function CVDetailPage({ selectedLog, getManagedJobStatus, onBack,
     const sections = getRenderableMatchingSections(detail);
     const scoreStatus = getScoreStatus(selectedLog.ai_matching_score);
 
-    const matchedSkills = getSectionPoints(detail, ["technical_skills", "programming_languages"], "good");
-    const missingSkills = getSectionPoints(detail, ["technical_skills", "programming_languages"], "missing");
+    const matchedSkills = getSectionPoints(detail, ["technical_skills", "programming_languages", "required_skills", "bonus_skills"], "good");
+    const missingSkills = getSectionPoints(detail, ["technical_skills", "programming_languages", "required_skills", "bonus_skills"], "missing");
     const missingRequirements = [
-        ...getSectionPoints(detail, ["experience", "responsibilities", "projects"], "missing"),
+        ...getSectionPoints(detail, ["experience", "responsibilities", "projects", "project_domain", "seniority", "responsibility", "testing_documentation", "language_collaboration"], "missing"),
         ...(detail?.must_have?.missing ?? []),
     ];
 
     const skillTotal = matchedSkills.length + missingSkills.length;
     const skillMatchPct = skillTotal > 0 ? Math.round((matchedSkills.length / skillTotal) * 100) : 0;
 
-    const radarLabels = sections.slice(0, 6).map((s) => s.label || s.key);
-    const radarValues = sections.slice(0, 6).map((s) => (typeof s.score === "number" ? Math.min(100, Math.max(0, s.score)) : 0));
+    const radarLabels = sections.slice(0, 7).map((s) => s.label || s.key);
+    const radarValues = sections.slice(0, 7).map((s) => (typeof s.score === "number" ? Math.min(100, Math.max(0, s.score)) : 0));
 
     const jobStatus = getManagedJobStatus(selectedLog.job_id);
-    const explanation = detail?.sections?.[0]?.explanation ?? null;
+    const explanation = (detail as any)?.reasoningSummary || detail?.sections?.[0]?.explanation || null;
 
     const displayScore = typeof selectedLog.ai_matching_score === "number" ? `${formatScore(selectedLog.ai_matching_score)}/100` : "—";
 

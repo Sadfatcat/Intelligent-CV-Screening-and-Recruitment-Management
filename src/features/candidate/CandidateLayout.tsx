@@ -383,26 +383,27 @@ export default function CandidateLayout() {
                             <p className={styles.detailsMeta}>
                                 {selectedJob.level} | {selectedJob.location} | Quantity: {selectedJob.quantity ?? "-"} | Salary: {selectedJob.salary || "-"}
                             </p>
-                            <div className={styles.detailsSection}>
-                                <h4>Short Description:</h4>
-                                <p>{selectedJob.description}</p>
-                            </div>
-                            {(selectedJob.requirements || selectedJob.jd_parsed_text) && (
-                                <div className={`${styles.detailsSection} ${styles.detailsRequirementSection}`}>
-                                    <h4>Requirements:</h4>
-                                    <p>{selectedJob.requirements || selectedJob.jd_parsed_text}</p>
-                                </div>
-                            )}
-                            <div className={styles.detailsSection}>
-                                <h4>Requirements / Deadline:</h4>
-                                <p>Deadline: <strong>{selectedJob.deadline}</strong></p>
-                                <p>Salary: <strong>{selectedJob.salary || "-"}</strong></p>
-                                <p>Direct contact: <strong>{selectedJob.direct_contact || "N/A"}</strong></p>
-                            </div>
-                            {selectedJob.jd_file_path && (
+                            <div className={styles.jobDetailsBody}>
                                 <div className={styles.detailsSection}>
-                                    <h4>Job Description File:</h4>
-                                    <div style={{ display: "flex", gap: "10px" }}>
+                                    <h4>Short Description:</h4>
+                                    <p>{selectedJob.description}</p>
+                                </div>
+                                <div className={styles.detailsSection}>
+                                    <h4>Requirements / Deadline:</h4>
+                                    <p>Deadline: <strong>{selectedJob.deadline}</strong></p>
+                                    <p>Salary: <strong>{selectedJob.salary || "-"}</strong></p>
+                                    <p>Direct contact: <strong>{selectedJob.direct_contact || "N/A"}</strong></p>
+                                </div>
+                                {(selectedJob.requirements || selectedJob.jd_parsed_text) && (
+                                    <div className={`${styles.detailsSection} ${styles.detailsRequirementSection}`}>
+                                        <h4>Requirements:</h4>
+                                        <p>{selectedJob.requirements || selectedJob.jd_parsed_text}</p>
+                                    </div>
+                                )}
+                            </div>
+                            <div className={styles.jobDetailsActions}>
+                                {selectedJob.jd_file_path && (
+                                    <div className={styles.jobDetailsFileActions}>
                                         <a href={`/api/jobs/${selectedJob.id}/jd-file`} download className={styles.applyButton} style={{ textDecoration: "none" }}>
                                             📥 Download JD
                                         </a>
@@ -410,23 +411,23 @@ export default function CandidateLayout() {
                                             👁️ View JD
                                         </a>
                                     </div>
-                                </div>
-                            )}
-                            <button
-                                onClick={() => {
-                                    if (isCandidateLocked) {
-                                        setApplyStatus({ type: "error", message: "Your CV is being scored, please wait." });
-                                        setActiveSubTab("applications");
-                                        return;
-                                    }
-                                    setIsModalOpen(true);
-                                }}
-                                className={`${styles.applyButton} ${styles.applyPrimaryButton}`}
-                                disabled={isCandidateLocked}
-                                type="button"
-                            >
-                                {isCandidateLocked ? "Scoring in progress..." : "Apply For This Job"}
-                            </button>
+                                )}
+                                <button
+                                    onClick={() => {
+                                        if (isCandidateLocked) {
+                                            setApplyStatus({ type: "error", message: "Your CV is being scored, please wait." });
+                                            setActiveSubTab("applications");
+                                            return;
+                                        }
+                                        setIsModalOpen(true);
+                                    }}
+                                    className={`${styles.applyButton} ${styles.applyPrimaryButton}`}
+                                    disabled={isCandidateLocked}
+                                    type="button"
+                                >
+                                    {isCandidateLocked ? "Scoring in progress..." : "Apply For This Job"}
+                                </button>
+                            </div>
                         </div>
                     ) : (
                         <div className={styles.emptyState}>

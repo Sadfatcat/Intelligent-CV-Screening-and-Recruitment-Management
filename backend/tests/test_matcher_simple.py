@@ -143,6 +143,31 @@ def test_alpha_map_is_returned_but_score_is_public_scale():
     assert 0.0 <= out["final_score"] <= 100.0
 
 
+def test_hybrid_scoring_new_fields():
+    cv = """
+    Alice
+    Skills: Java, Spring Boot, HTML, CSS, JavaScript, SQL
+    Experience: 4 years backend developer building retail store operation systems
+    Projects: POS inventory system with designed technical specifications and test case design
+    Languages: English
+    """
+    jd = """
+    Requirements: Java, Spring Boot, 3+ years experience
+    Responsibilities: Develop retail store operation system, design technical specification, perform test case design
+    """
+    out = score_cv_vs_jd(cv, jd)
+
+    assert "finalScore" in out
+    assert "subScores" in out
+    assert "matched" in out
+    assert "missingOrWeak" in out
+    assert "reasoningSummary" in out
+    assert isinstance(out["finalScore"], (int, float))
+    assert 0.0 <= out["finalScore"] <= 100.0
+    assert "required_skills" in out["subScores"]
+    assert "project_domain" in out["subScores"]
+
+
 if __name__ == '__main__':
     test_score_basic_shape_and_range()
     test_technical_skill_exact_match_and_missing_case()
@@ -150,4 +175,5 @@ if __name__ == '__main__':
     test_experience_match_and_rule_pass()
     test_must_have_matched_missing_and_capped_penalty()
     test_alpha_map_is_returned_but_score_is_public_scale()
+    test_hybrid_scoring_new_fields()
     print('tests passed')
