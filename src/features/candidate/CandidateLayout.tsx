@@ -115,6 +115,10 @@ export default function CandidateLayout() {
         }
         setSelectedJob(jobData);
         setSelectedJobImageFailed(false);
+        if (jobData.mockDisplayOnly) {
+            setIsModalOpen(false);
+            return;
+        }
         if (jobData.isMock && ENABLE_DEV_MOCK_DATA) setIsModalOpen(true);
         if (!jobData.isMock) {
             fetch(apiUrl(`/api/jobs/${jobData.id}`))
@@ -402,7 +406,7 @@ export default function CandidateLayout() {
                                 )}
                             </div>
                             <div className={styles.jobDetailsActions}>
-                                {selectedJob.jd_file_path && (
+                                {selectedJob.jd_file_path && !selectedJob.mockDisplayOnly && (
                                     <div className={styles.jobDetailsFileActions}>
                                         <a href={`/api/jobs/${selectedJob.id}/jd-file`} download className={styles.applyButton} style={{ textDecoration: "none" }}>
                                             📥 Download JD
@@ -412,21 +416,23 @@ export default function CandidateLayout() {
                                         </a>
                                     </div>
                                 )}
-                                <button
-                                    onClick={() => {
-                                        if (isCandidateLocked) {
-                                            setApplyStatus({ type: "error", message: "Your CV is being scored, please wait." });
-                                            setActiveSubTab("applications");
-                                            return;
-                                        }
-                                        setIsModalOpen(true);
-                                    }}
-                                    className={`${styles.applyButton} ${styles.applyPrimaryButton}`}
-                                    disabled={isCandidateLocked}
-                                    type="button"
-                                >
-                                    {isCandidateLocked ? "Scoring in progress..." : "Apply For This Job"}
-                                </button>
+                                {!selectedJob.mockDisplayOnly && (
+                                    <button
+                                        onClick={() => {
+                                            if (isCandidateLocked) {
+                                                setApplyStatus({ type: "error", message: "Your CV is being scored, please wait." });
+                                                setActiveSubTab("applications");
+                                                return;
+                                            }
+                                            setIsModalOpen(true);
+                                        }}
+                                        className={`${styles.applyButton} ${styles.applyPrimaryButton}`}
+                                        disabled={isCandidateLocked}
+                                        type="button"
+                                    >
+                                        {isCandidateLocked ? "Scoring in progress..." : "Apply For This Job"}
+                                    </button>
+                                )}
                             </div>
                         </div>
                     ) : (

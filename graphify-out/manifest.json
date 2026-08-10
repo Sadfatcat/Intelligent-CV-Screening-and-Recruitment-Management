@@ -1,0 +1,827 @@
+{
+  ".claude/settings.local.json": {
+    "mtime": 1784004237.3461554,
+    "ast_hash": "8873b4b5bc555b11082b1369ce09d845",
+    "semantic_hash": "8873b4b5bc555b11082b1369ce09d845"
+  },
+  "backend/app/__init__.py": {
+    "mtime": 1775737888.1583397,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "backend/app/database.py": {
+    "mtime": 1779090677.5977387,
+    "ast_hash": "82fcbc00e19b38c45a60f86dba40be3d",
+    "semantic_hash": "82fcbc00e19b38c45a60f86dba40be3d"
+  },
+  "backend/app/main.py": {
+    "mtime": 1782363565.2027197,
+    "ast_hash": "41c06c72d6948f4aa847f7a79b228b77",
+    "semantic_hash": "41c06c72d6948f4aa847f7a79b228b77"
+  },
+  "backend/app/models.py": {
+    "mtime": 1779090667.4536095,
+    "ast_hash": "5403f54c94745433b325205669a858e5",
+    "semantic_hash": "5403f54c94745433b325205669a858e5"
+  },
+  "backend/app/routes/admin.py": {
+    "mtime": 1781923610.924833,
+    "ast_hash": "64a267e935405d97cb42b0763a527f5e",
+    "semantic_hash": "64a267e935405d97cb42b0763a527f5e"
+  },
+  "backend/app/routes/auth.py": {
+    "mtime": 1782379957.1814303,
+    "ast_hash": "fb75f53ec5fb8da5c9e06503e8e92a67",
+    "semantic_hash": "fb75f53ec5fb8da5c9e06503e8e92a67"
+  },
+  "backend/app/routes/cvs.py": {
+    "mtime": 1782817229.3232381,
+    "ast_hash": "25da9011e352effe57d65287c3c1a798",
+    "semantic_hash": "25da9011e352effe57d65287c3c1a798"
+  },
+  "backend/app/routes/jobs.py": {
+    "mtime": 1781920165.83452,
+    "ast_hash": "2bbfe4d16732b08e1aa5bc584f5d789b",
+    "semantic_hash": "2bbfe4d16732b08e1aa5bc584f5d789b"
+  },
+  "backend/app/routes/match.py": {
+    "mtime": 1782845159.6490667,
+    "ast_hash": "5531b7e4fab7955b2cea6831281f28be",
+    "semantic_hash": "5531b7e4fab7955b2cea6831281f28be"
+  },
+  "backend/app/routes/recruiter.py": {
+    "mtime": 1781923962.1321487,
+    "ast_hash": "13224f1238de9d124cfbf12f64023a72",
+    "semantic_hash": "13224f1238de9d124cfbf12f64023a72"
+  },
+  "backend/app/scripts/evaluate_crosspair_matching.py": {
+    "mtime": 1784003666.7621107,
+    "ast_hash": "fdf7f37c90c87d40363d41ded9279c10",
+    "semantic_hash": "fdf7f37c90c87d40363d41ded9279c10"
+  },
+  "backend/app/scripts/evaluate_matching_labels.py": {
+    "mtime": 1782896350.5534549,
+    "ast_hash": "ba65f5e3235b4fe6f278f5a00ab53a08",
+    "semantic_hash": "ba65f5e3235b4fe6f278f5a00ab53a08"
+  },
+  "backend/app/scripts/export_crosspair_evaluation.py": {
+    "mtime": 1784003598.3615506,
+    "ast_hash": "2b7a7255ed2cef01dbb3869f55e57733",
+    "semantic_hash": "2b7a7255ed2cef01dbb3869f55e57733"
+  },
+  "backend/app/scripts/export_manual_review.py": {
+    "mtime": 1782896350.5536373,
+    "ast_hash": "722a10d7ed47a5a0d3559bdb9002eac1",
+    "semantic_hash": "722a10d7ed47a5a0d3559bdb9002eac1"
+  },
+  "backend/app/scripts/reembed_vectors.py": {
+    "mtime": 1776225943.7301702,
+    "ast_hash": "4dca6af7607e7e2bb17cf18d64371f1a",
+    "semantic_hash": "4dca6af7607e7e2bb17cf18d64371f1a"
+  },
+  "backend/app/security.py": {
+    "mtime": 1779347641.4458907,
+    "ast_hash": "2842524c53dc771f21a9ed5c92664179",
+    "semantic_hash": "2842524c53dc771f21a9ed5c92664179"
+  },
+  "backend/app/services/__init__.py": {
+    "mtime": 1775797274.5819983,
+    "ast_hash": "e44d05b66993fe10013f809a5e69119d",
+    "semantic_hash": "e44d05b66993fe10013f809a5e69119d"
+  },
+  "backend/app/services/ai_service.py": {
+    "mtime": 1776358371.3037636,
+    "ast_hash": "49f101863bee1e7b0cb5a95ae22f6a3a",
+    "semantic_hash": "49f101863bee1e7b0cb5a95ae22f6a3a"
+  },
+  "backend/app/services/cv_scoring.py": {
+    "mtime": 1783999592.6979747,
+    "ast_hash": "06e5bf222ece756ec574bd0836c574ce",
+    "semantic_hash": "06e5bf222ece756ec574bd0836c574ce"
+  },
+  "backend/app/services/extractor.py": {
+    "mtime": 1778899435.932725,
+    "ast_hash": "8d9fbaeb84c27702032c8d207357aaf8",
+    "semantic_hash": "8d9fbaeb84c27702032c8d207357aaf8"
+  },
+  "backend/app/services/matcher.py": {
+    "mtime": 1783931883.4987001,
+    "ast_hash": "4daf4dedbf38edde89d97518821ffa1a",
+    "semantic_hash": "4daf4dedbf38edde89d97518821ffa1a"
+  },
+  "backend/app/services/matcher_config.py": {
+    "mtime": 1783931577.8332143,
+    "ast_hash": "47ed5584082e8de89af53970d8e3b820",
+    "semantic_hash": "47ed5584082e8de89af53970d8e3b820"
+  },
+  "backend/app/services/matcher_extractor.py": {
+    "mtime": 1783931757.6272128,
+    "ast_hash": "c64c2eeeeadb82c43e4066dfdcab4df8",
+    "semantic_hash": "c64c2eeeeadb82c43e4066dfdcab4df8"
+  },
+  "backend/app/services/matcher_parser.py": {
+    "mtime": 1783931669.4477797,
+    "ast_hash": "faef66cd354231a8c88bdeb94025ed2f",
+    "semantic_hash": "faef66cd354231a8c88bdeb94025ed2f"
+  },
+  "backend/app/services/matcher_scorer.py": {
+    "mtime": 1783931864.1344903,
+    "ast_hash": "2d1a99527feaa2682514c55b6d4a45a2",
+    "semantic_hash": "2d1a99527feaa2682514c55b6d4a45a2"
+  },
+  "backend/app/services/matcher_text.py": {
+    "mtime": 1783931642.8129313,
+    "ast_hash": "d230fac9d7127953e174465205cf4fd8",
+    "semantic_hash": "d230fac9d7127953e174465205cf4fd8"
+  },
+  "backend/app/services/matching_config.py": {
+    "mtime": 1782842726.0715246,
+    "ast_hash": "25982733eb0cd7802dfbfb8cfc9e7d35",
+    "semantic_hash": "25982733eb0cd7802dfbfb8cfc9e7d35"
+  },
+  "backend/app/services/pipeline_demo.py": {
+    "mtime": 1782896350.554426,
+    "ast_hash": "c9a1f9dd543a5432ff09b150d43718d1",
+    "semantic_hash": "c9a1f9dd543a5432ff09b150d43718d1"
+  },
+  "backend/app/services/skill_aliases.json": {
+    "mtime": 1782838731.0689037,
+    "ast_hash": "81eae9b93cfd059c01b75eb1fb79773d",
+    "semantic_hash": "81eae9b93cfd059c01b75eb1fb79773d"
+  },
+  "backend/app/services/vectorizer.py": {
+    "mtime": 1777812794.9882703,
+    "ast_hash": "6a02ff6cdbf15cd75d3411459d8a59d1",
+    "semantic_hash": "6a02ff6cdbf15cd75d3411459d8a59d1"
+  },
+  "backend/grading_results.json": {
+    "mtime": 1782843028.4809747,
+    "ast_hash": "6be0aa97de1ad0f0b34fe90437a29486",
+    "semantic_hash": "6be0aa97de1ad0f0b34fe90437a29486"
+  },
+  "backend/init_db.py": {
+    "mtime": 1775737888.1592915,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "backend/railway.json": {
+    "mtime": 1776651011.528792,
+    "ast_hash": "431ec7fac9169f2bd8d4232579486365",
+    "semantic_hash": "431ec7fac9169f2bd8d4232579486365"
+  },
+  "backend/scratch_debug_bonus.py": {
+    "mtime": 1782842540.2909029,
+    "ast_hash": "bb94472899d224ef327e658a490378d1",
+    "semantic_hash": "bb94472899d224ef327e658a490378d1"
+  },
+  "backend/scratch_debug_demands.py": {
+    "mtime": 1782842446.9546509,
+    "ast_hash": "afb6bb93cb3052f9095cdb7438dad3c0",
+    "semantic_hash": "afb6bb93cb3052f9095cdb7438dad3c0"
+  },
+  "backend/scratch_debug_khoa.py": {
+    "mtime": 1782896350.554426,
+    "ast_hash": "2d7025dfd70188f91eb490395a27df16",
+    "semantic_hash": "2d7025dfd70188f91eb490395a27df16"
+  },
+  "backend/scratch_debug_legacy.py": {
+    "mtime": 1782842454.7398367,
+    "ast_hash": "ca44f53b2bacc13e992af9a3edce4acc",
+    "semantic_hash": "ca44f53b2bacc13e992af9a3edce4acc"
+  },
+  "backend/scratch_debug_skills.py": {
+    "mtime": 1782842531.3786855,
+    "ast_hash": "50dcdc4bb5be11911b0dc88fa5d74ca3",
+    "semantic_hash": "50dcdc4bb5be11911b0dc88fa5d74ca3"
+  },
+  "backend/scratch_debug_years.py": {
+    "mtime": 1782842510.9231884,
+    "ast_hash": "d6b424032a2a40e29d1af769b9f5dce2",
+    "semantic_hash": "d6b424032a2a40e29d1af769b9f5dce2"
+  },
+  "backend/scratch_grade_cvs.py": {
+    "mtime": 1782841132.3702629,
+    "ast_hash": "dfccd47763eff8d279b51ec9057ea103",
+    "semantic_hash": "dfccd47763eff8d279b51ec9057ea103"
+  },
+  "backend/scripts/rescore_applications.py": {
+    "mtime": 1782845164.9118845,
+    "ast_hash": "a79101460f44dcfbc57fa86bd0fe8952",
+    "semantic_hash": "a79101460f44dcfbc57fa86bd0fe8952"
+  },
+  "backend/scripts/test_criteria_scoring.py": {
+    "mtime": 1782811256.867153,
+    "ast_hash": "4ec9a161adefa1d3b2d5a0ac382bf02d",
+    "semantic_hash": "4ec9a161adefa1d3b2d5a0ac382bf02d"
+  },
+  "backend/scripts/test_match_route_uses_criteria_scoring.py": {
+    "mtime": 1782896350.5557113,
+    "ast_hash": "fda412a3cd0de7352e98c0ce5e52511d",
+    "semantic_hash": "fda412a3cd0de7352e98c0ce5e52511d"
+  },
+  "backend/tests/factories.py": {
+    "mtime": 1779347635.8902352,
+    "ast_hash": "0f430d83ad25b1cd29e15a51219235cc",
+    "semantic_hash": "0f430d83ad25b1cd29e15a51219235cc"
+  },
+  "backend/tests/run_tests.py": {
+    "mtime": 1778291066.7135632,
+    "ast_hash": "5a6a56b37fae4a50d4fce76b91eecedf",
+    "semantic_hash": "5a6a56b37fae4a50d4fce76b91eecedf"
+  },
+  "backend/tests/test_admin_routes.py": {
+    "mtime": 1779347704.4050293,
+    "ast_hash": "dd14587bd445381c3733593085ea1c3b",
+    "semantic_hash": "dd14587bd445381c3733593085ea1c3b"
+  },
+  "backend/tests/test_auth_routes.py": {
+    "mtime": 1779347654.4464455,
+    "ast_hash": "c51cf865c66615fcacd2c53360f191ae",
+    "semantic_hash": "c51cf865c66615fcacd2c53360f191ae"
+  },
+  "backend/tests/test_cvs_upload.py": {
+    "mtime": 1782842922.9411335,
+    "ast_hash": "50a9eba6e526008f7958faed58f49a61",
+    "semantic_hash": "50a9eba6e526008f7958faed58f49a61"
+  },
+  "backend/tests/test_jobs_matching_config.py": {
+    "mtime": 1782842873.358289,
+    "ast_hash": "22b74dcf53d03c6e75e9155796807539",
+    "semantic_hash": "22b74dcf53d03c6e75e9155796807539"
+  },
+  "backend/tests/test_matcher_simple.py": {
+    "mtime": 1782896350.5558207,
+    "ast_hash": "21eee50152536d340376851ab06d217d",
+    "semantic_hash": "21eee50152536d340376851ab06d217d"
+  },
+  "backend/tests/test_matching_config.py": {
+    "mtime": 1782842729.687616,
+    "ast_hash": "70752f945b5d83f3f3ad9dc1a1e85c5f",
+    "semantic_hash": "70752f945b5d83f3f3ad9dc1a1e85c5f"
+  },
+  "backend/tests/test_models_schema.py": {
+    "mtime": 1778898342.7610226,
+    "ast_hash": "da43e130896d85a367e303437fc51ffc",
+    "semantic_hash": "da43e130896d85a367e303437fc51ffc"
+  },
+  "backend/tests/test_recruiter_matching_detail.py": {
+    "mtime": 1779347713.9451435,
+    "ast_hash": "bca653bc2a764bb424b7f3f18b6ae5a3",
+    "semantic_hash": "bca653bc2a764bb424b7f3f18b6ae5a3"
+  },
+  "backend/tests/test_recruiter_permissions_and_delete_risk.py": {
+    "mtime": 1779347718.5851994,
+    "ast_hash": "4245a617128d304955a7f90d64943f92",
+    "semantic_hash": "4245a617128d304955a7f90d64943f92"
+  },
+  "eslint.config.mjs": {
+    "mtime": 1775737888.1592915,
+    "ast_hash": "dfa1f5f6a7037bf39dc510f30b180002",
+    "semantic_hash": "dfa1f5f6a7037bf39dc510f30b180002"
+  },
+  "next.config.ts": {
+    "mtime": 1776650178.4020658,
+    "ast_hash": "eb7ae91348637020fd2842443334bc1d",
+    "semantic_hash": "eb7ae91348637020fd2842443334bc1d"
+  },
+  "package.json": {
+    "mtime": 1781919855.6430526,
+    "ast_hash": "f12e108b132f671430ba018bc6e1eb91",
+    "semantic_hash": "f12e108b132f671430ba018bc6e1eb91"
+  },
+  "scripts/verify-candidate-flow.mjs": {
+    "mtime": 1782793375.192104,
+    "ast_hash": "d27f300de651dcf4ae3a717a9dadb237",
+    "semantic_hash": "d27f300de651dcf4ae3a717a9dadb237"
+  },
+  "scripts/verify-matching-detail-ui.mjs": {
+    "mtime": 1778251261.853466,
+    "ast_hash": "628c8067ba31c622ad39219f168a3585",
+    "semantic_hash": "628c8067ba31c622ad39219f168a3585"
+  },
+  "scripts/verify-recruiter-job-flow.mjs": {
+    "mtime": 1782793375.3240626,
+    "ast_hash": "915730bc6a82050fd758c0bfe4504e6a",
+    "semantic_hash": "915730bc6a82050fd758c0bfe4504e6a"
+  },
+  "scripts/verify-theme-css.mjs": {
+    "mtime": 1778292095.6517196,
+    "ast_hash": "0e401c85081ae55dcf8147e4ff93c53a",
+    "semantic_hash": "0e401c85081ae55dcf8147e4ff93c53a"
+  },
+  "src/app/admin/activity-logs/page.tsx": {
+    "mtime": 1782836960.759857,
+    "ast_hash": "5be17fb6d63e4412b446116be353c59a",
+    "semantic_hash": "5be17fb6d63e4412b446116be353c59a"
+  },
+  "src/app/admin/dashboard/page.tsx": {
+    "mtime": 1782836960.759857,
+    "ast_hash": "3f85ff54cc96f1a1ef9ae85def162811",
+    "semantic_hash": "3f85ff54cc96f1a1ef9ae85def162811"
+  },
+  "src/app/admin/login/page.tsx": {
+    "mtime": 1778669478.3895934,
+    "ast_hash": "3dc2c10ec6b40891a3f9698789640f9f",
+    "semantic_hash": "3dc2c10ec6b40891a3f9698789640f9f"
+  },
+  "src/app/admin/recruiters/page.tsx": {
+    "mtime": 1782836960.759857,
+    "ast_hash": "802851ceb4d45a451735488a6c0ee47b",
+    "semantic_hash": "802851ceb4d45a451735488a6c0ee47b"
+  },
+  "src/app/admin/register/page.tsx": {
+    "mtime": 1778899934.5535471,
+    "ast_hash": "d3989252af77f43363a8a835bee0e7a7",
+    "semantic_hash": "d3989252af77f43363a8a835bee0e7a7"
+  },
+  "src/app/candidate/page.tsx": {
+    "mtime": 1779332359.142644,
+    "ast_hash": "c65aa5082f9bb66b8da2d9e03c7ce3b1",
+    "semantic_hash": "c65aa5082f9bb66b8da2d9e03c7ce3b1"
+  },
+  "src/app/candidate/settings/page.tsx": {
+    "mtime": 1779332364.4058,
+    "ast_hash": "d7b0d626bc2d46372400df3321812acf",
+    "semantic_hash": "d7b0d626bc2d46372400df3321812acf"
+  },
+  "src/app/candidate_UI/page.tsx": {
+    "mtime": 1779155345.825361,
+    "ast_hash": "22b6efda7109e9110fd1b95507ebdfdb",
+    "semantic_hash": "22b6efda7109e9110fd1b95507ebdfdb"
+  },
+  "src/app/job/[id]/page.tsx": {
+    "mtime": 1779155271.7230523,
+    "ast_hash": "02671be3ac89805c9a7425e43a3c0ecb",
+    "semantic_hash": "02671be3ac89805c9a7425e43a3c0ecb"
+  },
+  "src/app/layout.tsx": {
+    "mtime": 1778900080.4892762,
+    "ast_hash": "be8b51c0094fd8d340c45f6d4526c959",
+    "semantic_hash": "be8b51c0094fd8d340c45f6d4526c959"
+  },
+  "src/app/login/page.tsx": {
+    "mtime": 1784004226.5390432,
+    "ast_hash": "00ce8962f164aabe104a701c1d47dbd4",
+    "semantic_hash": "00ce8962f164aabe104a701c1d47dbd4"
+  },
+  "src/app/page.tsx": {
+    "mtime": 1775737888.192847,
+    "ast_hash": "29ec588e5527b33325a3a72adc1b3a5e",
+    "semantic_hash": "29ec588e5527b33325a3a72adc1b3a5e"
+  },
+  "src/app/recruiter/applications/page.tsx": {
+    "mtime": 1779087272.8635085,
+    "ast_hash": "e42caecce7a0b6498bdba8be34bb6858",
+    "semantic_hash": "e42caecce7a0b6498bdba8be34bb6858"
+  },
+  "src/app/recruiter/change-password/page.tsx": {
+    "mtime": 1784001497.1043334,
+    "ast_hash": "247703cba2ae53b4a8ed3ac07e97447b",
+    "semantic_hash": "247703cba2ae53b4a8ed3ac07e97447b"
+  },
+  "src/app/recruiter/jobs/page.tsx": {
+    "mtime": 1779087265.0973234,
+    "ast_hash": "d677c4ffe2318af917dbeb23521c3522",
+    "semantic_hash": "d677c4ffe2318af917dbeb23521c3522"
+  },
+  "src/app/recruiter/login/page.tsx": {
+    "mtime": 1778669488.6879473,
+    "ast_hash": "864ff358dd68a1eeb78a728391c76283",
+    "semantic_hash": "864ff358dd68a1eeb78a728391c76283"
+  },
+  "src/app/recruiter_UI/page.tsx": {
+    "mtime": 1778469741.4506302,
+    "ast_hash": "b043766248a5f4b013f71f942a3051e6",
+    "semantic_hash": "b043766248a5f4b013f71f942a3051e6"
+  },
+  "src/app/register/candidate/page.tsx": {
+    "mtime": 1781923536.1784513,
+    "ast_hash": "15bbd793010fe278f776ae73c81df882",
+    "semantic_hash": "15bbd793010fe278f776ae73c81df882"
+  },
+  "src/components/Jobcard.tsx": {
+    "mtime": 1782363571.307819,
+    "ast_hash": "a1d9f4a3a12fd6126ea3ca2c438d3fda",
+    "semantic_hash": "a1d9f4a3a12fd6126ea3ca2c438d3fda"
+  },
+  "src/components/brand/BrandLogoFull.tsx": {
+    "mtime": 1778899233.2045012,
+    "ast_hash": "cd892ee0ce7c619f298e0454cce73f18",
+    "semantic_hash": "cd892ee0ce7c619f298e0454cce73f18"
+  },
+  "src/components/brand/BrandLogoIcon.tsx": {
+    "mtime": 1778899233.0904977,
+    "ast_hash": "823885a6eb5e10c8fa1e13b7ba1e03e1",
+    "semantic_hash": "823885a6eb5e10c8fa1e13b7ba1e03e1"
+  },
+  "src/components/charts/DashboardCharts.tsx": {
+    "mtime": 1779247211.4946833,
+    "ast_hash": "5653a15ae28893270fce8f30c2959cc0",
+    "semantic_hash": "5653a15ae28893270fce8f30c2959cc0"
+  },
+  "src/components/charts/DoughnutChart.tsx": {
+    "mtime": 1779331775.779081,
+    "ast_hash": "9cc8300c978b7d1a3900495d12969394",
+    "semantic_hash": "9cc8300c978b7d1a3900495d12969394"
+  },
+  "src/components/charts/LineChart.tsx": {
+    "mtime": 1779331784.6178951,
+    "ast_hash": "76e70630bc7adb67dfcf72c95375abd7",
+    "semantic_hash": "76e70630bc7adb67dfcf72c95375abd7"
+  },
+  "src/components/charts/RadarChart.tsx": {
+    "mtime": 1779333902.348555,
+    "ast_hash": "d7173cb49b1ece172656eff0b738b32e",
+    "semantic_hash": "d7173cb49b1ece172656eff0b738b32e"
+  },
+  "src/components/navbar/Navbar.tsx": {
+    "mtime": 1781923471.613404,
+    "ast_hash": "31f4d1ee488a4cecc0a0fc10800cf2d1",
+    "semantic_hash": "31f4d1ee488a4cecc0a0fc10800cf2d1"
+  },
+  "src/components/navbar/Navbar_candidate.tsx": {
+    "mtime": 1782471789.166315,
+    "ast_hash": "5ad820e780a8757f00ac606c3aa39d19",
+    "semantic_hash": "5ad820e780a8757f00ac606c3aa39d19"
+  },
+  "src/components/navigation/BackButton.tsx": {
+    "mtime": 1778899990.9328177,
+    "ast_hash": "03f54fa9af674169ca46cb677d72201c",
+    "semantic_hash": "03f54fa9af674169ca46cb677d72201c"
+  },
+  "src/features/candidate/CandidateLayout.tsx": {
+    "mtime": 1783936217.4297388,
+    "ast_hash": "9db5c13b605cc68dd8c14d3ec4a865cf",
+    "semantic_hash": "9db5c13b605cc68dd8c14d3ec4a865cf"
+  },
+  "src/features/candidate/hooks/useCandidateData.ts": {
+    "mtime": 1783936318.638677,
+    "ast_hash": "6129c59e020fd9d8ce9b87fd37ffb328",
+    "semantic_hash": "6129c59e020fd9d8ce9b87fd37ffb328"
+  },
+  "src/features/candidate/pages/AppliedCVsPage.tsx": {
+    "mtime": 1782842774.025742,
+    "ast_hash": "189756061798c370136e707b91591cdf",
+    "semantic_hash": "189756061798c370136e707b91591cdf"
+  },
+  "src/features/candidate/pages/JobBrowsePage.tsx": {
+    "mtime": 1779332197.2588534,
+    "ast_hash": "60dcdd75a6d610120fb8e75920f0e197",
+    "semantic_hash": "60dcdd75a6d610120fb8e75920f0e197"
+  },
+  "src/features/candidate/pages/SettingsPage.tsx": {
+    "mtime": 1782804568.7491813,
+    "ast_hash": "34f6bdd954ccbf4af04ca12736b765e7",
+    "semantic_hash": "34f6bdd954ccbf4af04ca12736b765e7"
+  },
+  "src/features/candidate/utils/candidateJobAssets.ts": {
+    "mtime": 1782361781.9393926,
+    "ast_hash": "b514b258c8c5592f49523cf52738f5f4",
+    "semantic_hash": "b514b258c8c5592f49523cf52738f5f4"
+  },
+  "src/features/recruiter/RecruiterLayout.tsx": {
+    "mtime": 1782804915.4337597,
+    "ast_hash": "5eb2b27240d9a3534cfaaf2ab522dddc",
+    "semantic_hash": "5eb2b27240d9a3534cfaaf2ab522dddc"
+  },
+  "src/features/recruiter/RecruiterPage.tsx": {
+    "mtime": 1779332102.4280295,
+    "ast_hash": "7c4ce0fc68066c0cdb7b664397aba031",
+    "semantic_hash": "7c4ce0fc68066c0cdb7b664397aba031"
+  },
+  "src/features/recruiter/components/CVLogItem.tsx": {
+    "mtime": 1782841965.482288,
+    "ast_hash": "6ae40e6e56b715218c36c0e87c2c4339",
+    "semantic_hash": "6ae40e6e56b715218c36c0e87c2c4339"
+  },
+  "src/features/recruiter/components/JobCard.tsx": {
+    "mtime": 1779331932.149277,
+    "ast_hash": "b02887675ac6124826709b3d0e8f8307",
+    "semantic_hash": "b02887675ac6124826709b3d0e8f8307"
+  },
+  "src/features/recruiter/components/RecruiterLogin.tsx": {
+    "mtime": 1778468089.9848208,
+    "ast_hash": "5a53b1937a02a44b0d355557b7f29eb0",
+    "semantic_hash": "5a53b1937a02a44b0d355557b7f29eb0"
+  },
+  "src/features/recruiter/components/RecruiterSidebar.tsx": {
+    "mtime": 1782407437.4226696,
+    "ast_hash": "153b43710bfc51b0a0b5fc156c028ea0",
+    "semantic_hash": "153b43710bfc51b0a0b5fc156c028ea0"
+  },
+  "src/features/recruiter/components/RecruiterStatCard.tsx": {
+    "mtime": 1779087416.9779387,
+    "ast_hash": "b3e4d7839fec3cc923fbadc747ca2109",
+    "semantic_hash": "b3e4d7839fec3cc923fbadc747ca2109"
+  },
+  "src/features/recruiter/components/RecruiterToast.tsx": {
+    "mtime": 1778468077.895993,
+    "ast_hash": "e67392698cde66bebcae558d4e8bd9aa",
+    "semantic_hash": "e67392698cde66bebcae558d4e8bd9aa"
+  },
+  "src/features/recruiter/components/RecruiterUploadJDModal.tsx": {
+    "mtime": 1782363106.136633,
+    "ast_hash": "44bcc1beaa0f7da242b75bcac564a1c3",
+    "semantic_hash": "44bcc1beaa0f7da242b75bcac564a1c3"
+  },
+  "src/features/recruiter/constants/recruiterConstants.ts": {
+    "mtime": 1782841956.3731213,
+    "ast_hash": "c02f89e2b0384a878c1c49967630e2b0",
+    "semantic_hash": "c02f89e2b0384a878c1c49967630e2b0"
+  },
+  "src/features/recruiter/hooks/useCVFilters.ts": {
+    "mtime": 1782842004.297014,
+    "ast_hash": "db0285c9a12c12587e4c96ca2d31101c",
+    "semantic_hash": "db0285c9a12c12587e4c96ca2d31101c"
+  },
+  "src/features/recruiter/hooks/useRecruiterData.ts": {
+    "mtime": 1782793374.9551787,
+    "ast_hash": "95141c13470059fea6a53a2f80d61c18",
+    "semantic_hash": "95141c13470059fea6a53a2f80d61c18"
+  },
+  "src/features/recruiter/pages/CVDetailPage.tsx": {
+    "mtime": 1782842761.3484194,
+    "ast_hash": "e14cf39e43a7bbc787a96c788d7acbb5",
+    "semantic_hash": "e14cf39e43a7bbc787a96c788d7acbb5"
+  },
+  "src/features/recruiter/pages/DashboardPage.tsx": {
+    "mtime": 1782842066.1472208,
+    "ast_hash": "f207ba8299bbf3ef12804f2de00fa043",
+    "semantic_hash": "f207ba8299bbf3ef12804f2de00fa043"
+  },
+  "src/features/recruiter/pages/JobManagementPage.tsx": {
+    "mtime": 1782842746.2240353,
+    "ast_hash": "5d67a5c2091839a0705e42627a03c295",
+    "semantic_hash": "5d67a5c2091839a0705e42627a03c295"
+  },
+  "src/features/recruiter/pages/SettingsPage.tsx": {
+    "mtime": 1781924023.863153,
+    "ast_hash": "af4d6f82c7197cffb44fc13881f0681a",
+    "semantic_hash": "af4d6f82c7197cffb44fc13881f0681a"
+  },
+  "src/features/recruiter/pages/SubmittedCVsPage.tsx": {
+    "mtime": 1782841988.9317236,
+    "ast_hash": "3cae4e5641b6a18518c8174d52018fbf",
+    "semantic_hash": "3cae4e5641b6a18518c8174d52018fbf"
+  },
+  "src/features/recruiter/services/recruiterApi.ts": {
+    "mtime": 1782793375.0771456,
+    "ast_hash": "2d2fa457af62743ca92e34dd263a39ff",
+    "semantic_hash": "2d2fa457af62743ca92e34dd263a39ff"
+  },
+  "src/features/recruiter/types/recruiterTypes.ts": {
+    "mtime": 1782841926.3365822,
+    "ast_hash": "b44c36ae982c6441fb7db33dfd09b8b6",
+    "semantic_hash": "b44c36ae982c6441fb7db33dfd09b8b6"
+  },
+  "src/features/recruiter/utils/cvScoringUtils.ts": {
+    "mtime": 1782842779.3778784,
+    "ast_hash": "db00c88a27603e8afc58a75544c38294",
+    "semantic_hash": "db00c88a27603e8afc58a75544c38294"
+  },
+  "src/features/recruiter/utils/recruiterFormatters.ts": {
+    "mtime": 1778467842.638654,
+    "ast_hash": "5636d2ee554457c3c0240f00b1d3c861",
+    "semantic_hash": "5636d2ee554457c3c0240f00b1d3c861"
+  },
+  "src/features/recruiter/utils/recruiterMockMappers.ts": {
+    "mtime": 1782793350.9573336,
+    "ast_hash": "4fd4997093b27f390cd49c5cc7b58612",
+    "semantic_hash": "4fd4997093b27f390cd49c5cc7b58612"
+  },
+  "src/mock/cvScreeningMockData.ts": {
+    "mtime": 1781923358.9898596,
+    "ast_hash": "1f653a6fdb25f258f7d5b5b666fd7356",
+    "semantic_hash": "1f653a6fdb25f258f7d5b5b666fd7356"
+  },
+  "src/mock/mockJobCards.ts": {
+    "mtime": 1783936217.1797423,
+    "ast_hash": "9b299f888aa13f25060cfbb1ac30e48e",
+    "semantic_hash": "9b299f888aa13f25060cfbb1ac30e48e"
+  },
+  "src/utils/adminLoginHandler.ts": {
+    "mtime": 1775737888.1930554,
+    "ast_hash": "a59418414c20c35dda1721050f9d3b8b",
+    "semantic_hash": "a59418414c20c35dda1721050f9d3b8b"
+  },
+  "src/utils/api.ts": {
+    "mtime": 1776615297.6953604,
+    "ast_hash": "891f286a3f8e3d2e52b9b3f08727889c",
+    "semantic_hash": "891f286a3f8e3d2e52b9b3f08727889c"
+  },
+  "src/utils/authSession.ts": {
+    "mtime": 1782405457.5762272,
+    "ast_hash": "b31ba8f98f6017964866dc14af88fccf",
+    "semantic_hash": "b31ba8f98f6017964866dc14af88fccf"
+  },
+  "src/utils/homeRoute.ts": {
+    "mtime": 1782405473.4641218,
+    "ast_hash": "aae9118b05c2a377ca24a2f6c142690e",
+    "semantic_hash": "aae9118b05c2a377ca24a2f6c142690e"
+  },
+  "src/utils/loginHandler.ts": {
+    "mtime": 1782379972.647949,
+    "ast_hash": "9bc787f858d59411012650964dce88fd",
+    "semantic_hash": "9bc787f858d59411012650964dce88fd"
+  },
+  "src/utils/registerHandler.ts": {
+    "mtime": 1776613431.4271905,
+    "ast_hash": "92aacca2e0df0d75c3d3054ecdacdd63",
+    "semantic_hash": "92aacca2e0df0d75c3d3054ecdacdd63"
+  },
+  "start_demo.sh": {
+    "mtime": 1775737888.1930952,
+    "ast_hash": "a14825420c53549284a6e1029a0bb9cd",
+    "semantic_hash": "a14825420c53549284a6e1029a0bb9cd"
+  },
+  "stop_demo.sh": {
+    "mtime": 1775737888.1930952,
+    "ast_hash": "1cfe8aa5e7e9410bbac135497a549098",
+    "semantic_hash": "1cfe8aa5e7e9410bbac135497a549098"
+  },
+  "tools/evaluate_crosspair_matching.py": {
+    "mtime": 1782896350.5574734,
+    "ast_hash": "ef68c17b1aabb31b5bd1f11216283dc9",
+    "semantic_hash": "ef68c17b1aabb31b5bd1f11216283dc9"
+  },
+  "tsconfig.json": {
+    "mtime": 1775737888.1930952,
+    "ast_hash": "ee17fd1c97c735e9f3564e3f5251f125",
+    "semantic_hash": "ee17fd1c97c735e9f3564e3f5251f125"
+  },
+  "vercel.json": {
+    "mtime": 1778483492.0314543,
+    "ast_hash": "6974355a0a51566d9a6591210b85cf19",
+    "semantic_hash": "6974355a0a51566d9a6591210b85cf19"
+  },
+  ".agents/AGENTS.md": {
+    "mtime": 1782896350.5513873,
+    "ast_hash": "e0f666bcb934d58a53f960cb9c17ddb3",
+    "semantic_hash": "e0f666bcb934d58a53f960cb9c17ddb3"
+  },
+  ".agents/TASK.md": {
+    "mtime": 1782896350.5531209,
+    "ast_hash": "f60451863d58b54ccab55e2c7ac350b7",
+    "semantic_hash": "f60451863d58b54ccab55e2c7ac350b7"
+  },
+  "CLAUDE.md": {
+    "mtime": 1783929971.3980997,
+    "ast_hash": "c5fecd8c301f857283ba2b5ff9c9c348",
+    "semantic_hash": "c5fecd8c301f857283ba2b5ff9c9c348"
+  },
+  "DEPLOY_VERCEL_RAILWAY.md": {
+    "mtime": 1778483533.7205932,
+    "ast_hash": "096303a46179718492c714a5813ec014",
+    "semantic_hash": "096303a46179718492c714a5813ec014"
+  },
+  "README.md": {
+    "mtime": 1775737887.7323253,
+    "ast_hash": "d633b21d80c0a278e0e0b315125c38e8",
+    "semantic_hash": "d633b21d80c0a278e0e0b315125c38e8"
+  },
+  "backend/README_PIPELINE.md": {
+    "mtime": 1782896350.5533211,
+    "ast_hash": "da863b243ccd3fa5016d9a0b07131ca8",
+    "semantic_hash": "da863b243ccd3fa5016d9a0b07131ca8"
+  },
+  "backend/docker-compose.yml": {
+    "mtime": 1778251482.6055233,
+    "ast_hash": "e61b41a04e04ff5c65b8b6876bf585fb",
+    "semantic_hash": "e61b41a04e04ff5c65b8b6876bf585fb"
+  },
+  "backend/requirements.txt": {
+    "mtime": 1776065275.4978223,
+    "ast_hash": "cb5f289e2407e0220bf9a8200810f568",
+    "semantic_hash": "cb5f289e2407e0220bf9a8200810f568"
+  },
+  "docs/report/code_extracted_report_materials.md": {
+    "mtime": 1782896350.5558946,
+    "ast_hash": "83d3e52b651263ff61fc48232b613550",
+    "semantic_hash": "83d3e52b651263ff61fc48232b613550"
+  },
+  "matcher_evaluation_outputs/after_tom_tat_crosspair.md": {
+    "mtime": 1779680946.3697345,
+    "ast_hash": "6f50dccc570addfd0a7689964801ccaa",
+    "semantic_hash": "6f50dccc570addfd0a7689964801ccaa"
+  },
+  "matcher_evaluation_outputs/baseline_tom_tat_crosspair.md": {
+    "mtime": 1779680904.1515539,
+    "ast_hash": "6817243f2bc290585c834e9e60a74076",
+    "semantic_hash": "6817243f2bc290585c834e9e60a74076"
+  },
+  "report_info.md": {
+    "mtime": 1782896350.5574105,
+    "ast_hash": "4e3e33def5ae858153c24505795fc768",
+    "semantic_hash": "4e3e33def5ae858153c24505795fc768"
+  },
+  "backend/app/uploads/cv/0cc2a141-b156-4b37-b8d3-9e5c32b9568b_Nguy\u1ec5n_V\u0103n_H\u1ea3i_25.pdf": {
+    "mtime": 1782894611.1990705,
+    "ast_hash": "f61b43b41a41925a3a3d93b2bbd50738",
+    "semantic_hash": "f61b43b41a41925a3a3d93b2bbd50738"
+  },
+  "backend/app/uploads/cv/1f5a4023-336c-4416-aeec-b97430229c29_Ph\u1ea1m_Quang_Huy_70.pdf": {
+    "mtime": 1782889623.0670884,
+    "ast_hash": "72d9d4d67d29664ceabe7d0372721a07",
+    "semantic_hash": "72d9d4d67d29664ceabe7d0372721a07"
+  },
+  "backend/app/uploads/cv/23cb4dfa-b85b-476b-9363-1f5bbaea0e92_Tien Dat 34T.pdf": {
+    "mtime": 1782896195.7857332,
+    "ast_hash": "1f09a2ceacb94e326e124b50785e823f",
+    "semantic_hash": "1f09a2ceacb94e326e124b50785e823f"
+  },
+  "backend/app/uploads/cv/273f1c97-5156-482b-a4f1-eda82a58ac2d_CV_DEMO_03_WEAK_TARGET_45_55_Nguyen_Gia_Huy.pdf": {
+    "mtime": 1782895898.6868663,
+    "ast_hash": "f98deda505ff6879981fcd1ff1782a77",
+    "semantic_hash": "f98deda505ff6879981fcd1ff1782a77"
+  },
+  "backend/app/uploads/cv/3aa8ffa4-2231-4173-b1e2-2bebce545cd9_Tien-Dat-TopCV.vn-040826.110108.pdf": {
+    "mtime": 1785816266.732965,
+    "ast_hash": "a1c54bf987de4e7a20f8e4e76129bc19",
+    "semantic_hash": "a1c54bf987de4e7a20f8e4e76129bc19"
+  },
+  "backend/app/uploads/cv/3c33b561-b8f7-4ea6-b667-dec0ef58c8f1_Nguyen Hoang Minh 92.pdf": {
+    "mtime": 1784008178.5708497,
+    "ast_hash": "c97800414f96fa7d97752557c6895d5a",
+    "semantic_hash": "c97800414f96fa7d97752557c6895d5a"
+  },
+  "backend/app/uploads/cv/65b17564-0cfe-4e97-855e-ed966a5edcd2_CV_DEMO_00_PENDING_IMAGE_ONLY_Possible_NoScore.pdf": {
+    "mtime": 1782895787.8949187,
+    "ast_hash": "fb63bdcf28a7e427ed0c8a3b5ae5c270",
+    "semantic_hash": "fb63bdcf28a7e427ed0c8a3b5ae5c270"
+  },
+  "backend/app/uploads/cv/718bc614-5c47-47ad-908c-ae2d0edee78b_CV_DEMO_05_LOW_POTENTIAL_TARGET_60_65_Claire_Moreau.pdf": {
+    "mtime": 1782895915.1352112,
+    "ast_hash": "f68879a540c9e975e02145c087c28bbe",
+    "semantic_hash": "f68879a540c9e975e02145c087c28bbe"
+  },
+  "backend/app/uploads/cv/747f12df-ce2f-46a3-856e-40fe3bed2e81_Tr\u1ea7n_Minh_\u0110\u1ee9c_40.pdf": {
+    "mtime": 1782889640.9039063,
+    "ast_hash": "83e473ee591241ceb159f1d0053e9a8a",
+    "semantic_hash": "83e473ee591241ceb159f1d0053e9a8a"
+  },
+  "backend/app/uploads/cv/780e693c-6050-44ac-bf97-ed082e7db86c_Le_Minh_Khoa_98_JP.pdf": {
+    "mtime": 1782889559.3935268,
+    "ast_hash": "a3063e7123930ad75c2fa1340e47877f",
+    "semantic_hash": "a3063e7123930ad75c2fa1340e47877f"
+  },
+  "backend/app/uploads/cv/8f18e33c-6334-4248-8c81-88dbf749a199_CV_DEMO_01_STRONG_TARGET_86_92_Akiyama_Hiroto.pdf": {
+    "mtime": 1782895796.7521212,
+    "ast_hash": "4d280858302d40008c1be85ca9c68a3a",
+    "semantic_hash": "4d280858302d40008c1be85ca9c68a3a"
+  },
+  "backend/app/uploads/cv/97e5a213-b438-421c-ab66-378f5d352d18_David_Robe_85.pdf": {
+    "mtime": 1782894597.6567552,
+    "ast_hash": "2dcf7ba2c54ed8ce26aa026c73e5f74b",
+    "semantic_hash": "2dcf7ba2c54ed8ce26aa026c73e5f74b"
+  },
+  "backend/app/uploads/cv/b861fbba-d0b0-47f5-a10e-3f128e00c3f3_CV_DEMO_04_NOT_SUITABLE_TARGET_25_40_Tran_Bao_Duc.pdf": {
+    "mtime": 1782895906.9909275,
+    "ast_hash": "42d6cb114dcc24d7dfcb1a9612a65f74",
+    "semantic_hash": "42d6cb114dcc24d7dfcb1a9612a65f74"
+  },
+  "backend/app/uploads/cv/bd5148fe-f54f-4106-be8e-4d7ba341a630_L\u00ea_Minh_Khoa_98.pdf": {
+    "mtime": 1782889568.251117,
+    "ast_hash": "d597a9b57e703689ea130cf2d474c064",
+    "semantic_hash": "d597a9b57e703689ea130cf2d474c064"
+  },
+  "backend/app/uploads/cv/c8c88219-0b80-46b6-b0b8-59888966a5c8_CV_DEMO_02_POTENTIAL_TARGET_68_74_David_Robe.pdf": {
+    "mtime": 1782895805.606702,
+    "ast_hash": "a5abd6711d942123b9881ad49caa55cc",
+    "semantic_hash": "a5abd6711d942123b9881ad49caa55cc"
+  },
+  "backend/app/uploads/cv/e48606bd-812c-47a6-85b7-c63c89270fff_Nguyen Hoang Minh 92.pdf": {
+    "mtime": 1782840407.7704258,
+    "ast_hash": "c97800414f96fa7d97752557c6895d5a",
+    "semantic_hash": "c97800414f96fa7d97752557c6895d5a"
+  },
+  "backend/app/uploads/jd/9ddcbc12-81f8-4ff7-b0dd-8be6d9d52ab5_Senior Full Stack Developer | Java\uff0fSpring- C\u00d4NG TY TNHH GEO SYSTEM SOLUTIONS VI\u1ec6T NAM.pdf": {
+    "mtime": 1782808735.156337,
+    "ast_hash": "31e294d4abf73740ae15e980f71f1663",
+    "semantic_hash": "31e294d4abf73740ae15e980f71f1663"
+  },
+  "backend/app/uploads/jd/ab9d4664-c742-47ae-9eda-d6f2be1b494a_JD Fullstack Dev Java.pdf": {
+    "mtime": 1781924748.800305,
+    "ast_hash": "a147a4ed1bdfa215b22f71b6ed6ff6ec",
+    "semantic_hash": "a147a4ed1bdfa215b22f71b6ed6ff6ec"
+  },
+  "backend/app/uploads/jd/bd6fd7ae-8e59-4e57-a930-4aa1f9fd28fa_[FPT Software] AI Engineer (FHN NGT).pdf": {
+    "mtime": 1785816183.6431706,
+    "ast_hash": "bc61541973b35d41f70e58be900d5418",
+    "semantic_hash": "bc61541973b35d41f70e58be900d5418"
+  },
+  "backend/app/uploads/jd/c6fd9bcf-e88a-438b-b712-bc34e901c034_JD Fullstack Dev Java.pdf": {
+    "mtime": 1782363357.7201529,
+    "ast_hash": "a147a4ed1bdfa215b22f71b6ed6ff6ec",
+    "semantic_hash": "a147a4ed1bdfa215b22f71b6ed6ff6ec"
+  },
+  "backend/app/uploads/jd/d37f3bbe-f087-49bd-a112-146578cf436e_JD Fullstack Dev Java.pdf": {
+    "mtime": 1782363468.750325,
+    "ast_hash": "a147a4ed1bdfa215b22f71b6ed6ff6ec",
+    "semantic_hash": "a147a4ed1bdfa215b22f71b6ed6ff6ec"
+  },
+  "backend/app/uploads/jd/f337ed37-3225-468d-9c26-d48f1d72af16_JD Fullstack Dev Java.pdf": {
+    "mtime": 1784007635.5608046,
+    "ast_hash": "a147a4ed1bdfa215b22f71b6ed6ff6ec",
+    "semantic_hash": "a147a4ed1bdfa215b22f71b6ed6ff6ec"
+  }
+}

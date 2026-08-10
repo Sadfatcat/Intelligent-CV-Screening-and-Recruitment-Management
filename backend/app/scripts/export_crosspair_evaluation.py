@@ -4,7 +4,9 @@ import re
 from pathlib import Path
 from typing import Any
 
-from app.services.matcher import score_cv_vs_jd
+from app.services.cv_scoring import CvScoringService
+
+SCORING_SERVICE = CvScoringService()
 
 
 ROOT_DIR = Path(__file__).resolve().parents[3]
@@ -328,6 +330,14 @@ def _read_mock_sources() -> tuple[dict[str, dict[str, str]], dict[str, dict[str,
     return jobs, cvs
 
 
+def _read_csv_sources() -> tuple[dict[str, dict[str, str]], dict[str, dict[str, str]]]:
+    with JD_FILE.open(newline="", encoding="utf-8") as csv_file:
+        jobs = {row["jd_id"]: row for row in csv.DictReader(csv_file)}
+    with CV_FILE.open(newline="", encoding="utf-8") as csv_file:
+        cvs = {row["cv_id"]: row for row in csv.DictReader(csv_file)}
+    return jobs, cvs
+
+
 def _write_csv(path: Path, columns: list[str], rows: list[dict[str, str]]) -> None:
     with path.open("w", newline="", encoding="utf-8") as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=columns)
@@ -347,14 +357,10 @@ def _evidence_quality(job: dict[str, str] | None, cv: dict[str, str] | None, sco
 
 
 def _score_pair(job: dict[str, str], cv: dict[str, str]) -> tuple[str, str, str]:
-    result = score_cv_vs_jd(cv["cv_text"], job["jd_text"])
-    score = result.get("final_score")
-    good = list(result.get("good_points") or [])
-    missing = list(result.get("missing_points") or [])
-    must_have = result.get("must_have") or {}
-    if isinstance(must_have, dict):
-        good.extend([f"{item} matched" for item in must_have.get("matched") or []])
-        missing.extend([f"{item} missing" for item in must_have.get("missing") or []])
+    result = SCORING_SERVICE.score_cv_vs_jd(cv["cv_text"], job["jd_text"])
+    score = result.get("finalScore")
+    good = [item for items in (result.get("matched") or {}).values() for item in items or []]
+    missing = [item for items in (result.get("missingOrWeak") or {}).values() for item in items or []]
     return f"{float(score):.3f}", _compact_items(good), _compact_items(missing)
 
 
@@ -418,10 +424,10 @@ def _write_rules() -> None:
 
 def main() -> None:
     EVALUATION_DIR.mkdir(exist_ok=True)
-    jobs, cvs = _read_mock_sources()
+    # Old mock data (JD 101-124, CV 201-226) was removed from cvScreeningMockData.ts;
+    # the committed danh_sach CSVs are now the canonical source for jd_text/cv_text.
+    jobs, cvs = _read_csv_sources()
 
-    _write_csv(JD_FILE, JD_COLUMNS, [jobs[key] for key in sorted(jobs, key=int)])
-    _write_csv(CV_FILE, CV_COLUMNS, [cvs[key] for key in sorted(cvs, key=int)])
     _write_rules()
 
     rows = _crosspair_rows(jobs, cvs)
@@ -436,8 +442,8 @@ def main() -> None:
         "partial": sum(1 for row in rows if row["evidence_quality"] == "partial"),
         "insufficient": sum(1 for row in rows if row["evidence_quality"] == "insufficient"),
     }
-    print(f"Wrote {JD_FILE.relative_to(ROOT_DIR)} ({len(jobs)} mock JDs)")
-    print(f"Wrote {CV_FILE.relative_to(ROOT_DIR)} ({len(cvs)} mock CVs)")
+    print(f"Read {JD_FILE.relative_to(ROOT_DIR)} ({len(jobs)} mock JDs)")
+    print(f"Read {CV_FILE.relative_to(ROOT_DIR)} ({len(cvs)} mock CVs)")
     print(f"Wrote {RULES_FILE.relative_to(ROOT_DIR)}")
     print(f"Wrote {CANDIDATES_FILE.relative_to(ROOT_DIR)} ({len(rows)} cross-pair rows)")
     print(f"Wrote {LABEL_TEMPLATE_FILE.relative_to(ROOT_DIR)}")

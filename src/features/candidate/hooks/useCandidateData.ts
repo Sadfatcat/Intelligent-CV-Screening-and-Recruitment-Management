@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MOCK_JOB_DESCRIPTIONS } from "@/mock/cvScreeningMockData";
+import { MOCK_JOB_CARDS } from "@/mock/mockJobCards";
 import { apiUrl } from "@/utils/api";
 import { getStoredUser } from "@/utils/authSession";
 import { ENABLE_DEV_MOCK_DATA, FINT_MOCK_APPLICATIONS_STORAGE_KEY } from "@/features/recruiter/constants/recruiterConstants";
@@ -22,6 +23,7 @@ export type JobItem = {
     jd_parsed_text?: string | null;
     jd_file_path?: string | null;
     isMock?: boolean;
+    mockDisplayOnly?: boolean;
 };
 
 export type MatchingSection = {
@@ -105,6 +107,8 @@ const MOCK_CANDIDATE_JOBS: JobItem[] = MOCK_JOB_DESCRIPTIONS.map((job) => ({
     jd_file_path: null,
     isMock: true,
 }));
+
+const SHOW_CANDIDATE_DEMO_JOB_CARDS = process.env.NODE_ENV !== "production" || ENABLE_DEV_MOCK_DATA;
 
 export function saveFintMockApplication(application: StoredFintMockApplication) {
     if (!ENABLE_DEV_MOCK_DATA) return;
@@ -237,7 +241,11 @@ export function useCandidateData() {
                 const normalizedJobs: JobItem[] = Array.isArray(data)
                     ? (data as JobItem[]).map((job) => ({ ...job, image_url: job.image_url ?? undefined }))
                     : [];
-                setJobs(ENABLE_DEV_MOCK_DATA ? [...normalizedJobs, ...MOCK_CANDIDATE_JOBS] : normalizedJobs);
+                setJobs(
+                    SHOW_CANDIDATE_DEMO_JOB_CARDS
+                        ? [...normalizedJobs, ...MOCK_CANDIDATE_JOBS, ...MOCK_JOB_CARDS]
+                        : normalizedJobs
+                );
             })
             .catch(() => setJobs([]));
     }, []);

@@ -242,7 +242,7 @@ class EvidenceExtractor:
                     return 0.8
         return 0.5
 
-
+#tạo ra lời giải thích cho điểm số
 class ScoringExplanationBuilder:
     @staticmethod
     def build_reasoning_summary(sub_scores: Dict[str, float], matched: Dict[str, List[str]], missing: Dict[str, List[str]], years_experience: float) -> str:
@@ -303,7 +303,7 @@ class ScoringExplanationBuilder:
 
         strengths = _dedupe(strengths)
         weaknesses = _dedupe(weaknesses)
-
+        #ghép câu
         if strengths and weaknesses:
             return f"Strengths: {', '.join(strengths)}. Weaknesses: {', '.join(weaknesses)}."
         if strengths:

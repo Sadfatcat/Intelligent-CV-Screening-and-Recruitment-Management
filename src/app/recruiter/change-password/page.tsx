@@ -7,6 +7,7 @@ import { RecruiterToast } from "../../../features/recruiter/components/Recruiter
 import { RECRUITER_PASSWORD_CHANGE_STORAGE_KEY, RECRUITER_SESSION_STORAGE_KEY } from "../../../features/recruiter/constants/recruiterConstants";
 import { changeRecruiterPassword } from "../../../features/recruiter/services/recruiterApi";
 import type { RecruiterSession } from "../../../features/recruiter/types/recruiterTypes";
+import { setAuthSession } from "../../../utils/authSession";
 import BackButton from "../../../components/navigation/BackButton";
 
 // Recruiter Password Change: bắt đổi mật khẩu mặc định trước khi vào workspace.
@@ -59,6 +60,7 @@ export default function RecruiterChangePasswordPage() {
             const nextSession = { ...pendingSession, must_change_password: false };
             localStorage.removeItem(RECRUITER_PASSWORD_CHANGE_STORAGE_KEY);
             localStorage.setItem(RECRUITER_SESSION_STORAGE_KEY, JSON.stringify(nextSession));
+            setAuthSession(nextSession);
             setMessage("Password changed successfully");
             setMessageType("success");
             router.push("/recruiter_UI");

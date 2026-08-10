@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import brightStyles from "./page.bright.module.css";
 import { handleLoginSubmit } from "@/utils/loginHandler";
-import { getAuthSession } from "@/utils/authSession";
+import { clearAuthSession, getAuthSession } from "@/utils/authSession";
 import { homeHrefForRole } from "@/utils/homeRoute";
 
 export default function LoginPage() {
@@ -21,7 +21,12 @@ export default function LoginPage() {
 
   useEffect(() => {
     const session = getAuthSession();
-    if (session) router.replace(homeHrefForRole(session.user.role));
+    if (!session) return;
+    if (session.user.role === "recruiter" && session.user.must_change_password) {
+      clearAuthSession();
+      return;
+    }
+    router.replace(homeHrefForRole(session.user.role));
   }, [router]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {

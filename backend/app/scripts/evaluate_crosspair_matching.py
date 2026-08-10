@@ -1,5 +1,6 @@
 import csv
 import math
+import sys
 from collections import defaultdict
 from pathlib import Path
 
@@ -9,6 +10,11 @@ EVALUATION_DIR = ROOT_DIR / "evaluation"
 LABEL_TEMPLATE_FILE = EVALUATION_DIR / "mau_gan_nhan_crosspair.csv"
 RESULTS_FILE = EVALUATION_DIR / "ket_qua_crosspair.csv"
 SUMMARY_FILE = EVALUATION_DIR / "tom_tat_crosspair.md"
+
+if len(sys.argv) > 1:
+    LABEL_TEMPLATE_FILE = Path(sys.argv[1]).resolve()
+    RESULTS_FILE = EVALUATION_DIR / f"ket_qua_{LABEL_TEMPLATE_FILE.stem}.csv"
+    SUMMARY_FILE = EVALUATION_DIR / f"tom_tat_{LABEL_TEMPLATE_FILE.stem}.md"
 
 LABEL_TO_RELEVANCE = {"High": 2, "Medium": 1, "Low": 0}
 RELEVANT_LABELS = {"High", "Medium"}
